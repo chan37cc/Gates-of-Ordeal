@@ -34,53 +34,71 @@ button{font:inherit;color:inherit;cursor:pointer}
 
 #app{position:relative;height:100%;max-width:480px;margin:0 auto;display:flex;flex-direction:column;background:var(--night);overflow:hidden;box-shadow:0 0 0 1px #000,0 0 80px #000}
 
-/* top bar */
-.topbar{position:relative;z-index:3;display:grid;grid-template-columns:auto minmax(0,1fr) auto;align-items:center;gap:10px;padding:10px 12px 26px;background:linear-gradient(#060914e6,#06091499 55%,transparent)}
-.avatar{position:relative;width:52px;height:52px;padding:0;border-radius:10px;overflow:hidden;border:0;background:#2a1d08;box-shadow:0 0 0 2px #2a1d08,0 0 0 4px #e0b352,0 0 0 5px #5a3c14,0 4px 10px #000a}
+/* ===== 主畫面：大理石、金框、深藍 ===== */
+.topbar{position:relative;z-index:3;display:flex;justify-content:space-between;align-items:flex-start;gap:8px;padding:12px 12px 0}
+.me{display:flex;align-items:center;gap:4px;min-width:0}
+.av-wrap{position:relative;flex:none;width:74px;height:74px;display:grid;place-items:center}
+.laurel{position:absolute;inset:-7px;pointer-events:none;filter:drop-shadow(0 2px 2px #5a3c1488)}
+.laurel svg{width:100%;height:100%;display:block;overflow:visible}
+.avatar{position:relative;width:60px;height:60px;padding:0;border-radius:50%;overflow:hidden;border:0;background:#2a1d08;box-shadow:0 0 0 2px #fff6d8,0 0 0 4px #d9ac4a,0 0 0 5px #7a5220,0 4px 8px #0006}
 .avatar svg{width:100%;height:100%;display:block}
-.who{min-width:0}
-.who .name{font:900 16px var(--f-title);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-shadow:0 1px 3px #000,0 0 8px #000}
-.title-chip{display:inline-block;margin-top:4px;font:600 11px var(--f-title);letter-spacing:.12em;padding:2px 9px;border-radius:2px;color:var(--gold-hi);background:linear-gradient(#3b2a12e6,#1b130ae6);box-shadow:inset 0 0 0 1px #8a5f22}
-.wallet{display:flex;align-items:center;gap:8px;padding:5px 14px 5px 5px;border-radius:999px;background:linear-gradient(#1c1509e6,#0c0904e6);box-shadow:inset 0 0 0 1px #c99232,inset 0 0 0 3px #0008,0 4px 10px #000a}
-.coin{width:28px;height:28px;border-radius:50%;display:grid;place-items:center;font:900 13px var(--f-display);color:#5a3a0c;background:radial-gradient(circle at 35% 30%,#fff6cf,#f0c25a 40%,#a8721f 80%);box-shadow:inset 0 0 0 2px #fbe6a4,inset 0 0 0 4px #a8721f,0 2px 4px #000}
-.wallet b{font:800 19px var(--f-display);font-variant-numeric:tabular-nums}
+.me-side{min-width:0;display:grid;gap:5px;justify-items:start;margin-left:-4px}
+.me-row{display:flex;align-items:center;gap:6px;min-width:0;max-width:100%}
+.lvl{flex:none;min-width:34px;height:34px;padding:0 6px;border-radius:50%;display:grid;place-items:center;font:900 17px var(--f-display);color:#fdebb8;background:radial-gradient(circle at 40% 28%,#3c5cae,#17275c 70%,#0c173e);box-shadow:0 0 0 2px #e2b85a,0 0 0 3px #7a5220,0 2px 5px #0006;font-variant-numeric:tabular-nums}
+.who,.me-row .name{min-width:0}
+.me-row .name{font:900 15px var(--f-title);color:#1b2550;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-shadow:0 0 6px #fff,0 0 10px #fff,0 1px 0 #fff}
+.title-chip{font:900 13px var(--f-title);letter-spacing:.16em;padding:4px 14px 4px 16px;border-radius:6px;color:#fdebb8;background:linear-gradient(#2c4590,#15245a);box-shadow:0 0 0 2px #e2b85a,0 0 0 3px #7a5220,0 0 0 6px #fffaf0,0 0 0 7px #c9a04a,0 3px 6px #0005;white-space:nowrap}
+.wallet{flex:none;padding:6px;border-radius:10px;background:repeating-linear-gradient(115deg,#0000 0 17px,#c9b99a2b 17px 18px),linear-gradient(#fffdf8,#ece2d2);box-shadow:0 0 0 2px #d9ac4a,0 0 0 3px #7a5220,inset 0 0 0 1px #fff,0 4px 10px #0005}
+.wallet-in{display:flex;align-items:center;gap:8px;padding:4px 14px 4px 4px;border-radius:999px;background:linear-gradient(#2c4590,#15245a);box-shadow:inset 0 0 0 1.5px #e2b85a,inset 0 2px 5px #0006}
+.coin{width:30px;height:30px;border-radius:50%;display:grid;place-items:center;font:900 14px var(--f-display);color:#6a430c;background:radial-gradient(circle at 35% 30%,#fff6cf,#f0c25a 40%,#a8721f 80%);box-shadow:inset 0 0 0 2px #fbe6a4,inset 0 0 0 4px #b98226,0 1px 3px #0008}
+.wallet b{font:800 19px var(--f-display);color:#fde9ae;text-shadow:0 1px 0 #0b1436;font-variant-numeric:tabular-nums}
 .wallet.pulse b{animation:pf .8s}
-@keyframes pf{40%{filter:brightness(1.8) drop-shadow(0 0 10px #ffd26a)}}
-.demo-bar{position:relative;z-index:2;margin:-18px 12px 0;padding:6px 10px;border-radius:6px;font-size:11.5px;line-height:1.45;color:#f0d9a8;background:#1a1206d9;box-shadow:inset 0 0 0 1px var(--gold-lo)}
-.help-btn{position:relative;z-index:2;align-self:flex-end;margin:8px 12px 0 0;width:36px;height:36px;border-radius:50%;border:0;font:900 16px var(--f-title);color:var(--gold-hi);background:radial-gradient(circle at 35% 30%,#4a3a22,#120d06);box-shadow:inset 0 0 0 2px #c99232,0 3px 8px #000a}
+@keyframes pf{40%{color:#fff;text-shadow:0 0 12px #ffd26a}}
+.demo-bar{position:relative;z-index:2;margin:10px 12px 0;padding:6px 10px;border-radius:8px;font-size:11.5px;line-height:1.45;color:#f3e6c4;background:#15245ad9;box-shadow:0 0 0 1px #e2b85a}
+.help-btn{position:relative;z-index:2;align-self:flex-end;margin:12px 16px 0 0;width:40px;height:40px;border-radius:50%;border:0;padding:0;background:none}
+.help-btn::before{content:"";position:absolute;inset:-5px;background:linear-gradient(135deg,#fff0b8,#c8922e 55%,#7a5220);clip-path:polygon(50% 0,61% 22%,78% 22%,78% 39%,100% 50%,78% 61%,78% 78%,61% 78%,50% 100%,39% 78%,22% 78%,22% 61%,0 50%,22% 39%,22% 22%,39% 22%);filter:drop-shadow(0 2px 3px #0006)}
+.help-btn span{position:absolute;inset:2px;border-radius:50%;display:grid;place-items:center;font:900 20px var(--f-display);color:#fdebb8;background:radial-gradient(circle at 40% 28%,#3c5cae,#17275c 70%,#0c173e);box-shadow:0 0 0 2px #e2b85a,0 0 0 3px #7a5220}
 .fill{flex:1;min-height:0}
+.rib{position:relative;z-index:2;align-self:center;margin-top:-34px;border:0;padding:5px 18px;border-radius:999px;font:900 12.5px var(--f-title);letter-spacing:.1em;color:#fdebb8;white-space:nowrap;background:linear-gradient(#2c4590,#15245a);box-shadow:0 0 0 2px #e2b85a,0 0 0 3px #7a5220,0 3px 8px #0006}
 
-/* map：整個畫面就是塔，頂列與底列疊在上面 */
-.map{position:absolute;inset:0;z-index:0;background:#0a1020}
+/* map：整個畫面就是神殿，其他介面疊在上面 */
+.map{position:absolute;inset:0;z-index:0;background:#7ea4d4}
 .map canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
 .map.intro canvas{animation:mapIn 1.6s cubic-bezier(.2,.7,.2,1)}
 @keyframes mapIn{from{transform:scale(1.12);filter:brightness(1.5) blur(3px)}}
-.rib{position:relative;z-index:2;align-self:center;border:0;padding:6px 26px;font:900 14px var(--f-title);letter-spacing:.1em;color:#3a230a;white-space:nowrap;
-  background:linear-gradient(#fff0c0,#ddb04e 45%,#b8862f 55%,#7a5220);box-shadow:inset 0 0 0 1px #4a3010,inset 0 0 0 3px #fff4c855;filter:drop-shadow(0 3px 5px #000a)}
-.rib::before,.rib::after{content:"";position:absolute;top:5px;bottom:-5px;width:18px;z-index:-1;background:linear-gradient(#9a4a24,#4e1f0c)}
-.rib::before{left:-12px;clip-path:polygon(0 0,100% 0,100% 100%,0 100%,38% 50%)}
-.rib::after{right:-12px;clip-path:polygon(0 0,100% 0,62% 50%,100% 100%,0 100%)}
-.rib:active{filter:drop-shadow(0 3px 5px #000a) brightness(1.15)}
-.rib-new{margin-top:-30px;font-size:12.5px;padding:5px 20px}
-#towerRib{margin-bottom:-14px}
 
-/* dock */
-.dock{position:relative;z-index:2;display:grid;grid-template-columns:1fr 1fr 116px 1fr 1fr;align-items:end;gap:2px;padding:34px 6px 12px;background:linear-gradient(transparent,#06080fcc 38%,#06080ff2)}
-.dock-btn{position:relative;display:flex;flex-direction:column;align-items:center;gap:4px;padding:2px 0;background:none;border:0;font:700 12px var(--f-title);color:var(--ink);text-shadow:0 1px 2px #000,0 0 6px #000}
-.dock-btn .ico{width:50px;height:50px;border-radius:50%;display:grid;place-items:center;background:radial-gradient(circle at 40% 30%,#6f5a36,#2a1f10 70%,#130e07);box-shadow:inset 0 0 0 2px #c99232,inset 0 0 0 4px #2a1d0b,inset 0 0 0 5px #8a5f22,inset 0 6px 10px #ffffff18,0 3px 6px #000}
-.dock-btn .ico svg{width:24px;height:24px;stroke:var(--gold-hi);fill:none;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round;filter:drop-shadow(0 1px 0 #000)}
+/* 進入試煉、水晶、層數牌 */
+.enter{position:relative;z-index:2;align-self:center;border:0;padding:11px 40px 12px 46px;border-radius:999px;font:900 22px var(--f-title);letter-spacing:.3em;color:#fdebb8;text-shadow:0 2px 0 #0b1436;white-space:nowrap;
+  background:radial-gradient(ellipse 70% 60% at 50% 0,#5a78c8aa,transparent 70%),linear-gradient(#2c4590,#14225a);
+  box-shadow:0 0 0 2px #f0cc74,0 0 0 3.5px #7a5220,0 0 0 6px #fffaf0cc,0 6px 16px #0007,inset 0 2px 5px #ffffff40;animation:enterGlow 2.2s ease-in-out infinite}
+@keyframes enterGlow{50%{box-shadow:0 0 0 2px #fff0b8,0 0 0 3.5px #7a5220,0 0 0 6px #fffaf0cc,0 6px 16px #0007,0 0 26px #ffe39a,inset 0 2px 5px #ffffff40}}
+.enter::before,.enter::after{content:"✦";position:absolute;top:50%;transform:translateY(-52%);font-size:17px;letter-spacing:0;color:#fff3c8;text-shadow:0 0 8px #ffd978,0 0 2px #7a5220}
+.enter::before{left:-9px}.enter::after{right:-9px}
+.enter:active{transform:scale(.97)}
+.enter.boss{background:radial-gradient(ellipse 70% 60% at 50% 0,#e07a6aaa,transparent 70%),linear-gradient(#8a2018,#4a0c0a)}
+.enter.off{filter:grayscale(.6) brightness(.9);animation:none}
+.gem{position:relative;z-index:2;align-self:center;width:66px;margin:2px 0 -6px;pointer-events:none;filter:drop-shadow(0 0 10px #6fc0ffcc)}
+.gem svg{width:100%;height:auto;display:block;overflow:visible}
+.gem-body{animation:gemBob 2.4s ease-in-out infinite}
+@keyframes gemBob{50%{transform:translateY(-5px)}}
+.gem-ring{transform-origin:30px 58px;animation:gemRing 2.4s ease-out infinite}
+@keyframes gemRing{0%{transform:scale(.55);opacity:1}100%{transform:scale(1.35);opacity:0}}
+.plaque{position:relative;z-index:2;align-self:center;border:0;margin:0 0 6px;padding:8px 34px;border-radius:8px;font:900 16px var(--f-title);letter-spacing:.12em;color:#3a2a12;white-space:nowrap;
+  background:repeating-linear-gradient(115deg,#0000 0 17px,#c9b99a33 17px 18px),linear-gradient(#fffdf8,#ece2d2);
+  box-shadow:0 0 0 2px #d9ac4a,0 0 0 3px #7a5220,inset 0 0 0 1px #fff,inset 0 0 0 3px #e9cf8f88,0 5px 12px #0006}
+.plaque::before,.plaque::after{content:"";position:absolute;top:50%;width:26px;height:26px;margin-top:-13px;background:radial-gradient(circle at 40% 30%,#3c5cae,#17275c 70%);clip-path:polygon(50% 0,100% 50%,50% 100%,0 50%);box-shadow:none;outline:0;filter:drop-shadow(0 0 0 #e2b85a)}
+.plaque::before{left:-14px}.plaque::after{right:-14px}
+.plaque:active{filter:brightness(1.06)}
+
+/* dock：四顆月桂框的圓形按鈕 */
+.dock{position:relative;z-index:2;display:grid;grid-template-columns:repeat(4,1fr);gap:2px;padding:10px 8px 12px}
+.dock-btn{display:flex;flex-direction:column;align-items:center;gap:1px;padding:0;background:none;border:0}
+.dock-btn .ico{position:relative;width:74px;height:74px;display:grid;place-items:center}
+.dock-btn .ico::before{content:"";position:absolute;inset:11px;border-radius:50%;background:radial-gradient(circle at 40% 26%,#4366bd,#17275c 68%,#0c173e);box-shadow:0 0 0 2px #fff6d8,0 0 0 4px #d9ac4a,0 0 0 5px #7a5220,0 4px 8px #0006,inset 0 3px 6px #ffffff33}
+.dock-btn .ico>svg{position:relative;width:27px;height:27px;stroke:#fbe3a2;fill:none;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round;filter:drop-shadow(0 1px 0 #0b1436)}
+.dock-btn em{position:relative;margin-top:-6px;min-width:58px;padding:3px 9px 4px;border-radius:5px;font:900 13px var(--f-title);font-style:normal;letter-spacing:.06em;color:#3a2a12;white-space:nowrap;
+  background:linear-gradient(#fffdf8,#ece2d2);box-shadow:0 0 0 1.5px #d9ac4a,0 0 0 2.5px #7a5220,inset 0 0 0 1px #fff,0 3px 6px #0005}
 .dock-btn:active .ico{transform:scale(.94)}
-.battle{position:relative;justify-self:center;width:116px;height:116px;border-radius:50%;border:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0;
-  background:radial-gradient(ellipse 60% 35% at 50% 18%,#ffffff70,transparent 70%),radial-gradient(circle at 50% 70%,#b9a0ff55,transparent 60%),radial-gradient(circle at 50% 40%,#5b6fd0,#1a1e52 70%,#0a0c28);
-  box-shadow:0 0 0 3px #d6dde6,0 0 0 5px #5d6b7a,0 0 0 8px #c99232,0 0 0 10px #3a260c,0 10px 24px #000,inset 0 -14px 22px #05061a,inset 0 0 18px #b9c0ff66}
-.battle::before{content:"";position:absolute;inset:6px;border-radius:50%;background:repeating-conic-gradient(#dcd4ff33 0 4deg,transparent 4deg 15deg);-webkit-mask:radial-gradient(circle,transparent 62%,#000 63% 70%,transparent 71%);mask:radial-gradient(circle,transparent 62%,#000 63% 70%,transparent 71%);animation:spin 18s linear infinite}
-@keyframes spin{to{transform:rotate(360deg)}}
-.battle::after{content:"";position:absolute;inset:-10px;border-radius:50%;border:2px solid var(--gold-hi);opacity:0;animation:ring 2.4s ease-out infinite}
-@keyframes ring{0%{opacity:.8;transform:scale(1)}100%{opacity:0;transform:scale(1.28)}}
-.battle small{position:relative;font:700 12px var(--f-title);color:#e4e2ff;font-variant-numeric:tabular-nums}
-.battle span{position:relative;font:900 22px var(--f-display);letter-spacing:.05em;color:#fff;text-shadow:0 2px 0 #14163a,0 0 12px #b9c0ff}
-.battle em{position:relative;font:700 11px var(--f-title);font-style:normal;color:#d8d6f6}
-.battle:active{transform:scale(.96)}
 
 /* 戰鬥 */
 .screen{position:absolute;inset:0;z-index:10;display:flex;flex-direction:column;background:#0a0d18 58% 30%/cover no-repeat;overflow-y:auto}
@@ -294,7 +312,9 @@ button{font:inherit;color:inherit;cursor:pointer}
 
 <div id="app">
   <header class="topbar">
-    <button class="avatar" id="avatar" aria-label="我的帳號"><svg viewBox="0 0 64 64" aria-hidden="true">
+    <div class="me">
+      <div class="av-wrap"><span class="laurel" data-n="11" data-r="43"></span>
+        <button class="avatar" id="avatar" aria-label="我的帳號"><svg viewBox="0 0 64 64" aria-hidden="true">
       <defs><linearGradient id="avSky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#3b5fa8"/><stop offset="1" stop-color="#f2b46a"/></linearGradient>
       <linearGradient id="avHood" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#8a5a2c"/><stop offset="1" stop-color="#3c2412"/></linearGradient></defs>
       <rect width="64" height="64" fill="url(#avSky)"/>
@@ -308,23 +328,32 @@ button{font:inherit;color:inherit;cursor:pointer}
       <path d="M28 37Q32 40 36 37" stroke="#8a4a32" stroke-width="1.6" fill="none" stroke-linecap="round"/>
       <path d="M14 34Q12 10 32 8" stroke="#ffe2a8" stroke-width="1.5" fill="none" opacity=".7"/>
     </svg></button>
-    <div class="who"><div class="name" id="uName">訪客</div><div class="title-chip" id="uTitle">尚未登入</div></div>
-    <div class="wallet" id="purse" aria-label="本金"><span class="coin">U</span><b class="metal-text" id="uBal">10,000</b></div>
+      </div>
+      <div class="me-side">
+        <div class="me-row"><span class="lvl" id="uLv" title="目前挑戰的層數">1</span><span class="name" id="uName">訪客</span></div>
+        <div class="title-chip" id="uTitle">尚未登入</div>
+      </div>
+    </div>
+    <div class="wallet" id="purse" aria-label="本金"><div class="wallet-in"><span class="coin">U</span><b id="uBal">10,000</b></div></div>
   </header>
   <div class="demo-bar" id="demoBar" hidden></div>
 
   <main class="map" id="map"><canvas id="mapCv"></canvas></main>
-  <button class="help-btn" id="btnAccount" aria-label="規則說明">？</button>
+  <button class="help-btn" id="btnAccount" aria-label="規則說明"><span>?</span></button>
   <button class="rib rib-new" data-act="battle" id="newRib" hidden></button>
   <div class="fill"></div>
-  <button class="rib" data-act="battle" id="towerRib">第 1 層</button>
+  <button class="enter" id="btnBattle" data-act="battle"><span id="battleTxt">進入試煉</span></button>
+  <div class="gem" aria-hidden="true"><svg viewBox="0 0 60 70"><defs><linearGradient id="gemG" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#f2fbff"/><stop offset=".45" stop-color="#6fc0ff"/><stop offset="1" stop-color="#1f5fd0"/></linearGradient></defs>
+    <ellipse class="gem-ring" cx="30" cy="58" rx="20" ry="6" fill="none" stroke="#3f8cff" stroke-width="2"/>
+    <ellipse cx="30" cy="58" rx="11" ry="3.2" fill="#2a6fe0" opacity=".45"/>
+    <g class="gem-body"><path d="M30 4L44 28L30 52L16 28Z" fill="url(#gemG)" stroke="#0b2a66" stroke-width="1.6" stroke-linejoin="round"/><path d="M30 4V52M16 28H44" stroke="#fff" stroke-width="1" opacity=".75"/><path d="M30 4L44 28L30 28Z" fill="#fff" opacity=".28"/></g></svg></div>
+  <button class="plaque" data-act="battle" id="towerRib">第 1 層</button>
 
   <nav class="dock" aria-label="主選單">
-    <button class="dock-btn" data-act="titles"><span class="ico"><svg viewBox="0 0 24 24"><path d="M3 8l4.5 4L12 5l4.5 7L21 8l-2 11H5z"/><path d="M5 19h14"/></svg></span>稱號</button>
-    <button class="dock-btn" data-act="rank"><span class="ico"><svg viewBox="0 0 24 24"><path d="M7 4h10v5a5 5 0 0 1-10 0z"/><path d="M7 6H4a3 3 0 0 0 3 4M17 6h3a3 3 0 0 1-3 4M12 14v4M8 21h8M9 18h6"/></svg></span>排行榜</button>
-    <button class="battle" id="btnBattle" data-act="battle"><small id="battleFloor">第 1 層</small><span>BATTLE</span><em id="battleSub">進入試煉</em></button>
-    <button class="dock-btn" data-act="account"><span class="ico"><svg viewBox="0 0 24 24"><path d="M4 20V10M10 20V4M16 20v-8M22 20H2"/></svg></span>戰績</button>
-    <button class="dock-btn" data-act="invite"><span class="ico"><svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c1-3.5 3.5-5.5 6.5-5.5s5.5 2 6.5 5.5M18 8v6M15 11h6"/></svg></span>邀請好友</button>
+    <button class="dock-btn" data-act="titles"><span class="ico"><span class="laurel" data-n="9" data-r="42"></span><svg viewBox="0 0 24 24"><path d="M3 8l4.5 4L12 5l4.5 7L21 8l-2 11H5z"/></svg></span><em>稱號</em></button>
+    <button class="dock-btn" data-act="rank"><span class="ico"><span class="laurel" data-n="9" data-r="42"></span><svg viewBox="0 0 24 24"><path d="M7 4h10v5a5 5 0 0 1-10 0zM7 6H4a3 3 0 0 0 3 4M17 6h3a3 3 0 0 1-3 4M12 14v4M8 21h8M9 18h6"/></svg></span><em>排行榜</em></button>
+    <button class="dock-btn" data-act="account"><span class="ico"><span class="laurel" data-n="9" data-r="42"></span><svg viewBox="0 0 24 24"><path d="M5 20V11M10 20V5M15 20v-7M20 20V9M3 20h18"/></svg></span><em>戰績</em></button>
+    <button class="dock-btn" data-act="invite"><span class="ico"><span class="laurel" data-n="9" data-r="42"></span><svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c1-3.5 3.5-5.5 6.5-5.5s5.5 2 6.5 5.5M18 8v6M15 11h6"/></svg></span><em>邀請好友</em></button>
   </nav>
 
   <section class="screen" id="battle" hidden aria-label="戰鬥">
@@ -706,8 +735,7 @@ HOME_ART.src = HOME_SRC;
 /* 神殿插畫：火盆位置、殿門、階梯（相對比例） */
 const BRAZIERS = [[.293, .59], [.708, .59], [.21, .665], [.79, .665], [.137, .75], [.87, .75], [.357, .515], [.642, .515], [.39, .482], [.61, .482], [.42, .46], [.58, .46]];
 const DOOR = { x: .5, y: .462 };
-const STAIRS = { x: .5, y0: .7, y1: .49 };   // 玩家的光點：從階梯底走到殿門
-const MAP = { fog: [], sky: [], motes: [], glints: [], raf: 0, last: 0 };   // fog / sky 兩組雲開場也共用
+const MAP = { fog: [], sky: [], low: [], shade: [], motes: [], glints: [], raf: 0, last: 0 };   // fog / sky 兩組雲開場也共用
 const rnd = (a, b) => a + Math.random() * (b - a);
 function soft(g, x, y, rx, ry, color, alpha) {
   g.save(); g.translate(x, y); g.scale(1, ry / rx);
@@ -748,11 +776,16 @@ function initMapFx() {
   const r = rng(3);
   MAP.fog = Array.from({ length: 9 }, () => ({ x: r() * 640, y: 470 + r() * 120, rx: 70 + r() * 80, k: .26 + r() * .12, sp: (r() < .5 ? -1 : 1) * (3 + r() * 6), a: .3 + r() * .25, p: r() * 6 }));
   MAP.fog.push({ x: 40, y: 395, rx: 60, k: .3, sp: 2.5, a: .28, p: 1 }, { x: 420, y: 380, rx: 64, k: .3, sp: -2.2, a: .28, p: 3 });
+  MAP.low = Array.from({ length: 9 }, () => ({ x: r() * 640, y: 545 + r() * 190, rx: 80 + r() * 80, k: .3 + r() * .1, sp: (r() < .5 ? -1 : 1) * (3 + r() * 5), a: .5 + r() * .3, p: r() * 6 }));
+  MAP.shade = Array.from({ length: 7 }, () => ({ x: r() * 640, y: 560 + r() * 170, rx: 70 + r() * 70, k: .28 + r() * .1, sp: (r() < .5 ? -1 : 1) * (2 + r() * 4), a: .16 + r() * .12, p: r() * 6 }));
   MAP.sky = Array.from({ length: 7 }, () => ({ x: r() * 640, y: -r() * 300, rx: 60 + r() * 70, k: .3 + r() * .12, sp: (r() < .5 ? -1 : 1) * (2 + r() * 4), a: .35 + r() * .3, p: r() * 6 }));
 }
 /* 畫神殿場景（主畫面與開場共用）。呼叫前先設好座標轉換；ext＝插畫上方要補多高的天空（設計座標） */
-function drawTemple(g, t, dt, ext, fx) {
+function drawTemple(g, t, dt, ext, fx, extB) {
   const D = HOME;
+  if (extB > 0) {   // 插畫下方不夠高時，往下補一片雲海
+    g.fillStyle = '#f7ece8'; g.fillRect(0, D.H - 1, D.W, extB + 2);
+  }
   if (ext > 0) {
     const gr = g.createLinearGradient(0, -ext, 0, 0); gr.addColorStop(0, '#2f63b8'); gr.addColorStop(.55, '#5a8fd2'); gr.addColorStop(1, '#7ea4d4');
     g.fillStyle = gr; g.fillRect(0, -ext - 1, D.W, ext + 2);
@@ -765,6 +798,10 @@ function drawTemple(g, t, dt, ext, fx) {
       g.fillStyle = fd; g.fillRect(0, -strip - 1, D.W, strip + 1);
     }
     g.drawImage(HOME_ART, 0, 0, D.W, D.H);
+    if (extB > 0) {   // 讓插畫底部的雲淡入下方補的雲海，看不出接縫
+      const fb = g.createLinearGradient(0, D.H - 80, 0, D.H); fb.addColorStop(0, 'rgba(247,236,232,0)'); fb.addColorStop(1, 'rgba(247,236,232,1)');
+      g.fillStyle = fb; g.fillRect(0, D.H - 80, D.W, 81);
+    }
   } else { g.fillStyle = '#7ea4d4'; g.fillRect(0, 0, D.W, D.H); }
   if (ext > 0) drawFog(g, t, MAP.sky, D.W, 'rgba(255,250,244,A)');
   g.globalCompositeOperation = 'lighter';
@@ -798,22 +835,12 @@ function drawTemple(g, t, dt, ext, fx) {
 }
 function mapFrame(now) {
   const f = prepCanvas($('#mapCv')); if (!f) return;
-  const { g, dpr, W, H } = f, D = HOME, s = W / D.W, oy = H - D.H * s, t = now / 1000, dt = Math.min(.05, (now - (MAP.last || now)) / 1000); MAP.last = now;
+  const { g, dpr, W, H } = f, D = HOME, s = W / D.W, t = now / 1000, dt = Math.min(.05, (now - (MAP.last || now)) / 1000); MAP.last = now;
+  // 殿門放在畫面高度 52% 的位置：上面留天空給頭像與本金，下面的階梯和雲海留給按鈕
+  const oy = Math.min(H * .52 - DOOR.y * D.H * s, H * .3), extB = Math.max(0, (H - oy) / s - D.H);
   g.setTransform(s * dpr, 0, 0, s * dpr, 0, oy * dpr);
-  drawTemple(g, t, dt, oy / s, MAP);
-
-  // 玩家目前的進度：一顆光點沿著階梯往殿門走
-  const total = totalFloors(), cleared = S.user ? Math.min(S.user.floor, total) : 0, k = total ? cleared / total : 0;
-  const px = STAIRS.x * D.W, py = lerp(STAIRS.y0, STAIRS.y1, k) * D.H, sc = lerp(1, .55, k), pulse = .5 + .5 * Math.sin(t * 3);
-  const bobY = py - 14 * sc + Math.sin(t * 2) * 2.5 * sc;
-  g.fillStyle = 'rgba(40,30,10,.35)'; g.beginPath(); g.ellipse(px, py + 4 * sc, 12 * sc, 3.2 * sc, 0, 0, 7); g.fill();
-  g.strokeStyle = `rgba(30,90,200,${.85 - pulse * .6})`; g.lineWidth = 1.6; g.beginPath(); g.ellipse(px, py + 4 * sc, (14 + pulse * 14) * sc, (4 + pulse * 4) * sc, 0, 0, 7); g.stroke();
-  g.globalCompositeOperation = 'lighter'; soft(g, px, bobY, 26 * sc, 30 * sc, 'rgba(90,170,255,A)', .55 + pulse * .2); g.globalCompositeOperation = 'source-over';
-  const gw = 9 * sc, gh = 15 * sc, gg = g.createLinearGradient(px - gw, bobY - gh, px + gw, bobY + gh);
-  gg.addColorStop(0, '#eaf8ff'); gg.addColorStop(.45, '#6fc0ff'); gg.addColorStop(1, '#1f5fd0');
-  g.fillStyle = gg; g.strokeStyle = '#0b2a66'; g.lineWidth = 1.4;
-  g.beginPath(); g.moveTo(px, bobY - gh); g.lineTo(px + gw, bobY); g.lineTo(px, bobY + gh); g.lineTo(px - gw, bobY); g.closePath(); g.fill(); g.stroke();
-  g.strokeStyle = 'rgba(255,255,255,.75)'; g.lineWidth = 1; g.beginPath(); g.moveTo(px, bobY - gh); g.lineTo(px, bobY + gh); g.moveTo(px - gw, bobY); g.lineTo(px + gw, bobY); g.stroke();
+  drawTemple(g, t, dt, oy / s, MAP, extB);
+  if (extB > 0) { drawFog(g, t, MAP.shade, D.W, 'rgba(196,170,196,A)'); drawFog(g, t, MAP.low, D.W, 'rgba(255,253,250,A)'); }
 
   drawFog(g, t, MAP.fog, D.W, 'rgba(255,252,246,A)');   // 腳下流動的雲海
 }
@@ -828,7 +855,7 @@ function refreshTower() {
   const total = totalFloors(), cleared = S.user ? Math.min(S.user.floor, total) : 0;
   $('#towerRib').textContent = !total ? '塔正在建造中' : cleared >= total ? `已登上最高層 ${total}` : `第 ${cleared + 1} 層 ／ 共 ${total} 層`;
   $('#newRib').hidden = !(total > CONFIG.baseFloors);
-  $('#newRib').textContent = `NEW 今日 +${CONFIG.floorsPerDay} 層`;
+  $('#newRib').textContent = `NEW・今日 +${CONFIG.floorsPerDay} 層`;
 }
 
 /* ================= 開場（同一座神殿，鏡頭從殿門拉遠到全景） ================= */
@@ -844,7 +871,7 @@ function titleLoop(now) {
   const px = DOOR.x * D.W * s, py = oy + (DOOR.y + .06) * D.H * s;      // 縮放的中心：殿門
   const tx = px * (1 - z), ty = py * (1 - z) + oy * z;
   g.setTransform(s * z * dpr, 0, 0, s * z * dpr, tx * dpr, ty * dpr);
-  drawTemple(g, t, dt, Math.max(0, ty / (s * z)) + 2, TITLE);
+  drawTemple(g, t, dt, Math.max(0, ty / (s * z)) + 2, TITLE, 0);
   drawFog(g, t, MAP.fog, D.W, 'rgba(255,252,246,A)');
   // 上下壓暗，讓標題和冒險者站得出來
   g.setTransform(dpr, 0, 0, dpr, 0, 0);
@@ -874,6 +901,23 @@ function enterWorld() {
   setTimeout(() => { sec.hidden = true; sec.classList.remove('leave', 'entered'); }, 800);
 }
 
+/* 月桂葉外框：兩側各一排葉子沿著圓弧往上長，頂端一顆星、上下各一顆藍寶石 */
+function laurelSVG(n, R) {
+  let leaves = '';
+  for (const side of [-1, 1]) for (let i = 0; i < n; i++) {
+    const th = (24 + i * (128 / (n - 1))) * Math.PI / 180, x = side * Math.sin(th) * R, y = Math.cos(th) * R;
+    const rot = Math.atan2(side * Math.cos(th), Math.sin(th)) * 180 / Math.PI + side * (i % 2 ? 34 : -14), sc = 1 - i * .035;
+    leaves += `<path d="M0 1C3.6 -2.5 3.6 -8.5 0 -12.5C-3.6 -8.5 -3.6 -2.5 0 1Z" transform="translate(${x.toFixed(1)} ${y.toFixed(1)}) rotate(${rot.toFixed(1)}) scale(${sc.toFixed(2)})"/>`;
+  }
+  const gem = y => `<path d="M0 ${y - 5}L3.6 ${y}L0 ${y + 5}L-3.6 ${y}Z" fill="url(#lGem)" stroke="#0b2a66" stroke-width=".7"/>`;
+  return `<svg viewBox="-50 -50 100 100" aria-hidden="true"><defs>
+    <linearGradient id="lGold" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fff3c4"/><stop offset=".5" stop-color="#e3b450"/><stop offset="1" stop-color="#a8721f"/></linearGradient>
+    <linearGradient id="lGem" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#e6f6ff"/><stop offset="1" stop-color="#1f5fd0"/></linearGradient></defs>
+    <g fill="url(#lGold)" stroke="#7a5220" stroke-width=".6" stroke-linejoin="round">${leaves}
+    <path d="M0 ${-R - 13}L2.4 ${-R - 6.5}L8 ${-R - 5}L2.4 ${-R - 3.5}L0 ${-R + 2}L-2.4 ${-R - 3.5}L-8 ${-R - 5}L-2.4 ${-R - 6.5}Z"/></g>
+    ${gem(R + 1)}</svg>`;
+}
+
 /* ================= 首頁 ================= */
 function renderHome() {
   const u = S.user, total = totalFloors();
@@ -884,8 +928,10 @@ function renderHome() {
   if (u && prev !== now) { const p = $('#purse'); p.classList.remove('pulse'); void p.offsetWidth; p.classList.add('pulse'); }
   const cleared = u ? Math.min(u.floor, total) : 0;
   refreshTower();
-  $('#battleFloor').textContent = !total ? '建造中' : cleared >= total ? '已到最高層' : `第 ${cleared + 1} 層`;
-  $('#battleSub').textContent = !total ? '敬請期待' : cleared >= total ? '明日再戰' : (cleared + 1) % 10 === 0 ? '⚠ 魔王關' : '進入試煉';
+  const bossNext = (cleared + 1) % 10 === 0 && cleared < total, eb = $('#btnBattle');
+  $('#battleTxt').textContent = !total ? '建造中' : cleared >= total ? '明日再戰' : bossNext ? '挑戰魔王' : '進入試煉';
+  eb.classList.toggle('boss', !!total && bossNext); eb.classList.toggle('off', !total || cleared >= total);
+  $('#uLv').textContent = u ? Math.min(cleared + 1, Math.max(total, 1)) : 1;
   $('#bBal').textContent = u ? fmt(u.balance) : '—';
   const notes = [];
   if (!S.live) notes.push(S.cloudFailed ? '連不到雲端，暫以示範模式執行：帳號與本金只存在這台裝置，盤面為模擬。' : '示範模式：帳號與本金只存在這台裝置，盤面為模擬。');
@@ -1315,7 +1361,7 @@ function hideToast() { $('#toast').hidden = true; }
 
 /* ================= 綁定與啟動 ================= */
 function bindUI() {
-  document.querySelectorAll('.dock [data-act], .rib').forEach(x => x.onclick = () => act(x.dataset.act));
+  document.querySelectorAll('#app > [data-act], .dock [data-act]').forEach(x => x.onclick = () => act(x.dataset.act));
   $('#avatar').onclick = () => openSheet('account');
   $('#btnAccount').onclick = () => openSheet('rules');
   $('#sheetClose').onclick = closeSheet;
@@ -1339,6 +1385,7 @@ function boot() {
   $('#logoSub').innerHTML = `<span></span>${esc(CONFIG.gameNameEn)}<span></span>`;
   document.title = CONFIG.gameNameEn;
   $('#heroImg').src = HERO_SRC;
+  document.querySelectorAll('.laurel').forEach(el => { el.innerHTML = laurelSVG(+el.dataset.n, +el.dataset.r); });
   makeGrain(); bindUI(); initMapFx(); startTitle();
   S.ready = (async () => {
     renderHome();
