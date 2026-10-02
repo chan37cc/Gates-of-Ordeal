@@ -269,6 +269,12 @@ button{font:inherit;color:inherit;cursor:pointer}
 .dock-btn .ico{display:none}
 .dock-btn em{position:absolute;left:14%;right:14%;top:75.5%;height:16%;margin:0;min-width:0;padding:0;display:grid;place-items:center;background:none;box-shadow:none;border-radius:0;font-size:clamp(11px,3.3vw,13px);letter-spacing:.02em;color:#3a2a12;text-shadow:0 1px 0 #fff}
 .dock-btn:active{transform:scale(.95)}
+.fill2{flex:.72;min-height:0}
+.ticker{position:relative;z-index:2;display:flex;align-items:center;gap:8px;height:34px;margin:-37px 66px 0 12px;padding:0 12px 0 10px;border-radius:999px;background:linear-gradient(#24408ee0,#101e55e0);box-shadow:inset 0 0 0 1.5px #e2b85a,inset 0 2px 4px #ffffff22,0 3px 8px #0a143466}
+.ticker[hidden]+.plaque{margin-top:6px}
+.tk-ico{flex:none;color:#ffe9ae;font-size:13px;text-shadow:0 0 8px #ffd26a}
+.tk-win{flex:1;min-width:0;overflow:hidden;white-space:nowrap;-webkit-mask-image:linear-gradient(90deg,transparent,#000 8%,#000 92%,transparent);mask-image:linear-gradient(90deg,transparent,#000 8%,#000 92%,transparent)}
+#tkTxt{display:inline-block;font:900 13px var(--f-title);letter-spacing:.06em;color:#fff7dc;will-change:transform}
 /* ===== 試煉畫面：藍色玻璃面板 ===== */
 #battle{--ink:#fff;--muted:#dbe5ff;--gold-hi:#ffe9ae;--short:#ff7d73;--long:#5fe3a0}
 #battle .b-top{background:none;border:0;padding:10px 10px 4px}
@@ -283,6 +289,7 @@ button{font:inherit;color:inherit;cursor:pointer}
 #battle .hp{height:12px;border-radius:999px;background:#0b1436;box-shadow:inset 0 0 0 1px #e2b85a}
 #battle .streak{top:44px;right:12px}
 #battle .pips i{background:#0b1436;box-shadow:inset 0 0 0 1px #e2b85a}
+#battle .pips i.on{background:linear-gradient(135deg,#fff7d0,#f0b030);box-shadow:inset 0 0 0 1px #fff3c4,0 0 8px #ffc65a,0 0 14px #ffb030}
 #battle .stage{padding-top:52px}
 #battle .stage::before{background:radial-gradient(ellipse,#17275c99 0%,#2f4a9844 50%,transparent 72%);box-shadow:0 0 0 1.5px #ffe9aeaa,0 0 0 5px #ffffff22,0 0 22px #9cc4ff88}
 #battle .chart-card.gild,#battle .result.gild{border:0;border-radius:14px;background:linear-gradient(160deg,#1c3a96b8,#0e2068c7 45%,#0a174ed1);background-blend-mode:normal;-webkit-backdrop-filter:blur(7px) saturate(1.2);backdrop-filter:blur(7px) saturate(1.2);
@@ -296,14 +303,16 @@ button{font:inherit;color:inherit;cursor:pointer}
 #battle .tabs button{color:#dbe5ff}
 #battle .tabs button.on{background:linear-gradient(#fff3c4,#e8bd5a 55%,#b8862f);color:#1b2550;border-radius:6px}
 #battle .chart-foot{margin:2px -12px -10px;padding:9px 12px 11px;border-top:1px solid #a9c8ff88;box-shadow:inset 0 1px 0 #0b143688;color:#eaf0ff;font-size:12px;background:#0b143655;border-radius:0 0 14px 14px}
-#battle .actions{padding:16px 12px 14px;gap:10px}
+#battle .actions{padding:16px 12px 14px;gap:10px;grid-template-columns:repeat(3,1fr);align-items:stretch}
+#battle .act,#battle .act.flat{font-size:21px;letter-spacing:.08em;padding:12px 4px;justify-content:center;white-space:nowrap}
+#battle .act small{font-size:11px;letter-spacing:.04em}
 #battle .act{border-radius:12px;box-shadow:inset 0 -5px 0 #0005,inset 0 2px 0 #fff6,inset 0 0 0 1.5px #ffffff55,0 0 0 2px #7a5220,0 0 0 4px #f0c866,0 0 0 5px #7a5220,0 0 14px #ffe9ae77,0 6px 12px #0a143499}
 #battle .act.flat{background:radial-gradient(ellipse at 50% 0%,#e6eefaaa,transparent 60%),linear-gradient(#4a63a8,#1b2c6a)}
 #battle .result{margin:0 14px 18px}
 #battle .facts dt{color:#c3d2f5}
 #battle .btn.dim{background:#0b143688;color:#fff;box-shadow:inset 0 0 0 1.5px #a9c8ff}
 #battle .btn.gold{background:linear-gradient(#fff3c4,#e8bd5a 50%,#b8862f);color:#1b2550;box-shadow:inset 0 0 0 1px #fff8,0 0 0 1px #7a5220,0 3px 8px #0a143488}
-.plaque{width:min(340px,90vw);aspect-ratio:3;margin:-18px 0 -22px;padding:0 0 1.5%;border-radius:0;background:center/100% 100% no-repeat;box-shadow:none;font-size:17px;color:#3a2a12;text-shadow:0 1px 0 #fff;filter:drop-shadow(0 4px 6px #0006)}
+.plaque{width:min(300px,80vw);aspect-ratio:3;margin:-4px 0 0;padding:0 0 1.5%;border-radius:0;background:center/100% 100% no-repeat;box-shadow:none;font-size:17px;color:#3a2a12;text-shadow:0 1px 0 #fff;filter:drop-shadow(0 4px 6px #0006)}
 .plaque::before,.plaque::after{display:none}
 .plaque:active{filter:brightness(1.06) drop-shadow(0 4px 6px #0006)}
 .hero-pick{position:absolute;inset:0;z-index:30;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;padding:24px 18px;text-align:center;overflow-y:auto;background:radial-gradient(ellipse at 50% 30%,#1c2c58f5,#070b1cfa)}
@@ -448,14 +457,15 @@ button{font:inherit;color:inherit;cursor:pointer}
 
   <main class="map" id="map"><canvas id="mapCv"></canvas></main>
   <button class="help-btn" id="btnAccount" aria-label="規則說明"><span>?</span></button>
-  <button class="rib rib-new" data-act="battle" id="newRib" hidden></button>
+  <div class="ticker" id="ticker" hidden role="status" aria-live="off"><span class="tk-ico" aria-hidden="true">✦</span><div class="tk-win"><span id="tkTxt"></span></div></div>
+  <button class="plaque" data-act="battle" id="towerRib">試煉 01</button>
   <div class="fill"></div>
   <button class="enter" id="btnBattle" data-act="battle"><span id="battleTxt">進入試煉</span></button>
   <div class="gem" aria-hidden="true"><svg viewBox="0 0 60 70"><defs><linearGradient id="gemG" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#f2fbff"/><stop offset=".45" stop-color="#6fc0ff"/><stop offset="1" stop-color="#1f5fd0"/></linearGradient></defs>
     <ellipse class="gem-ring" cx="30" cy="58" rx="20" ry="6" fill="none" stroke="#3f8cff" stroke-width="2"/>
     <ellipse cx="30" cy="58" rx="11" ry="3.2" fill="#2a6fe0" opacity=".45"/>
     <g class="gem-body"><path d="M30 4L44 28L30 52L16 28Z" fill="url(#gemG)" stroke="#0b2a66" stroke-width="1.6" stroke-linejoin="round"/><path d="M30 4V52M16 28H44" stroke="#fff" stroke-width="1" opacity=".75"/><path d="M30 4L44 28L30 28Z" fill="#fff" opacity=".28"/></g></svg></div>
-  <button class="plaque" data-act="battle" id="towerRib">試煉 01</button>
+  <div class="fill2"></div>
 
   <nav class="dock" aria-label="主選單">
     <button class="dock-btn" data-act="titles"><span class="ico"><span class="laurel" data-n="9" data-r="42"></span><svg viewBox="0 0 24 24"><path d="M3 8l4.5 4L12 5l4.5 7L21 8l-2 11H5z"/></svg></span><em>稱號</em></button>
@@ -980,8 +990,7 @@ function startMapLoop() { if (!MAP.raf) MAP.raf = requestAnimationFrame(mapLoop)
 function refreshTower() {
   const total = totalFloors(), cleared = S.user ? Math.min(S.user.floor, total) : 0;
   $('#towerRib').textContent = !total ? '塔正在建造中' : cleared >= total ? `已通過全部 ${total} 道試煉` : `${trial(cleared + 1)} ／ 共 ${total}`;
-  $('#newRib').hidden = !(total > CONFIG.baseFloors);
-  $('#newRib').textContent = `NEW・今日 +${CONFIG.floorsPerDay} 試煉`;
+  tickerPoll();
 }
 
 /* ================= 開場（同一座神殿，鏡頭從殿門拉遠到全景） ================= */
@@ -1305,6 +1314,42 @@ function enterBattle(ctx, resume) {
   requestAnimationFrame(() => drawChart(0));
   if (!resume) introBattle(ctx);
 }
+/* ================= 跑馬燈：從排行榜資料推算，不需要額外寫入 ================= */
+const TK = { prev: null, topW: null, topR: null, queue: [], base: [], i: 0, busy: false, last: 0 };
+async function tickerPoll() {
+  if (!S.user || document.hidden || Date.now() - TK.last < 5000) return;
+  TK.last = Date.now();
+  let w, r; try { [w, r] = await Promise.all([B.leaderboard('wealth'), B.leaderboard('rate')]); } catch (e) { return; }
+  const cur = {}; w.concat(r).forEach(u => { cur[u.uid] = { name: u.name, floor: u.floor || 0, peak: u.peak || 0 }; });
+  if (TK.prev) {
+    for (const [id, u] of Object.entries(cur)) {
+      const p = TK.prev[id]; if (!p) continue;
+      const k = Math.floor(u.floor / 10);
+      if (k > Math.floor(p.floor / 10)) TK.queue.push(`${u.name} 通過了${trial(k * 10)}！`);
+      if (titleOf(u.peak) !== titleOf(p.peak)) TK.queue.push(`${u.name} 獲得稱號「${titleOf(u.peak)}」！`);
+    }
+    if (w[0] && TK.topW && w[0].uid !== TK.topW) TK.queue.push(`${w[0].name} 登上財富榜第一名！`);
+    if (r[0] && r[0].uid !== TK.topR && (TK.topR || TK.seenR)) TK.queue.push(`${r[0].name} 登上勝率榜第一名！`);
+  }
+  TK.seenR = true; TK.prev = Object.assign(TK.prev || {}, cur); TK.topW = w[0] ? w[0].uid : null; TK.topR = r[0] ? r[0].uid : null;
+  const far = w.concat(r).reduce((a, u) => (u.floor || 0) > (a ? a.floor || 0 : 0) ? u : a, null);
+  TK.base = [];
+  if (w[0]) TK.base.push(`財富榜第一名：${w[0].name}（${fmt(w[0].balance)} U）`);
+  if (r[0]) TK.base.push(`勝率榜第一名：${r[0].name}（${(r[0].rankBp / 100).toFixed(1)}%）`);
+  if (far && far.floor >= 10) TK.base.push(`${far.name} 已通過${trial(Math.floor(far.floor / 10) * 10)}`);
+  tickerRun();
+}
+function tickerRun() {
+  if (TK.busy) return;
+  const msg = TK.queue.shift() || (TK.base.length ? TK.base[TK.i++ % TK.base.length] : null);
+  const box = $('#ticker'); if (!msg) { box.hidden = true; return; }
+  box.hidden = false; const el = $('#tkTxt'); el.textContent = msg; TK.busy = true;
+  const done = () => { TK.busy = false; tickerRun(); };
+  const W = el.parentElement.clientWidth, w = el.offsetWidth;
+  if (reduceMotion() || !el.animate || !W) { el.style.transform = 'none'; setTimeout(done, 5000); return; }
+  el.animate([{ transform: `translateX(${W}px)` }, { transform: `translateX(${-w}px)` }], { duration: (W + w) / 60 * 1000, easing: 'linear' }).onfinish = done;
+}
+setInterval(tickerPoll, 60000);
 function exitBattle() { $('#battle').hidden = true; $('#wave').hidden = true; FX.parts = []; S.battle = null; renderHome(); }
 function burst(stage, n) {
   for (let i = 0; i < n; i++) {
