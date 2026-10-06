@@ -315,6 +315,43 @@ button{font:inherit;color:inherit;cursor:pointer}
 .sheet .btn.gold{background:linear-gradient(#fff3c4,#f0c877 50%,#d9a24e);color:#2a2258}
 .sheet .code input{background:#0c1236aa;border:1.5px solid #f3d58a99;border-radius:12px;color:#fff}
 .rename{margin:0 0 4px}.rn-l{font-size:12.5px;color:#ece6ff}
+
+/* ===== 彈出頁與登入：粉色／粉橘漸層玻璃 ===== */
+.sheet-card.gild,#gate .gate-card.gild{--ink:#4b2742;--muted:#7d566f;--dim:#7d566f;--gold-hi:#b4532f;--gold:#e8a86a;--gold-lo:#f0c9a0;color:#4b2742}
+.sheet-head,#sheetBody,#gate .gate-card.gild{-webkit-backdrop-filter:blur(12px) saturate(1.25);backdrop-filter:blur(12px) saturate(1.25)}
+.sheet-head{background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M12 0l2 10 10 2-10 2-2 10-2-10L0 12l10-2z' fill='%23fff'/%3E%3C/svg%3E") right 58px center/34px no-repeat,linear-gradient(100deg,#ffd9e6c9,#ffc6d0c2 45%,#ffc3a0c9);box-shadow:inset 0 0 0 1.5px #fff,inset 0 0 0 3px #f6c98a88,0 0 18px #ffc9b877}
+.sheet-head h2,.sheet .now-title .metal-text,.sheet .big-plus.metal-text{background:linear-gradient(180deg,#7a2f5c,#b4532f);-webkit-background-clip:text;background-clip:text;color:transparent;filter:none}
+.sheet .x{background:#ffffffb3;color:#7a2f5c;box-shadow:inset 0 0 0 1.5px #f0b58a,0 0 10px #fff8}
+#sheetBody,#gate .gate-card.gild{background:linear-gradient(165deg,#ffe6eeb3,#ffd6dca6 40%,#ffd0b8ad 75%,#ffc7a0b8);box-shadow:inset 0 0 0 1.5px #fff,inset 0 0 0 3px #f6c98a77,inset 0 0 30px #ffffff55,0 0 20px #ffc9b866}
+#gate .gate-card.gild::before{border-color:#ffffff88}
+.sheet .seg,#gate .seg{background:#ffffff66;box-shadow:inset 0 0 0 1px #f0b58a}
+.sheet .seg button,#gate .seg button{color:#7d566f}
+.sheet .seg button.on,#gate .seg button.on{background:linear-gradient(100deg,#ff9fb8,#ffab7e);color:#fff;text-shadow:0 1px 2px #a8456088;box-shadow:0 0 12px #ffb09a99}
+.sheet .lb li,.sheet .titles li,.sheet .stat{background:linear-gradient(90deg,#ffffff8c,#fff1ea73 60%,#ffe6d98c);box-shadow:inset 0 0 0 1px #ffffffcc,inset 0 0 0 2px #f6c98a44,0 2px 8px #c9788a22}
+.sheet .titles li:not(.got){background:linear-gradient(90deg,#ffffff59,#fff1ea40)}
+.sheet .titles li:not(.got) .tn,.sheet .titles .tv{color:#4b2742}
+.sheet .titles li.got .tv{color:#b4532f}
+.sheet .lb li.me,.sheet .titles li.cur{background:linear-gradient(100deg,#ff9fb8e6,#ffab8ae6 60%,#ffc08ae6);box-shadow:inset 0 0 0 2px #fff,0 0 16px #ffb09acc;--ink:#fff;--muted:#fff3ec;color:#fff}
+.sheet .titles li.cur .tn,.sheet .titles li.cur .tv,.sheet .lb li.me .val,.sheet .lb li.me .nm b{color:#fff;text-shadow:0 1px 2px #a8456088}
+.sheet .titles .tn::before,.sheet .titles li:not(.got) .tn::before{color:#f0975f;text-shadow:0 0 6px #fff}
+.sheet .titles li.cur .tn::before{color:#fff}
+.sheet .rk{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40' fill='none' stroke='%23c89ab0'%3E%3Ccircle cx='20' cy='20' r='13' stroke-width='1.4'/%3E%3Cpath d='M20 0l2 6-2 2-2-2zM20 40l2-6-2-2-2 2zM0 20l6-2 2 2-2 2zM40 20l-6-2-2 2 2 2z' fill='%23c89ab0' stroke='none'/%3E%3C/svg%3E");color:#7d566f;text-shadow:none}
+.sheet .rk.r1,.sheet .rk.r3{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40' fill='none' stroke='%23f0975f'%3E%3Ccircle cx='20' cy='20' r='13' stroke-width='1.4'/%3E%3Cpath d='M20 0l2 6-2 2-2-2zM20 40l2-6-2-2-2 2zM0 20l6-2 2 2-2 2zM40 20l-6-2-2 2 2 2z' fill='%23f0975f' stroke='none'/%3E%3C/svg%3E");color:#b4532f;text-shadow:none}
+.sheet .lb li.me .rk{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40' fill='none' stroke='%23ffffff'%3E%3Ccircle cx='20' cy='20' r='13' stroke-width='1.4'/%3E%3Cpath d='M20 0l2 6-2 2-2-2zM20 40l2-6-2-2-2 2zM0 20l6-2 2 2-2 2zM40 20l-6-2-2 2 2 2z' fill='%23ffffff' stroke='none'/%3E%3C/svg%3E");color:#fff;text-shadow:none}
+.sheet .val,.sheet .stat b{color:#b4532f}
+.sheet .now-title{background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M12 0l2 10 10 2-10 2-2 10-2-10L0 12l10-2z' fill='%23fff'/%3E%3C/svg%3E") right 14px top 14px/56px no-repeat,linear-gradient(120deg,#ffc2d4d9,#ffb9a8d9 55%,#ffc392d9);box-shadow:inset 0 0 0 1.5px #fff,inset 0 0 24px #ffffff66,0 0 14px #ffb09a77;color:#4b2742;--muted:#6a4560}
+.sheet .meter{background:#ffffff8c;box-shadow:inset 0 0 0 1px #f0b58a}.sheet .meter i{background:linear-gradient(90deg,#ff8fb0,#ffa56a)}
+.sheet .hint,.rn-l{color:#5e3a56}
+.sheet .btn.dim{background:#ffffff80;box-shadow:inset 0 0 0 1.5px #f0a58a;color:#7a2f5c}
+.sheet .btn.gold,#gate .btn.gold{background:linear-gradient(100deg,#ff8fb0,#ffa56a);color:#fff;text-shadow:0 1px 2px #a8456088;box-shadow:inset 0 0 0 1px #fff8,0 0 14px #ffb09a99}
+.sheet .code input,#gate .form input{background:#ffffff99;border:0;box-shadow:inset 0 0 0 1.5px #f0b58a;color:#4b2742}
+#gate .form input::placeholder{color:#a88a9c}
+#gate .form input:focus{outline:2px solid #ff8fb0;box-shadow:inset 0 0 0 1.5px #ff8fb0}
+#gate .form label{color:#5e3a56}
+#gate .linkish{color:#b4532f}
+.sheet .err,#gate .err{color:#c22f4a}
+.sheet .rules h3{color:#b4532f}
+.sheet .flat-t{color:#6a6f96}.sheet .good-t{color:#0f7a52}.sheet .bad-t{color:#c22f4a}
 /* ===== 試煉畫面：藍色玻璃面板 ===== */
 #battle{--ink:#fff;--muted:#dbe5ff;--gold-hi:#ffe9ae;--short:#ff7d73;--long:#5fe3a0}
 #battle .b-top{background:none;border:0;padding:10px 10px 4px}
@@ -1720,7 +1757,7 @@ function boot() {
   document.title = CONFIG.gameName + '｜' + CONFIG.gameNameEn;
   $('#heroImg').src = HERO_SRC;
   $('#gemImg').src = GEM_SRC;
-  $('#sheet').style.backgroundImage = `linear-gradient(#0d1038d9,#191650cc 45%,#120f3ce0), url(${OPEN_SRC})`;
+  $('#sheet').style.backgroundImage = `linear-gradient(#2a1c4a8c,#6a3f6a59 45%,#f2b59a66), url(${OPEN_SRC})`;
   $('#tScene').style.backgroundImage = `url(${OPEN_SRC})`;
   $('#scene').style.backgroundImage = `url(${NIGHT_SRC})`;
   $('#purse').style.backgroundImage = `url(${WALLET_SRC})`;
