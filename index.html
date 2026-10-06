@@ -1,0 +1,2175 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<link rel="preload" as="image" href="img/open.webp" fetchpriority="high">
+<link rel="preload" as="image" href="img/night.webp">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Gates of Ordeal｜破局紀元：試煉之門</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;800;900&family=Noto+Sans+TC:wght@400;500;700&family=Noto+Serif+TC:wght@600;900&display=swap">
+<style>
+/* Layout: one-screen mobile game — title sequence → gate (login/register) → painted world map with the tower, balance plaque and dock; battles, boss warnings and panels open as layers. Single dark fantasy look by design. */
+:root{
+  --night:#080b14; --panel:#1c170e; --panel2:#0f0c07;
+  --ink:#f3e8cc; --muted:#ab9e7e; --dim:#6f6754;
+  --gold:#d4a446; --gold-hi:#f8e2a0; --gold-lo:#6e4b1e; --bronze:#3a2a14;
+  --long:#46c37d; --short:#e5544a; --danger:#ff4040;
+  --f-display:"Cinzel","Noto Serif TC",Georgia,serif;
+  --f-title:"Noto Serif TC","Songti TC","PMingLiU",serif;
+  --f-body:"Noto Sans TC","PingFang TC","Microsoft JhengHei",system-ui,sans-serif;
+  --grain:none;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html,body{height:100%}
+body{margin:0;background:#04060b;color:var(--ink);font-family:var(--f-body);overflow:hidden}
+button{font:inherit;color:inherit;cursor:pointer}
+:focus-visible{outline:2px solid var(--gold-hi);outline-offset:2px}
+
+/* 金屬框 */
+.gild{position:relative;border:2px solid transparent;background:var(--grain),linear-gradient(#211a10,#0e0b07) padding-box,linear-gradient(140deg,#fff0bf,#8a5f22 22%,#e2b55a 45%,#5a3c14 70%,#f2d28a) border-box;background-blend-mode:overlay,normal,normal;box-shadow:inset 0 1px 0 #ffffff1c,inset 0 0 0 1px #000a,0 8px 22px #000c}
+.gild::before{content:"";position:absolute;inset:4px;border-radius:inherit;border:1px solid #f8e2a02e;pointer-events:none}
+.metal-text{background:linear-gradient(180deg,#fffaf0 0%,#f8e2a0 32%,#c99232 52%,#6b4413 54%,#e3b45a 76%,#fff1c0 100%);-webkit-background-clip:text;background-clip:text;color:transparent}
+
+#app{position:relative;height:100%;max-width:480px;margin:0 auto;display:flex;flex-direction:column;background:var(--night);overflow:hidden;box-shadow:0 0 0 1px #000,0 0 80px #000}
+
+/* ===== 主畫面：大理石、金框、深藍 ===== */
+.topbar{position:relative;z-index:3;display:flex;justify-content:space-between;align-items:flex-start;gap:8px;padding:12px 12px 0}
+.me{display:flex;align-items:center;gap:4px;min-width:0}
+.av-wrap{position:relative;flex:none;width:74px;height:74px;display:grid;place-items:center}
+.laurel{position:absolute;inset:-7px;pointer-events:none;filter:drop-shadow(0 2px 2px #5a3c1488)}
+.laurel svg{width:100%;height:100%;display:block;overflow:visible}
+.avatar{position:relative;width:60px;height:60px;padding:0;border-radius:50%;overflow:hidden;border:0;background:#2a1d08;box-shadow:0 0 0 2px #fff6d8,0 0 0 4px #d9ac4a,0 0 0 5px #7a5220,0 4px 8px #0006}
+.avatar svg{width:100%;height:100%;display:block}
+.me-side{min-width:0;display:grid;gap:5px;justify-items:start;margin-left:-4px}
+.me-row{display:flex;align-items:center;gap:6px;min-width:0;max-width:100%}
+.lvl{flex:none;min-width:34px;height:34px;padding:0 6px;border-radius:50%;display:grid;place-items:center;font:900 17px var(--f-display);color:#fdebb8;background:radial-gradient(circle at 40% 28%,#3c5cae,#17275c 70%,#0c173e);box-shadow:0 0 0 2px #e2b85a,0 0 0 3px #7a5220,0 2px 5px #0006;font-variant-numeric:tabular-nums}
+.who,.me-row .name{min-width:0}
+.me-row .name{font:900 15px var(--f-title);color:#1b2550;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-shadow:0 0 6px #fff,0 0 10px #fff,0 1px 0 #fff}
+.title-chip{font:900 13px var(--f-title);letter-spacing:.16em;padding:4px 14px 4px 16px;border-radius:6px;color:#fdebb8;background:linear-gradient(#2c4590,#15245a);box-shadow:0 0 0 2px #e2b85a,0 0 0 3px #7a5220,0 0 0 6px #fffaf0,0 0 0 7px #c9a04a,0 3px 6px #0005;white-space:nowrap}
+.wallet{flex:none;position:relative;width:min(178px,46vw);aspect-ratio:2;margin:-12px -8px -6px 0;background:center/100% 100% no-repeat;filter:drop-shadow(0 3px 5px #0006)}
+.wallet .wu{position:absolute;left:22.8%;top:59.4%;transform:translate(-50%,-50%);font:900 21px var(--f-display);color:#7a4c0c;text-shadow:0 1px 0 #fff3c4}
+.wallet b{position:absolute;left:37%;right:19.5%;top:43.5%;height:32%;display:grid;place-items:center;font:800 17px var(--f-display);color:#fdf1cc;text-shadow:0 1px 0 #0b1436;font-variant-numeric:tabular-nums;white-space:nowrap}
+.wallet .wplus{position:absolute;left:88.2%;top:59.4%;transform:translate(-50%,-50%);width:15%;aspect-ratio:1;border:0;border-radius:50%;padding:0;background:none;color:#fff;font:900 19px/1 var(--f-display);cursor:pointer}
+.wallet .wplus:focus-visible{outline:2px solid #fff}
+.coin{width:30px;height:30px;border-radius:50%;display:grid;place-items:center;font:900 14px var(--f-display);color:#6a430c;background:radial-gradient(circle at 35% 30%,#fff6cf,#f0c25a 40%,#a8721f 80%);box-shadow:inset 0 0 0 2px #fbe6a4,inset 0 0 0 4px #b98226,0 1px 3px #0008}
+.wallet.pulse b{animation:pf .8s}
+@keyframes pf{40%{color:#fff;text-shadow:0 0 12px #ffd26a}}
+.demo-bar{position:relative;z-index:2;margin:10px 12px 0;padding:6px 10px;border-radius:8px;font-size:11.5px;line-height:1.45;color:#f3e6c4;background:#15245ad9;box-shadow:0 0 0 1px #e2b85a}
+.help-btn{position:relative;z-index:2;align-self:flex-end;margin:12px 16px 0 0;width:40px;height:40px;border-radius:50%;border:0;padding:0;background:none}
+.help-btn::before{content:"";position:absolute;inset:-5px;background:linear-gradient(135deg,#fff0b8,#c8922e 55%,#7a5220);clip-path:polygon(50% 0,61% 22%,78% 22%,78% 39%,100% 50%,78% 61%,78% 78%,61% 78%,50% 100%,39% 78%,22% 78%,22% 61%,0 50%,22% 39%,22% 22%,39% 22%);filter:drop-shadow(0 2px 3px #0006)}
+.help-btn span{position:absolute;inset:2px;border-radius:50%;display:grid;place-items:center;font:900 20px var(--f-display);color:#fdebb8;background:radial-gradient(circle at 40% 28%,#3c5cae,#17275c 70%,#0c173e);box-shadow:0 0 0 2px #e2b85a,0 0 0 3px #7a5220}
+.fill{flex:1;min-height:0}
+.rib{position:relative;z-index:2;align-self:center;margin-top:-34px;border:0;padding:5px 18px;border-radius:999px;font:900 12.5px var(--f-title);letter-spacing:.1em;color:#fdebb8;white-space:nowrap;background:linear-gradient(#2c4590,#15245a);box-shadow:0 0 0 2px #e2b85a,0 0 0 3px #7a5220,0 3px 8px #0006}
+
+/* map：整個畫面就是神殿，其他介面疊在上面 */
+.map{position:absolute;inset:0;z-index:0;background:#7ea4d4}
+.map canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
+.map.intro canvas{animation:mapIn 1.6s cubic-bezier(.2,.7,.2,1)}
+@keyframes mapIn{from{transform:scale(1.12);filter:brightness(1.5) blur(3px)}}
+
+/* 進入試煉、水晶、層數牌 */
+.enter{position:relative;z-index:2;align-self:center;border:0;padding:11px 40px 12px 46px;border-radius:999px;font:900 22px var(--f-title);letter-spacing:.3em;color:#fdebb8;text-shadow:0 2px 0 #0b1436;white-space:nowrap;
+  background:radial-gradient(ellipse 70% 60% at 50% 0,#5a78c8aa,transparent 70%),linear-gradient(#2c4590,#14225a);
+  box-shadow:0 0 0 2px #f0cc74,0 0 0 3.5px #7a5220,0 0 0 6px #fffaf0cc,0 6px 16px #0007,inset 0 2px 5px #ffffff40;animation:enterGlow 2.2s ease-in-out infinite}
+@keyframes enterGlow{50%{box-shadow:0 0 0 2px #fff0b8,0 0 0 3.5px #7a5220,0 0 0 6px #fffaf0cc,0 6px 16px #0007,0 0 26px #ffe39a,inset 0 2px 5px #ffffff40}}
+.enter::before,.enter::after{content:"✦";position:absolute;top:50%;transform:translateY(-52%);font-size:17px;letter-spacing:0;color:#fff3c8;text-shadow:0 0 8px #ffd978,0 0 2px #7a5220}
+.enter::before{left:-9px}.enter::after{right:-9px}
+.enter:active{transform:scale(.97)}
+.enter.boss{background:radial-gradient(ellipse 70% 60% at 50% 0,#e07a6aaa,transparent 70%),linear-gradient(#8a2018,#4a0c0a)}
+.enter.off{filter:grayscale(.6) brightness(.9);animation:none}
+.gem{position:relative;z-index:2;align-self:center;width:66px;margin:2px 0 -6px;pointer-events:none;filter:drop-shadow(0 0 10px #6fc0ffcc)}
+.gem svg{width:100%;height:auto;display:block;overflow:visible}
+.gem-body{animation:gemBob 2.4s ease-in-out infinite}
+@keyframes gemBob{50%{transform:translateY(-5px)}}
+.gem-ring{transform-origin:30px 58px;animation:gemRing 2.4s ease-out infinite}
+@keyframes gemRing{0%{transform:scale(.55);opacity:1}100%{transform:scale(1.35);opacity:0}}
+.plaque{position:relative;z-index:2;align-self:center;border:0;margin:0 0 6px;padding:8px 34px;border-radius:8px;font:900 16px var(--f-title);letter-spacing:.12em;color:#3a2a12;white-space:nowrap;
+  background:repeating-linear-gradient(115deg,#0000 0 17px,#c9b99a33 17px 18px),linear-gradient(#fffdf8,#ece2d2);
+  box-shadow:0 0 0 2px #d9ac4a,0 0 0 3px #7a5220,inset 0 0 0 1px #fff,inset 0 0 0 3px #e9cf8f88,0 5px 12px #0006}
+.plaque::before,.plaque::after{content:"";position:absolute;top:50%;width:26px;height:26px;margin-top:-13px;background:radial-gradient(circle at 40% 30%,#3c5cae,#17275c 70%);clip-path:polygon(50% 0,100% 50%,50% 100%,0 50%);box-shadow:none;outline:0;filter:drop-shadow(0 0 0 #e2b85a)}
+.plaque::before{left:-14px}.plaque::after{right:-14px}
+.plaque:active{filter:brightness(1.06)}
+
+/* dock：四顆月桂框的圓形按鈕 */
+.dock{position:relative;z-index:2;display:grid;grid-template-columns:repeat(4,1fr);gap:2px;padding:10px 8px 12px}
+.dock-btn{display:flex;flex-direction:column;align-items:center;gap:1px;padding:0;background:none;border:0}
+.dock-btn .ico{position:relative;width:74px;height:74px;display:grid;place-items:center}
+.dock-btn .ico::before{content:"";position:absolute;inset:11px;border-radius:50%;background:radial-gradient(circle at 40% 26%,#4366bd,#17275c 68%,#0c173e);box-shadow:0 0 0 2px #fff6d8,0 0 0 4px #d9ac4a,0 0 0 5px #7a5220,0 4px 8px #0006,inset 0 3px 6px #ffffff33}
+.dock-btn .ico>svg{position:relative;width:27px;height:27px;stroke:#fbe3a2;fill:none;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round;filter:drop-shadow(0 1px 0 #0b1436)}
+.dock-btn em{position:relative;margin-top:-6px;min-width:58px;padding:3px 9px 4px;border-radius:5px;font:900 13px var(--f-title);font-style:normal;letter-spacing:.06em;color:#3a2a12;white-space:nowrap;
+  background:linear-gradient(#fffdf8,#ece2d2);box-shadow:0 0 0 1.5px #d9ac4a,0 0 0 2.5px #7a5220,inset 0 0 0 1px #fff,0 3px 6px #0005}
+.dock-btn:active .ico{transform:scale(.94)}
+
+/* 戰鬥 */
+.screen{position:absolute;inset:0;z-index:10;display:flex;flex-direction:column;background:#0a0d18 50% 30%/cover no-repeat;overflow-y:auto}
+.b-top{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:10px 12px;background:var(--grain),linear-gradient(#2c2416,#120e08);background-blend-mode:overlay,normal;border-bottom:2px solid #8a5f22}
+.ghost{background:#0006;border:1px solid var(--gold-lo);border-radius:6px;padding:6px 10px;font-size:13px;color:var(--ink)}
+.b-floor{font:900 17px var(--f-title);letter-spacing:.06em;text-align:center}
+.b-floor.boss{color:#ff6a5e;text-shadow:0 0 12px #ff2a2a88}
+.b-bal{display:flex;align-items:center;gap:6px;font:800 14px var(--f-display);color:var(--gold-hi);font-variant-numeric:tabular-nums;white-space:nowrap}
+.b-bal .coin{width:20px;height:20px;font-size:9px;box-shadow:inset 0 0 0 1px #fbe6a4,0 1px 2px #000}
+.stage{position:relative;flex:none;height:clamp(230px,37vh,310px);display:flex;align-items:flex-end;justify-content:center;padding:36px 16px 14px;overflow:hidden}
+.stage::before{content:"";position:absolute;left:50%;bottom:8px;width:min(64vw,250px);height:34px;transform:translateX(-50%);border-radius:50%;background:radial-gradient(ellipse,#000000b3 0%,#00000066 45%,transparent 70%);box-shadow:0 0 0 1.5px #f8e2a055,0 0 22px #ffcf7a44}
+#battle.boss .stage::before{box-shadow:0 0 0 1.5px #ff6a5e88,0 0 26px #ff3a2a77}
+.m-info{position:absolute;z-index:2;top:10px;left:16px;right:16px;display:flex;align-items:center;gap:10px}
+.m-name{font:900 14px var(--f-title);white-space:nowrap;text-shadow:0 1px 2px #000,0 0 8px #000}
+.hp{flex:1;height:11px;border-radius:2px;background:#000c;box-shadow:inset 0 0 0 1px #c99232,0 0 0 1px #000;overflow:hidden}
+.hp i{display:block;height:100%;width:100%;background:linear-gradient(#ffb1a1,#e2392b 45%,#8e130c);transition:width .12s linear}
+.monster{position:relative;width:min(60vw,240px);height:min(60vw,240px);margin-bottom:-8px;filter:drop-shadow(0 6px 10px #000a) drop-shadow(0 0 18px #36c8ff55);animation:bob 2.6s ease-in-out infinite}
+.monster.boss{width:min(70vw,285px);height:min(70vw,285px);margin-bottom:-14px;filter:drop-shadow(0 6px 10px #000a) drop-shadow(0 0 22px #ff5a4a66)}
+.monster img{width:100%;height:100%;display:block;object-fit:contain;user-select:none;-webkit-user-drag:none}
+@keyframes bob{50%{transform:translateY(-6px)}}
+.monster.hit{animation:hit .28s}
+@keyframes hit{0%,100%{transform:none}20%{transform:translateX(-10px);filter:brightness(3)}40%{transform:translateX(8px)}60%{transform:translateX(-5px)}}
+.monster.dead{animation:dead .8s .05s forwards}
+@keyframes dead{0%{opacity:1;filter:brightness(5)}25%{opacity:1;filter:brightness(7);transform:scale(1.08)}100%{transform:scale(1.25);opacity:0;filter:brightness(8) blur(8px)}}
+.monster.lunge{animation:lunge .65s}
+@keyframes lunge{45%{transform:scale(1.4) translateY(26px)}}
+.monster.pre{opacity:0;animation:none}
+.monster.spawn{animation:spawn .75s cubic-bezier(.2,.9,.3,1.2) both}
+@keyframes spawn{0%{opacity:0;transform:translateY(26px) scale(.55);filter:brightness(6) blur(4px)}55%{opacity:1;filter:brightness(2.4)}100%{opacity:1;transform:none}}
+.summon{position:absolute;left:50%;bottom:2px;width:min(74vw,290px);height:min(74vw,290px);margin-bottom:max(-37vw,-145px);transform:translateX(-50%) translateY(50%) rotateX(72deg);pointer-events:none;opacity:0}
+.summon i{position:absolute;inset:0;border-radius:50%;border:3px double #bfe8ff;box-shadow:0 0 18px #6fd0ff,inset 0 0 26px #6fd0ff88}
+.summon i:last-child{inset:16%;border:2px dashed #e9f6ff}
+.summon.go{animation:sumFade 1.1s ease-out both}
+.summon.go i{animation:spin 1.1s linear}
+.summon.go i:last-child{animation:spin 1.1s linear reverse}
+#battle.boss .summon i{border-color:#ffc0b0;box-shadow:0 0 18px #ff5a4a,inset 0 0 26px #ff5a4a88}
+@keyframes sumFade{0%{opacity:0;scale:.3}25%{opacity:1}70%{opacity:1;scale:1}100%{opacity:0;scale:1.15}}
+.dmg{position:absolute;z-index:3;font:900 22px var(--f-display);color:#fff;-webkit-text-stroke:1px #0b3a2a;text-shadow:0 0 10px #5dffb0,0 2px 0 #000;pointer-events:none;animation:dmg .8s ease-out forwards;font-variant-numeric:tabular-nums}
+.dmg.s{-webkit-text-stroke:1px #4a0f0a;text-shadow:0 0 10px #ff7a66,0 2px 0 #000}
+.dmg.n{-webkit-text-stroke:1px #1c2a44;text-shadow:0 0 10px #a9c8ff,0 2px 0 #000}
+@keyframes dmg{0%{opacity:0;transform:translate(-50%,0) scale(.5)}18%{opacity:1;transform:translate(-50%,-10px) scale(1.25)}100%{opacity:0;transform:translate(-50%,-54px) scale(1)}}
+.fx{position:absolute;inset:0;z-index:13;width:100%;height:100%;pointer-events:none}
+/* 進入新一層的橫幅 */
+.wave{position:absolute;inset:0;z-index:12;pointer-events:none;overflow:hidden;animation:waveDim 1.45s ease both}
+@keyframes waveDim{0%,100%{background:#0000}20%,78%{background:#02040a8c}}
+.wave-band{position:absolute;left:0;right:0;top:calc(36% - 60px);height:120px;background:linear-gradient(90deg,transparent,#fff3 50%,transparent) 0 0/40% 100% no-repeat,linear-gradient(transparent,#04060ee6 16%,#0a0d1cf2 50%,#04060ee6 84%,transparent);border-block:1px solid #f8e2a0aa;box-shadow:0 0 30px #000;animation:waveBand 1.45s cubic-bezier(.2,.8,.2,1) both}
+@keyframes waveBand{0%{transform:scaleY(0);background-position:-40% 0,0 0}16%{transform:scaleY(1)}84%{transform:scaleY(1);background-position:140% 0,0 0}100%{transform:scaleY(0);background-position:140% 0,0 0}}
+.wave-txt{position:absolute;left:0;right:0;top:calc(36% - 60px);height:120px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;animation:waveTxt 1.45s cubic-bezier(.2,.8,.2,1) both}
+@keyframes waveTxt{0%{opacity:0;transform:translateX(-70%) skewX(-20deg);filter:blur(8px)}22%{opacity:1;transform:translateX(-2%);filter:blur(0)}76%{opacity:1;transform:translateX(3%);filter:blur(0)}100%{opacity:0;transform:translateX(70%) skewX(-20deg);filter:blur(8px)}}
+.wave-txt b{font:900 clamp(34px,11vw,50px)/1.1 var(--f-title);letter-spacing:.18em;padding-left:.18em;background:linear-gradient(180deg,#fffdf4 0%,#ffe9ae 32%,#e2a93c 52%,#7a4c12 55%,#e9b85a 74%,#fff3c8 100%);-webkit-background-clip:text;background-clip:text;color:transparent;filter:drop-shadow(0 2px 0 #1b0f03) drop-shadow(0 0 14px #ffb84a99)}
+.wave-txt span{font:800 13px var(--f-display);letter-spacing:.5em;padding-left:.5em;color:#f3dca0;text-shadow:0 1px 2px #000}
+.wave.boss .wave-txt b{background:linear-gradient(180deg,#fff0ea 0%,#ffb09c 32%,#e2482c 52%,#6a1208 55%,#f0705a 74%,#ffd9cf 100%);-webkit-background-clip:text;background-clip:text;filter:drop-shadow(0 2px 0 #2a0503) drop-shadow(0 0 16px #ff3a2acc)}
+.wave.boss .wave-band{border-block-color:#ff7a66cc}
+.wave.boss .wave-txt span{color:#ffc4b8}
+.claw{position:absolute;inset:0;pointer-events:none;opacity:0}
+.claw.go{animation:claw .7s}
+@keyframes claw{25%{opacity:1;box-shadow:inset 0 0 90px 24px #ff2a2a99}}
+.shake{animation:shake .45s}
+@keyframes shake{20%{transform:translate(-6px,3px)}40%{transform:translate(5px,-3px)}60%{transform:translate(-4px,2px)}80%{transform:translate(3px,-1px)}}
+.pop{position:absolute;left:50%;top:42%;font:900 32px var(--f-display);pointer-events:none;white-space:nowrap;animation:pop 1.4s forwards}
+.pop.good{color:var(--gold-hi);text-shadow:0 2px 0 #000,0 0 18px #ffcf5a}
+.pop.bad{color:#ff6b5e;text-shadow:0 2px 0 #000}
+@keyframes pop{0%{opacity:0;transform:translate(-50%,-20%) scale(.6)}20%{opacity:1;transform:translate(-50%,-50%) scale(1.15)}100%{opacity:0;transform:translate(-50%,-150%)}}
+.spark{position:absolute;left:50%;top:55%;width:10px;height:10px;border-radius:50%;background:radial-gradient(#fff6c8,#e0a530);box-shadow:0 0 8px #ffcf5a;pointer-events:none;animation:spark .9s ease-out forwards}
+@keyframes spark{to{transform:translate(var(--dx),var(--dy)) scale(.3);opacity:0}}
+
+.chart-card{margin:10px 12px 0;border-radius:10px;padding:10px;display:flex;flex-direction:column;gap:6px}
+.chart-head{position:relative;display:flex;justify-content:space-between;align-items:center;gap:8px}
+.sym{font:900 14px var(--f-title);min-width:0}
+.sym small{display:block;font:500 11px var(--f-body);color:var(--muted)}
+.tabs{display:flex;background:#000a;border-radius:6px;padding:3px;box-shadow:inset 0 0 0 1px #5a3c14;flex:none}
+.tabs button{border:0;background:none;padding:4px 12px;border-radius:4px;font:800 12px var(--f-display);color:var(--muted)}
+.tabs button.on{background:linear-gradient(#f2d28a,#b8862f 55%,#7a5220);color:#1a1408}
+#chart{position:relative;width:100%;height:clamp(190px,30vh,300px);display:block}
+.chart-foot{position:relative;font-size:11.5px;line-height:1.5;color:var(--muted)}
+.actions{display:grid;grid-template-columns:1fr .82fr 1fr;gap:8px;padding:12px}
+.act{position:relative;border:0;border-radius:8px;padding:11px 8px;display:flex;flex-direction:column;align-items:center;gap:1px;font:900 22px var(--f-title);letter-spacing:.12em;color:#fff;text-shadow:0 2px 0 #0007;box-shadow:inset 0 -5px 0 #0006,inset 0 2px 0 #fff5,0 0 0 2px #0008,0 0 0 4px #c99232,0 6px 12px #000a}
+.act small{font:700 11px var(--f-body);letter-spacing:.06em;opacity:.92}
+.act.long{background:radial-gradient(ellipse at 50% 0%,#9effc6aa,transparent 60%),linear-gradient(#36b06c,#165c36)}
+.act.short{background:radial-gradient(ellipse at 50% 0%,#ffb2a8aa,transparent 60%),linear-gradient(#e0473c,#7e1812)}
+.act.flat{font-size:17px;letter-spacing:.06em;background:radial-gradient(ellipse at 50% 0%,#e6eefaaa,transparent 60%),linear-gradient(#6c7a90,#2c3646)}
+.streak{position:absolute;z-index:2;top:30px;right:16px;display:flex;align-items:center;gap:8px;padding:4px 10px 4px 8px;border-radius:999px;background:#000b;box-shadow:inset 0 0 0 1px #8a5f22}
+.streak b{font:900 15px var(--f-display);color:var(--gold-hi);font-variant-numeric:tabular-nums}
+.streak span{font:700 11px var(--f-title);color:var(--muted)}
+.pips{display:flex;gap:4px}
+.pips i{width:9px;height:9px;transform:rotate(45deg);background:#2a2015;box-shadow:inset 0 0 0 1px #8a5f22}
+.pips i.on{background:linear-gradient(135deg,#fff3c0,#e0a530);box-shadow:0 0 8px #ffc65a}
+.streak.hot{animation:hot 1s ease-in-out infinite}
+@keyframes hot{50%{box-shadow:inset 0 0 0 1px #ffd26a,0 0 16px #ff9a3a}}
+.monster.dodge{animation:dodge .8s}
+@keyframes dodge{30%{transform:scale(1.3) translateY(18px)}55%{transform:translateX(-40px) rotate(-8deg)}100%{transform:none}}
+.bonus-row{position:relative;display:flex;justify-content:space-between;align-items:center;padding:8px 10px;border-radius:6px;background:linear-gradient(90deg,#f2c25a33,#f2c25a08);box-shadow:inset 0 0 0 1px #c99232;font:700 13px var(--f-title)}
+.bonus-row b{font:900 16px var(--f-display);color:var(--gold-hi)}
+.flat-t{color:#b9c6d8}
+.rules{display:grid;gap:10px;font-size:13.5px;line-height:1.7}
+.rules h3{margin:6px 0 0;font:900 15px var(--f-title);color:var(--gold-hi);letter-spacing:.06em}
+.rules p{margin:0}
+.rules ul:not(.titles){margin:0;padding-left:1.2em;display:grid;gap:4px}
+.act:disabled{filter:grayscale(.75) brightness(.6);cursor:default}
+.act.picked{filter:none;outline:3px solid var(--gold-hi);outline-offset:4px}
+.result{margin:0 12px 16px;padding:14px;border-radius:10px;display:grid;gap:12px}
+.verdict{position:relative;display:flex;align-items:baseline;justify-content:space-between;gap:10px}
+.verdict h3{margin:0;font:900 22px var(--f-title)}
+.verdict .amt{font:900 22px var(--f-display);font-variant-numeric:tabular-nums}
+.good-t{color:var(--long)} .bad-t{color:var(--short)}
+.facts{position:relative;display:grid;grid-template-columns:auto 1fr;gap:5px 12px;font-size:13px;margin:0}
+.facts dt{color:var(--muted)} .facts dd{margin:0;font-variant-numeric:tabular-nums;min-width:0}
+.row{position:relative;display:flex;gap:8px}
+.btn{flex:1;border:0;border-radius:6px;padding:12px;font:900 14px var(--f-title);letter-spacing:.08em}
+.btn.gold{background:linear-gradient(#fff0bf,#e0b04f 45%,#9a6a22);color:#2a1806;box-shadow:inset 0 -3px 0 #0005,inset 0 1px 0 #fff8,0 0 0 1px #3a260c,0 3px 8px #000a}
+.btn.dim{background:linear-gradient(#2c2416,#120e08);color:var(--ink);box-shadow:inset 0 0 0 1px #8a5f22}
+.btn:disabled{opacity:.55;cursor:default}
+
+/* 魔王警告 */
+.avatar img{width:100%;height:100%;display:block;object-fit:cover}
+.topbar{align-items:center;gap:0;padding:8px 6px 0}
+#meFrame{position:relative;flex:none;display:block;width:min(232px,56vw);aspect-ratio:3;background:center/100% 100% no-repeat;filter:drop-shadow(0 3px 5px #0006)}
+#meFrame .laurel{display:none}
+#meFrame .av-wrap{position:absolute;left:17.75%;top:55.8%;width:19.6%;height:auto;aspect-ratio:1;transform:translate(-50%,-50%);display:block}
+#meFrame .avatar{width:100%;height:100%;box-shadow:none;background:#e9e2d2}
+#meFrame .me-side{position:absolute;left:36%;right:13%;top:43%;height:31%;margin:0;display:grid;align-items:center;justify-items:start}
+#meFrame .me-row .name{font:900 15px var(--f-title);color:#fdf1cc;text-shadow:0 1px 0 #0b1436,0 0 6px #0b1436}
+.wallet{width:min(168px,42vw);margin:-4px 0 0}
+
+/* ===== 彈出頁：藍色玻璃 ===== */
+.sheet{background:#050b24a6;-webkit-backdrop-filter:blur(3px);backdrop-filter:blur(3px)}
+.sheet-card.gild{--ink:#fff;--muted:#cfdcff;--dim:#e6edff;--gold:#e2b85a;--gold-hi:#ffe9ae;--gold-lo:#a9c8ff;color:#fff;border:0;border-radius:0;background:none;box-shadow:none;padding:0 10px calc(14px + env(safe-area-inset-bottom,0px));max-height:92%}
+.sheet-card.gild::before{display:none}
+.glass,.sheet-head,#sheetBody{-webkit-backdrop-filter:blur(8px) saturate(1.2);backdrop-filter:blur(8px) saturate(1.2)}
+.sheet-head{position:sticky;top:0;z-index:2;margin:0 0 10px;padding:13px 14px 13px 18px;border-radius:16px;overflow:hidden;
+  background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 120' fill='none' stroke='%23bcd6ff' stroke-width='.7'%3E%3Ccircle cx='60' cy='60' r='44' opacity='.5'/%3E%3Ccircle cx='60' cy='60' r='32' opacity='.35'/%3E%3Cpath d='M60 2l5 53 53 5-53 5-5 53-5-53-53-5 53-5z' fill='%23fff3d0' fill-opacity='.4' stroke='%23ffe9ae'/%3E%3Cpath d='M30 30l26 26M90 30L64 56M30 90l26-26M90 90L64 64' opacity='.6'/%3E%3C/svg%3E") right 52px center/88px no-repeat,radial-gradient(ellipse at 70% 50%,#3f7dffaa,transparent 55%),linear-gradient(120deg,#0c1c5ef2,#1840a8f2 70%,#0f2a7ef2);
+  box-shadow:inset 0 0 0 1.5px #9cc4ff,inset 0 0 18px #5b9bff88,inset 0 -1.5px 0 #e2b85a,0 0 16px #4f8fffaa}
+.sheet-head h2{font-size:23px;background:linear-gradient(180deg,#fffdf4,#ffe9ae 45%,#e2b04a);-webkit-background-clip:text;background-clip:text;color:transparent;filter:drop-shadow(0 1px 0 #0b1436)}
+.sheet .x{position:relative;z-index:1;width:38px;height:38px;background:#0b1e62cc;color:#fff;font-size:17px;box-shadow:inset 0 0 0 1.5px #cfe0ff,0 0 10px #7fb0ff}
+#sheetBody{padding:12px;border-radius:16px;background:linear-gradient(170deg,#1b3a96b0,#0f246ebd 50%,#0a1a56c7);box-shadow:inset 0 0 0 1.5px #9cc4ff,inset 0 0 26px #5b9bff66,inset 0 1px 0 #fff8,0 0 0 1px #e2b85a88,0 0 18px #4f8fff99}
+.sheet .seg{background:#0b143688;box-shadow:inset 0 0 0 1px #9cc4ffaa;border-radius:12px}
+.sheet .seg button{border-radius:9px;color:#cfdcff}
+.sheet .seg button.on{background:linear-gradient(#fff3c4,#e8bd5a 55%,#b8862f);color:#1b2550}
+.sheet .lb li,.sheet .titles li,.sheet .stat{background:linear-gradient(90deg,#ffffff24,#ffffff12);box-shadow:inset 0 0 0 1px #b9d3ffaa,inset 0 1px 0 #ffffff55;border-radius:12px}
+.sheet .titles li{padding:11px 14px}
+.sheet .titles li:not(.got){background:linear-gradient(90deg,#ffffff1a,#ffffff0a)}
+.sheet .titles li:not(.got) .tn::before{content:"✦";margin-right:9px;font-size:11px;color:#8fc0ff;text-shadow:0 0 6px #6fa8ff}
+.sheet .titles li:not(.got) .tn{color:#fff}
+.sheet .titles .tv{color:#fff;font-size:13px}
+.sheet .titles li.got .tv{color:#9fd4ff}
+.sheet .lb li.me,.sheet .titles li.cur{background:linear-gradient(100deg,#0c1c5ef0,#1b49b8f0 60%,#0f2a7ef0);box-shadow:inset 0 0 0 1.5px #ffe9ae,inset 4px 0 0 #e2b85a,0 0 14px #ffd98a88,0 0 18px #4f8fffaa}
+.sheet .titles li.cur .tn,.sheet .titles li.cur .tv{color:#ffe9ae}
+.sheet .rk{color:#cfdcff}.sheet .rk.r1{color:#ffd76a;text-shadow:0 0 10px #ffb84a}.sheet .rk.r2{color:#eef3ff}.sheet .rk.r3{color:#f0b488}
+.sheet .val{color:#ffe9ae}
+.sheet .stat b{color:#fff}
+.sheet .now-title{position:relative;overflow:hidden;padding:14px;border-radius:14px;color:#fff;
+  background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 120' fill='none' stroke='%23bcd6ff' stroke-width='.7'%3E%3Ccircle cx='60' cy='60' r='44' opacity='.5'/%3E%3Ccircle cx='60' cy='60' r='32' opacity='.35'/%3E%3Cpath d='M60 2l5 53 53 5-53 5-5 53-5-53-53-5 53-5z' fill='%23fff3d0' fill-opacity='.4' stroke='%23ffe9ae'/%3E%3Cpath d='M30 30l26 26M90 30L64 56M30 90l26-26M90 90L64 64' opacity='.6'/%3E%3C/svg%3E") right -14px top -10px/130px no-repeat,radial-gradient(ellipse at 90% 30%,#3f7dff99,transparent 55%),linear-gradient(120deg,#0a184ee6,#12308ce6);
+  box-shadow:inset 0 0 0 1.5px #b9d3ff,inset 0 0 20px #5b9bff66,inset 2px -2px 0 #e2b85a66,0 0 12px #4f8fff88}
+.sheet .now-title .metal-text,.sheet .big-plus.metal-text{background:linear-gradient(180deg,#fffdf4,#ffe9ae 45%,#e2b04a);-webkit-background-clip:text;background-clip:text;color:transparent}
+.sheet .now-title b{font-size:28px}
+.sheet .meter{height:10px;background:#081238;box-shadow:inset 0 0 0 1px #9cc4ffaa;border-radius:999px}.sheet .meter i{background:linear-gradient(90deg,#c9993a,#fff3c4);border-radius:999px}
+.sheet .hint{color:#e6edff}
+.sheet .code input{background:#081238aa;color:#ffe9ae;border:1.5px dashed #e2b85a;border-radius:10px}
+.sheet .btn{border-radius:10px}
+.sheet .btn.dim{background:#0b143688;color:#fff;box-shadow:inset 0 0 0 1.5px #b9d3ff}
+.sheet .btn.gold{background:linear-gradient(#fff3c4,#e8bd5a 50%,#b8862f);color:#1b2550;box-shadow:inset 0 0 0 1px #fff8,0 0 0 1px #7a5220,0 3px 8px #0a143488}
+.sheet .rules h3{color:#ffe9ae}
+.sheet .flat-t{color:#cfdcff}.sheet .good-t{color:#5fe3a0}.sheet .bad-t{color:#ff8a80}
+.dock{gap:0;padding:6px 4px 10px}
+.dock-btn{position:relative;display:block;width:100%;max-width:104px;justify-self:center;aspect-ratio:260/270;background:center/100% 100% no-repeat;filter:drop-shadow(0 3px 4px #0005);transition:transform .12s}
+.dock-btn .ico{display:none}
+.dock-btn em{position:absolute;left:14%;right:14%;top:75.5%;height:16%;margin:0;min-width:0;padding:0;display:grid;place-items:center;background:none;box-shadow:none;border-radius:0;font-size:clamp(11px,3.3vw,13px);letter-spacing:.02em;color:#3a2a12;text-shadow:0 1px 0 #fff}
+.dock-btn:active{transform:scale(.95)}
+.fill2{flex:.72;min-height:0}
+.gem .gem-body{display:none}
+.gem-img{position:absolute;left:50%;top:-4%;height:86%;width:auto;margin-left:-20.5%;animation:gemBob 2.4s ease-in-out infinite;filter:drop-shadow(0 0 8px #6fc0ffcc)}
+.gem{filter:none;width:74px}
+.enter,.enter.boss{width:min(255px,66vw);font-size:21px;aspect-ratio:600/170;padding:0;border-radius:0;background:center/100% 100% no-repeat;box-shadow:none;animation:none;display:grid;place-items:center;letter-spacing:.24em;padding-left:.24em;color:#fff1cf;text-shadow:0 0 10px #ffd98a,0 2px 0 #0b1436;filter:drop-shadow(0 0 10px #4f9bffaa) drop-shadow(0 4px 8px #0a143466)}
+.enter::before,.enter::after{display:none}
+.enter.art-txt span{opacity:0}
+.enter.boss{filter:hue-rotate(125deg) saturate(1.3) drop-shadow(0 0 10px #ff5a4aaa)}
+.enter:active{transform:scale(.97)}
+.ticker{position:relative;z-index:2;display:flex;align-items:center;gap:8px;height:34px;margin:-37px 66px 0 12px;padding:0 12px 0 10px;border-radius:999px;background:linear-gradient(#24408ee0,#101e55e0);box-shadow:inset 0 0 0 1.5px #e2b85a,inset 0 2px 4px #ffffff22,0 3px 8px #0a143466}
+.ticker[hidden]+.plaque{margin-top:6px}
+.tk-ico{flex:none;color:#ffe9ae;font-size:13px;text-shadow:0 0 8px #ffd26a}
+.tk-win{flex:1;min-width:0;overflow:hidden;white-space:nowrap;-webkit-mask-image:linear-gradient(90deg,transparent,#000 8%,#000 92%,transparent);mask-image:linear-gradient(90deg,transparent,#000 8%,#000 92%,transparent)}
+#tkTxt{display:inline-block;font:900 13px var(--f-title);letter-spacing:.06em;color:#fff7dc;will-change:transform}
+
+/* ===== 彈出頁：星空金線 ===== */
+.sheet{background:center bottom/cover no-repeat #0d1038;-webkit-backdrop-filter:none;backdrop-filter:none;align-items:center}
+.sheet-card.gild{max-height:100%;width:100%;padding:14px 12px calc(14px + env(safe-area-inset-bottom,0px));--muted:#d9d3f2}
+.sheet-head{border-radius:999px;padding:12px 14px 12px 22px;margin-bottom:12px;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M12 0l2 10 10 2-10 2-2 10-2-10L0 12l10-2z' fill='%23ffe9ae'/%3E%3C/svg%3E") right 58px center/40px no-repeat,linear-gradient(100deg,#14164aee,#2a2a78ee 55%,#4a3a8cee);box-shadow:inset 0 0 0 1.5px #f3d58a,inset 0 0 0 4px #0c123655,0 0 16px #ffd98a55}
+.sheet-head h2{font-size:24px;letter-spacing:.1em}
+.sheet .x{background:#14164a;box-shadow:inset 0 0 0 1.5px #f3d58a,0 0 10px #ffd98a66;color:#fff}
+#sheetBody{border-radius:20px;padding:12px;background:linear-gradient(170deg,#1b1c58c7,#22205fbd 50%,#17164ad1);box-shadow:inset 0 0 0 1.5px #f3d58acc,inset 0 0 0 5px #0c123644,inset 0 0 30px #8f7bff33,0 0 18px #ffd98a44}
+.sheet .seg{border-radius:999px;background:#0c123699;box-shadow:inset 0 0 0 1px #f3d58a99;padding:4px}
+.sheet .seg button{border-radius:999px;font-size:16px;padding:10px;color:#e6e0fa}
+.sheet .seg button.on{background:linear-gradient(#fff3c4,#f0c877 55%,#dba850);color:#2a2258;box-shadow:0 0 12px #ffd98a88}
+.sheet .lb li,.sheet .titles li,.sheet .stat{border-radius:14px;background:linear-gradient(90deg,#2a2a70b3,#3a3478a6 60%,#2a2a70b3);box-shadow:inset 0 0 0 1px #f3d58a99,inset 0 1px 0 #ffffff33}
+.sheet .lb li{grid-template-columns:44px minmax(0,1fr) auto;padding:9px 12px}
+.sheet .lb li.me,.sheet .titles li.cur{background:linear-gradient(100deg,#14164af2,#34308cf2 55%,#5a4a9cf2);box-shadow:inset 0 0 0 2px #ffe9ae,0 0 16px #ffd98a99,0 0 4px #fff}
+.sheet .rk{width:40px;height:40px;display:grid;place-items:center;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40' fill='none' stroke='%23cfd6ff'%3E%3Ccircle cx='20' cy='20' r='13' stroke-width='1.2'/%3E%3Ccircle cx='20' cy='20' r='10' stroke-width='.6' opacity='.6'/%3E%3Cpath d='M20 0l2 6-2 2-2-2zM20 40l2-6-2-2-2 2zM0 20l6-2 2 2-2 2zM40 20l-6-2-2 2 2 2z' fill='%23cfd6ff' stroke='none'/%3E%3C/svg%3E") center/contain no-repeat;color:#fff}
+.sheet .rk i{font-style:normal}
+.sheet .rk.r1,.sheet .rk.r3,.sheet .lb li.me .rk{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40' fill='none' stroke='%23ffe9ae'%3E%3Ccircle cx='20' cy='20' r='13' stroke-width='1.2'/%3E%3Ccircle cx='20' cy='20' r='10' stroke-width='.6' opacity='.6'/%3E%3Cpath d='M20 0l2 6-2 2-2-2zM20 40l2-6-2-2-2 2zM0 20l6-2 2 2-2 2zM40 20l-6-2-2 2 2 2z' fill='%23ffe9ae' stroke='none'/%3E%3C/svg%3E");color:#ffe9ae;text-shadow:0 0 8px #ffb84a}
+.sheet .nm b{font:900 16px var(--f-title);letter-spacing:.04em}
+.sheet .val{font-size:18px;color:#ffe9ae}
+.sheet .titles li{padding:13px 16px;border-radius:999px}
+.sheet .titles .tn{font-size:17px}
+.sheet .titles .tn::before,.sheet .titles li:not(.got) .tn::before{content:"✦";margin-right:12px;font-size:14px;color:#ffe9ae;text-shadow:0 0 8px #ffd26a}
+.sheet .titles .tv{font-size:15px;font-weight:900}
+.sheet .now-title{border-radius:18px;padding:16px;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M12 0l2 10 10 2-10 2-2 10-2-10L0 12l10-2z' fill='%23ffe9ae'/%3E%3C/svg%3E") right 14px top 14px/64px no-repeat,linear-gradient(120deg,#14164aeb,#2f2c80eb 60%,#5a4a9ceb);box-shadow:inset 0 0 0 1.5px #f3d58a,inset 0 0 24px #8f7bff44,0 0 14px #ffd98a55}
+.sheet .now-title b{font-size:30px}
+.sheet .meter{background:#0c1236;box-shadow:inset 0 0 0 1px #f3d58a99}
+.sheet .hint{color:#ece6ff}
+.sheet .btn{border-radius:999px}
+.sheet .btn.dim{background:#0c123699;box-shadow:inset 0 0 0 1.5px #f3d58a;color:#fff3d0}
+.sheet .btn.gold{background:linear-gradient(#fff3c4,#f0c877 50%,#d9a24e);color:#2a2258}
+.sheet .code input{background:#0c1236aa;border:1.5px solid #f3d58a99;border-radius:12px;color:#fff}
+.rename{margin:0 0 4px}.rn-l{font-size:12.5px;color:#ece6ff}
+
+/* ===== 彈出頁與登入：深藍金線 ===== */
+.sheet-card.gild,#gate .gate-card.gild{--ink:#fff;--muted:#e6e9ff;--dim:#e6e9ff;--gold-hi:#ffe9ae;--gold:#f3d58a;--gold-lo:#f3d58a;color:#fff}
+.sheet-head,#sheetBody,#gate .gate-card.gild{-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px)}
+.sheet-head{background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 48 48' fill='none' stroke='%23f3d58a' stroke-width='.8'%3E%3Ccircle cx='24' cy='24' r='15' opacity='.7'/%3E%3Ccircle cx='24' cy='24' r='10' opacity='.4'/%3E%3Cpath d='M24 0l2.6 21.4L48 24l-21.4 2.6L24 48l-2.6-21.4L0 24l21.4-2.6z' fill='%23ffe9ae' stroke='none'/%3E%3C/svg%3E") right 56px center/46px no-repeat,linear-gradient(100deg,#141d5cf0,#1e2a78eb 55%,#3a3590e6);box-shadow:inset 0 0 0 1.5px #f3d58a,inset 0 0 0 4px #0b123a66,0 0 0 1px #fff3c455,0 0 16px #ffd98a66}
+.sheet-head h2,.sheet .now-title .metal-text,.sheet .big-plus.metal-text{background:linear-gradient(180deg,#fffdf4,#ffe9ae 50%,#e6b860);-webkit-background-clip:text;background-clip:text;color:transparent;filter:drop-shadow(0 1px 0 #0b123a)}
+.sheet-head h2{font-size:26px}
+.sheet .x{background:#141d5c;color:#fff;box-shadow:inset 0 0 0 1.5px #f3d58a,0 0 10px #ffd98a66}
+#sheetBody,#gate .gate-card.gild{background:linear-gradient(170deg,#121a55d9,#1e2a78d1 50%,#101850de);box-shadow:inset 0 0 0 1.5px #f3d58a,inset 0 0 0 5px #0b123a55,0 0 0 1px #fff3c455,0 0 18px #ffd98a55}
+#gate .gate-card.gild::before{border-color:#f3d58a55}
+.sheet .seg,#gate .seg{background:#0b123a99;box-shadow:inset 0 0 0 1px #f3d58a99}
+.sheet .seg button,#gate .seg button{color:#e6e9ff}
+.sheet .seg button.on,#gate .seg button.on{background:linear-gradient(#fff3c4,#f0c877 55%,#dba850);color:#141d5c;text-shadow:none;box-shadow:0 0 12px #ffd98a88}
+.sheet .lb{max-height:58vh;overflow-y:auto;padding:2px}
+.sheet .lb li,.sheet .titles li,.sheet .stat{background:linear-gradient(100deg,#18246ecc,#22308accc 55%,#3a3a92b3);box-shadow:inset 0 0 0 1.5px #f3d58acc,inset 0 0 0 3px #0b123a44,0 0 8px #ffd98a33}
+.sheet .titles li:not(.got){background:linear-gradient(100deg,#141d5cb3,#1c2874a6)}
+.sheet .titles li:not(.got) .tn,.sheet .titles .tv{color:#fff}
+.sheet .titles li.got .tv{color:#ffe9ae}
+.sheet .lb li.me,.sheet .titles li.cur{background:linear-gradient(100deg,#1c2a80f5,#3a3ca0f5 55%,#6a58b0f0);box-shadow:inset 0 0 0 2px #ffe9ae,0 0 16px #ffd98aaa,0 0 3px #fff}
+.sheet .titles li.cur .tn,.sheet .titles li.cur .tv,.sheet .lb li.me .val,.sheet .lb li.me .nm b{color:#ffe9ae;text-shadow:none}
+.sheet .titles .tn::before,.sheet .titles li:not(.got) .tn::before,.sheet .titles li.cur .tn::before{color:#ffe9ae;text-shadow:0 0 8px #ffd26a}
+.sheet .rk{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40' fill='none' stroke='%23dfe4ff'%3E%3Ccircle cx='20' cy='20' r='13' stroke-width='1.2'/%3E%3Cpath d='M20 0l2 6-2 2-2-2zM20 40l2-6-2-2-2 2zM0 20l6-2 2 2-2 2zM40 20l-6-2-2 2 2 2z' fill='%23dfe4ff' stroke='none'/%3E%3C/svg%3E");color:#fff}
+.sheet .rk.r1,.sheet .rk.r3,.sheet .lb li.me .rk{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40' fill='none' stroke='%23ffe9ae'%3E%3Ccircle cx='20' cy='20' r='13' stroke-width='1.2'/%3E%3Cpath d='M20 0l2 6-2 2-2-2zM20 40l2-6-2-2-2 2zM0 20l6-2 2 2-2 2zM40 20l-6-2-2 2 2 2z' fill='%23ffe9ae' stroke='none'/%3E%3C/svg%3E");color:#ffe9ae}
+.sheet .val{color:#ffe9ae}
+.sheet .stat{padding:12px 14px}
+.sheet .stat span{font-size:13px;color:#e6e9ff}
+.sheet .stat b{font-size:22px;background:linear-gradient(180deg,#fffdf4,#ffe9ae 50%,#e6b860);-webkit-background-clip:text;background-clip:text;color:transparent}
+.sheet .now-title{background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 48 48' fill='none' stroke='%23f3d58a' stroke-width='.8'%3E%3Ccircle cx='24' cy='24' r='15' opacity='.7'/%3E%3Ccircle cx='24' cy='24' r='10' opacity='.4'/%3E%3Cpath d='M24 0l2.6 21.4L48 24l-21.4 2.6L24 48l-2.6-21.4L0 24l21.4-2.6z' fill='%23ffe9ae' stroke='none'/%3E%3C/svg%3E") right 12px center/72px no-repeat,linear-gradient(110deg,#141d5cf0,#22308aeb 55%,#4a4298e0);box-shadow:inset 0 0 0 1.5px #f3d58a,inset 0 0 0 4px #0b123a55,0 0 12px #ffd98a55;color:#fff;--muted:#e6e9ff}
+.sheet .meter{background:#0b123a;box-shadow:inset 0 0 0 1px #f3d58a99}.sheet .meter i{background:linear-gradient(90deg,#c9993a,#fff3c4)}
+.sheet .hint,.rn-l{color:#e6e9ff}
+.sheet .btn.dim{background:linear-gradient(100deg,#141d5ce6,#22308ae6);box-shadow:inset 0 0 0 1.5px #f3d58a,0 0 10px #ffd98a44;color:#ffe9ae;padding:14px;font-size:16px;letter-spacing:.2em}
+.sheet .btn.gold,#gate .btn.gold{background:linear-gradient(#fff3c4,#f0c877 50%,#d9a24e);color:#141d5c;text-shadow:none;box-shadow:inset 0 0 0 1px #fff8,0 0 14px #ffd98a77}
+.sheet .code input,#gate .form input{background:#0b123aaa;border:0;box-shadow:inset 0 0 0 1.5px #f3d58a99;color:#fff}
+#gate .form input::placeholder{color:#a9b0d8}
+#gate .form input:focus{outline:2px solid #ffe9ae;box-shadow:inset 0 0 0 1.5px #ffe9ae}
+#gate .form label{color:#e6e9ff}
+#gate .linkish{color:#ffe9ae}
+.sheet .err,#gate .err{color:#ffb3ab}
+.sheet .rules h3{color:#ffe9ae}
+.sheet .flat-t{color:#cfdcff}.sheet .good-t{color:#5fe3a0}.sheet .bad-t{color:#ff8a80}
+.sheet .lb li.t1{background:linear-gradient(100deg,#7a5a14e6,#1c2a80e6 45%,#3a3a92cc);box-shadow:inset 0 0 0 2px #ffd76a,inset 0 0 0 4px #0b123a66,0 0 14px #ffd76a99}
+.sheet .lb li.t1 .rk{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40' fill='none' stroke='%23ffd76a'%3E%3Ccircle cx='20' cy='20' r='13' stroke-width='1.6'/%3E%3Ccircle cx='20' cy='20' r='10' stroke-width='.7'/%3E%3Cpath d='M20 0l2 6-2 2-2-2zM20 40l2-6-2-2-2 2zM0 20l6-2 2 2-2 2zM40 20l-6-2-2 2 2 2z' fill='%23ffd76a' stroke='none'/%3E%3C/svg%3E");color:#fff3c4;text-shadow:0 0 8px #ffd76a}
+.sheet .lb li.t1 .nm b,.sheet .lb li.t1 .val{color:#fff3c4}
+.sheet .lb li.t2{background:linear-gradient(100deg,#4a5672e6,#1c2a80e6 45%,#3a3a92cc);box-shadow:inset 0 0 0 2px #e3e9f5,inset 0 0 0 4px #0b123a66,0 0 14px #e3e9f599}
+.sheet .lb li.t2 .rk{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40' fill='none' stroke='%23e3e9f5'%3E%3Ccircle cx='20' cy='20' r='13' stroke-width='1.6'/%3E%3Ccircle cx='20' cy='20' r='10' stroke-width='.7'/%3E%3Cpath d='M20 0l2 6-2 2-2-2zM20 40l2-6-2-2-2 2zM0 20l6-2 2 2-2 2zM40 20l-6-2-2 2 2 2z' fill='%23e3e9f5' stroke='none'/%3E%3C/svg%3E");color:#ffffff;text-shadow:0 0 8px #e3e9f5}
+.sheet .lb li.t2 .nm b,.sheet .lb li.t2 .val{color:#ffffff}
+.sheet .lb li.t3{background:linear-gradient(100deg,#6e4226e6,#1c2a80e6 45%,#3a3a92cc);box-shadow:inset 0 0 0 2px #e8a878,inset 0 0 0 4px #0b123a66,0 0 14px #e8a87899}
+.sheet .lb li.t3 .rk{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40' fill='none' stroke='%23e8a878'%3E%3Ccircle cx='20' cy='20' r='13' stroke-width='1.6'/%3E%3Ccircle cx='20' cy='20' r='10' stroke-width='.7'/%3E%3Cpath d='M20 0l2 6-2 2-2-2zM20 40l2-6-2-2-2 2zM0 20l6-2 2 2-2 2zM40 20l-6-2-2 2 2 2z' fill='%23e8a878' stroke='none'/%3E%3C/svg%3E");color:#ffd9bd;text-shadow:0 0 8px #e8a878}
+.sheet .lb li.t3 .nm b,.sheet .lb li.t3 .val{color:#ffd9bd}
+.sheet .lb li.top{padding-block:12px;margin-inline:2px}
+.sheet .lb li.top .rk{width:46px;height:46px;font-size:20px;margin-left:-3px}
+.sheet .lb li.top .nm b{font-size:17px}.sheet .lb li.top .val{font-size:20px}
+.sheet .lb li.t1 .nm b::before{content:"♛ ";color:#ffd76a}
+.sheet .lb li.t3{margin-bottom:8px}
+.sheet .lb li.top.me{box-shadow:inset 0 0 0 2px #fff,inset 0 0 0 4px #ffe9ae,0 0 18px #ffd98a}
+.lots{display:flex;align-items:center;gap:10px;margin:12px 14px -4px;padding:7px 12px;border-radius:999px;background:linear-gradient(#24408ee6,#101e55e6);box-shadow:inset 0 0 0 1.5px #e2b85a,0 3px 8px #0a143488}
+.lots-k{flex:none;font:900 13px var(--f-title);color:#ffe9ae;letter-spacing:.1em}
+.lots-seg{flex:none;display:flex;gap:4px;padding:3px;border-radius:999px;background:#0b143699}
+.lots-seg button{border:0;background:none;min-width:52px;padding:7px 8px;border-radius:999px;font:900 13px var(--f-title);color:#dbe5ff;cursor:pointer}
+.lots-seg button.on{background:linear-gradient(#fff3c4,#e8bd5a 55%,#b8862f);color:#1b2550}
+.lots-v{flex:1;min-width:0;text-align:right;font:700 12px var(--f-body);color:#fff;font-variant-numeric:tabular-nums;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.lots.locked{opacity:.6}.lots.locked button{cursor:default}
+.lots-seg button:disabled{opacity:.35;cursor:not-allowed;text-decoration:line-through}
+.stage-note{position:absolute;inset:0;z-index:32;display:grid;place-items:center;padding:16px;background:#050b24cc;-webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px);overflow-y:auto}
+.sn-card{width:100%;max-width:400px;padding:22px 18px 20px;border-radius:20px;text-align:center;color:#fff;background:linear-gradient(170deg,#121a55f2,#17226af2 50%,#101850f5);box-shadow:inset 0 0 0 1.5px #f3d58a,inset 0 0 0 5px #0b123a55,0 0 24px #ffd98a66;animation:rise .5s cubic-bezier(.2,.8,.2,1)}
+.sn-k{margin:0;font:700 11px var(--f-display);letter-spacing:.34em;color:#f3d58a}
+.sn-card h2{margin:6px 0 12px;font:900 24px var(--f-title);letter-spacing:.08em;background:linear-gradient(180deg,#fffdf4,#ffe9ae 50%,#e6b860);-webkit-background-clip:text;background-clip:text;color:transparent}
+.sn-p{margin:0 0 10px;font-size:14px;line-height:1.7;color:#f1f3ff;text-align:left}
+.sn-p b{color:#ffe9ae}
+.sn-w{padding:10px 12px;border-radius:12px;background:#0b123a99;box-shadow:inset 0 0 0 1px #f3d58a77;color:#ffe9ae}
+.sn-t{width:100%;margin:4px 0 12px;border-collapse:collapse;font-size:14px;font-variant-numeric:tabular-nums}
+.sn-t th,.sn-t td{padding:8px 6px;border-bottom:1px solid #f3d58a44;text-align:center}
+.sn-t thead th{font:700 12px var(--f-title);color:#cfd6ff}
+.sn-t tbody th{font:900 14px var(--f-title);color:#ffe9ae}
+.sn-card .hp-go{margin-top:6px;width:100%}
+.sheet .seg button{padding-inline:4px;font-size:15px}
+/* ===== 戰績碑：整張面板圖 ===== */
+.sheet.art .sheet-head{display:none}
+.sheet.art .sheet-card.gild{padding:0 4px;margin:auto 0}
+.sheet.art #sheetBody{padding:0;background:none;box-shadow:none;-webkit-backdrop-filter:none;backdrop-filter:none;border-radius:0;width:min(100%,calc((100vh - 16px) * .6667));margin:0 auto;container-type:inline-size}
+.acct{position:relative;width:100%;aspect-ratio:1024/1536;background:center/100% 100% no-repeat;color:#fff}
+.acct>*{position:absolute;margin:0}
+.ac-title{left:13%;top:23%;height:8%;display:flex;align-items:center;font:900 8.6cqw var(--f-title);letter-spacing:.08em;background:linear-gradient(180deg,#fffdf4,#ffe9ae 50%,#e6b860);-webkit-background-clip:text;background-clip:text;color:transparent;filter:drop-shadow(0 .3cqw 0 #0b123a)}
+.ac-x{left:83.4%;top:23.9%;width:9.4%;aspect-ratio:1;border:0;border-radius:50%;background:none;cursor:pointer}
+.ac-name{left:8%;right:26%;top:36.2%;height:10.6%;display:flex;flex-direction:column;justify-content:center;gap:.6cqw;min-width:0}
+.ac-name b{line-height:1.15;font:900 5.2cqw var(--f-title);background:linear-gradient(180deg,#fffdf4,#ffe9ae 50%,#e6b860);-webkit-background-clip:text;background-clip:text;color:transparent;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ac-name>span{font-size:3cqw;color:#f1f3ff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-shadow:0 1px 2px #0b123a}
+.ac-name .rename{margin:0;display:flex;gap:1.5cqw;align-items:center;flex-wrap:wrap}
+.ac-name small{font-size:2.8cqw;color:#cfd6ff}
+.ac-edit{border:0;padding:.6cqw 2.4cqw;border-radius:999px;background:#0b123acc;box-shadow:inset 0 0 0 1px #f3d58a;color:#ffe9ae;font:700 3cqw var(--f-title);cursor:pointer}
+.ac-name.editing>b,.ac-name.editing>span{display:none}
+.ac-name #rnIn{flex:1;min-width:0;padding:1.6cqw 2.4cqw;border-radius:2cqw;border:0;background:#0b123ae6;box-shadow:inset 0 0 0 1.5px #f3d58a;color:#fff;font:600 max(16px,3.6cqw) var(--f-body)}
+.ac-name #rnGo{flex:none;border:0;padding:1.8cqw 3.2cqw;border-radius:999px;background:linear-gradient(#fff3c4,#f0c877 50%,#d9a24e);color:#141d5c;font:900 3.4cqw var(--f-title);cursor:pointer}
+.ac-name #rnErr{flex-basis:100%;margin:0;min-height:0;font-size:2.8cqw;color:#ffb3ab}
+.ac-stat{width:38%;height:8.4%;display:flex;flex-direction:column;justify-content:center;gap:.4cqw}
+.ac-stat span{font-size:3.2cqw;color:#f1f3ff;text-shadow:0 1px 2px #0b123a}
+.ac-stat b{font:900 5.6cqw var(--f-display);background:linear-gradient(180deg,#fffdf4,#ffe9ae 50%,#e6b860);-webkit-background-clip:text;background-clip:text;color:transparent;filter:drop-shadow(0 .2cqw 0 #0b123a);white-space:nowrap}
+.ac-s1,.ac-s3,.ac-s5{left:8.4%}.ac-s2,.ac-s4,.ac-s6{left:54.6%}
+.ac-s1,.ac-s2{top:50.3%}.ac-s3,.ac-s4{top:62.4%}.ac-s5,.ac-s6{top:74.5%}
+.ac-out{left:14%;right:14%;top:87%;height:7.4%;border:0;background:none;cursor:pointer;font:900 5cqw var(--f-title);letter-spacing:.3em;padding-left:.3em;color:#ffe9ae;text-shadow:0 0 2cqw #ffd98a,0 .3cqw 0 #0b123a}
+.ac-x:focus-visible,.ac-out:focus-visible{outline:2px solid #fff}
+.ac-name::before,.ac-stat::before{content:"";position:absolute;z-index:-1;border-radius:3.4cqw;background:linear-gradient(90deg,#0e1a58d9,#0e1a58bf 55%,#0e1a5873);pointer-events:none}
+.ac-name,.ac-stat{z-index:0}
+.ac-name::before{inset:-1.2cqw -19.6cqw -1.2cqw -1.4cqw}
+.ac-stat::before{inset:-.6cqw -5.6cqw -.6cqw -2.8cqw}
+.ac-out{background:radial-gradient(ellipse 45% 70% at 50% 50%,#0e1a58b3,transparent)}
+.ac-title{filter:drop-shadow(0 .3cqw 0 #0b123a) drop-shadow(0 0 2cqw #0e1a58) drop-shadow(0 0 3cqw #0e1a58)}
+.acct.inv{aspect-ratio:720/797}
+.inv .ac-title{left:9%;top:8.5%;height:14%;font-size:8cqw}
+.inv .ac-x{left:83.5%;top:12.4%}
+.iv-info{left:6%;right:6%;top:25.5%;height:20%;padding:0 3cqw;display:flex;flex-direction:column;justify-content:center;gap:1.2cqw;border-radius:3cqw;background:linear-gradient(90deg,#0e1a58d9,#0e1a58bf 55%,#0e1a5866)}
+.iv-info b{font:900 9cqw var(--f-display);line-height:1.1;background:linear-gradient(180deg,#fffdf4,#ffe9ae 50%,#e6b860);-webkit-background-clip:text;background-clip:text;color:transparent;filter:drop-shadow(0 .3cqw 0 #0b123a)}
+.iv-info p{margin:0;font-size:3.3cqw;line-height:1.55;color:#f1f3ff;max-width:72%}
+.iv-code{left:8.6%;width:54%;top:50.2%;height:8%;border:0;padding:0 2cqw;border-radius:2.4cqw;background:#0e1a58cc;color:#ffe9ae;font:700 max(16px,3.8cqw) var(--f-body);min-width:0}
+.iv-copy{left:76.6%;width:15.4%;top:49.6%;height:9.2%;border:0;background:none;cursor:pointer;font:900 4.4cqw var(--f-title);letter-spacing:.1em;color:#3a2a12;text-shadow:0 1px 0 #fff8}
+.inv .ac-stat{width:30%;height:17%;justify-content:flex-start;padding-top:2.6cqw}
+.inv .ac-stat::before{inset:1.2cqw -9.4cqw 1.2cqw -1.6cqw;border-radius:3cqw}
+.iv-s1{left:9%;top:66%}.iv-s2{left:54%;top:66%}
+.iv-code:focus-visible,.iv-copy:focus-visible{outline:2px solid #fff}
+.acct.ttl{aspect-ratio:971/1619}
+.sheet.art #sheetBody:has(.ttl){width:min(100%,calc((100vh - 12px) * .6))}
+.ttl .ac-title{left:7%;top:3.9%;height:6.2%;font-size:6.6cqw}
+.ttl .ac-x{left:86.2%;top:4.6%;width:8.3%;display:grid;place-items:center;color:#fff;font-size:4.4cqw}
+.tt-k{left:9%;top:15.6%;font-size:3.3cqw;color:#f1f3ff}
+.tt-cur{left:9%;top:18.6%;font:900 7.4cqw var(--f-title);letter-spacing:.06em;line-height:1.2;background:linear-gradient(180deg,#fffdf4,#ffe9ae 50%,#e6b860);-webkit-background-clip:text;background-clip:text;color:transparent;filter:drop-shadow(0 .3cqw 0 #0b123a)}
+.tt-bar{left:9%;right:9.2%;top:24.6%;height:1.5%;border-radius:999px;background:#0b1440;box-shadow:inset 0 0 0 1px #f3d58a99;overflow:hidden}
+.tt-bar i{display:block;height:100%;border-radius:999px;background:linear-gradient(90deg,#d9a53e,#ffe9ae);box-shadow:0 0 2cqw #ffd98a;transition:width .6s}
+.tt-d{left:9%;right:30%;top:27.4%;font-size:3cqw;line-height:1.5;color:#f1f3ff}
+.tt-row{left:13.6%;right:8.4%;height:5.25%;display:flex;align-items:center;justify-content:space-between;gap:2cqw}
+.tt-row b{font:900 4.1cqw var(--f-title);color:#fff;white-space:nowrap;text-shadow:0 1px 2px #0b123a}
+.tt-row span{font:800 3.5cqw var(--f-display);color:#fff;white-space:nowrap;font-variant-numeric:tabular-nums;text-shadow:0 1px 2px #0b123a}
+.tt-row.got span,.tt-row.cur b,.tt-row.cur span{color:#ffe9ae}
+.tt-row.cur::before{content:"";position:absolute;inset:-.3cqw -4.4cqw -.3cqw -8.6cqw;border-radius:999px;background:linear-gradient(90deg,#0b1440cc,#0b144099);box-shadow:inset 0 0 0 .5cqw #ffe9ae,0 0 3cqw #ffc45a,0 0 1cqw #fff;z-index:-1}
+.tt-row{z-index:0}
+.acct.ttl::before{content:"";position:absolute;left:5.2%;right:5.2%;top:13.9%;height:18.6%;border-radius:5cqw;background:linear-gradient(90deg,#0e1a58f2,#0e1a58eb 62%,#0e1a5800 78%);pointer-events:none}
+.ttl>*{z-index:1}
+.rnk .ac-title{left:9%;top:5.6%;height:6.6%;font-size:7cqw}
+.rnk .ac-x{left:84.4%;top:6.1%;width:8.4%}
+.sheet .rnk .seg{left:7.6%;right:7.6%;top:16%;height:5.7%;margin:0;padding:0;border-radius:999px;background:#0e1a58;box-shadow:inset 0 0 0 .3cqw #f3d58a}
+.sheet .rnk .seg button{padding:0;font-size:4.2cqw;border-radius:999px}
+.sheet .rnk .lb{inset:0;display:block;pointer-events:none}
+.sheet .rnk .lb li{position:absolute;left:7.4%;right:7.4%;height:6.6%;top:22.8%;display:grid;grid-template-columns:10.5cqw minmax(0,1fr) auto;gap:2cqw;padding:0 3cqw 0 2.2cqw;border-radius:3.4cqw;background:linear-gradient(90deg,#0e1a5859 0,#0e1a5859 13%,#0e1a58f0 19%,#0e1a58e0 60%,#0e1a58b8);box-shadow:none}
+.sheet .rnk .lb li:nth-child(2){top:30.2%}.sheet .rnk .lb li:nth-child(3){top:37.6%}.sheet .rnk .lb li:nth-child(4){top:45%}.sheet .rnk .lb li:nth-child(5){top:52.4%}.sheet .rnk .lb li:nth-child(6){top:59.8%}.sheet .rnk .lb li:nth-child(7){top:67.3%}.sheet .rnk .lb li:nth-child(8){top:74.8%}.sheet .rnk .lb li:nth-child(9){top:82.4%}
+.sheet .rnk .lb li.me{background:linear-gradient(90deg,#1a2a8066 0,#1a2a8066 13%,#1a2a80f5 19%,#2a34a0eb);box-shadow:inset 0 0 0 .5cqw #ffe9ae,0 0 3cqw #ffc45a,0 0 1cqw #fff}
+.sheet .rnk .rk{width:10cqw;height:10cqw;background:none;font-size:4.4cqw}
+.sheet .rnk .lb li{align-items:center}.sheet .rnk .nm,.sheet .rnk .val{line-height:1.15}.sheet .rnk .nm span{display:block}.sheet .rnk .nm b{font-size:3.8cqw;line-height:1.2}.sheet .rnk .nm span{font-size:2.8cqw;color:#e6e9ff}
+.sheet .rnk .val{font-size:4.4cqw}.sheet .rnk .val small{font-size:2.8cqw;color:#e6e9ff}
+.rnk #lbHint{left:9%;right:9%;top:90%;height:3.8%;margin:0;display:grid;place-items:center;text-align:center;font-size:2.9cqw;color:#f1f3ff}
+.ac-name::before,.ac-stat::before{background:linear-gradient(90deg,#0e1a58f5,#0e1a58eb 60%,#0e1a58c7)}
+.iv-info{background:linear-gradient(90deg,#0e1a58f5,#0e1a58eb 60%,#0e1a58b8)}
+.iv-code{background:#0e1a58f0}
+.ac-name::before,.ac-stat::before{display:none}
+.iv-info,.iv-code,.ac-out{background:none}
+.acct span,.acct p,.acct small,.iv-code{text-shadow:0 1px 2px #0b123a,0 0 6px #0b123a}
+.acct.ttl{aspect-ratio:887/1684}
+.acct.ttl::before{display:none}
+.sheet.art #sheetBody:has(.ttl){width:min(100%,calc((100vh - 12px) * 0.5267))}
+.ttl .ac-title{left:6%;top:4.28%;height:5.11%;font-size:6.6cqw}
+.ttl .ac-x{left:85.6%;top:4.57%;width:8.6%}
+.tt-k{top:14.13%}.tt-cur{top:16.15%}
+.tt-bar{left:9.6%;right:9.8%;top:23.34%;height:1.43%}
+.tt-d{top:25.65%;right:9%}
+.tt-row{left:15%;right:9%;height:4.87%}
+.tt-row.cur::before{inset:-.2cqw -4.6cqw -.2cqw -10cqw;background:none}
+#battle{background-position:50% 0}
+.ac-name,.ac-stat,.iv-info{width:fit-content;right:auto;z-index:0}
+.ac-name{max-width:64%}.ac-stat{max-width:38%}.inv .ac-stat{height:auto;max-width:34%;padding-top:3.4cqw}
+.iv-info{max-width:62%;height:auto;top:27%;padding:0}.iv-info p{max-width:none}
+.ac-name::before,.ac-stat::before,.inv .ac-stat::before,.iv-info::before{content:"";display:block;position:absolute;z-index:-1;inset:-1.2cqw -4cqw -1.6cqw -3cqw;border-radius:4cqw;background:#05081ec7;filter:blur(2.6cqw);pointer-events:none}
+.inv .ac-stat::before{top:2cqw}
+.sheet.art #sheetBody:has(.ac-assets){width:min(100%,calc((100vh - 128px) * .6667))}
+.ac-title{font-size:7.2cqw}.ac-name b{font-size:4.5cqw}.ac-name>span{font-size:2.7cqw}
+.ac-stat span{font-size:2.8cqw}.ac-stat b{font-size:4.6cqw}.ac-out{font-size:4.2cqw}.ac-edit{font-size:2.6cqw}
+.ac-assets{margin:1.5cqw 2cqw 0;padding:2.4cqw 2.6cqw 2.8cqw;border-radius:4cqw;background:linear-gradient(170deg,#121a55e6,#17226ae0);box-shadow:inset 0 0 0 1.5px #f3d58a,inset 0 0 0 4px #0b123a55,0 0 12px #ffd98a44}
+.ac-assets h3{margin:0 0 1.8cqw;font:900 3.2cqw var(--f-title);letter-spacing:.2em;text-align:center;color:#ffe9ae}
+.aa-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1.6cqw}
+.aa-c{padding:1.6cqw .6cqw;border-radius:2.6cqw;text-align:center;background:#0b123a99;box-shadow:inset 0 0 0 1px #f3d58a88;min-width:0}
+.aa-c span{display:block;font-size:2.7cqw;color:#e6e9ff}
+.aa-c b{display:block;font:900 4.2cqw var(--f-display);line-height:1.3;background:linear-gradient(180deg,#fffdf4,#ffe9ae 50%,#e6b860);-webkit-background-clip:text;background-clip:text;color:transparent;font-variant-numeric:tabular-nums}
+.aa-c small{display:block;font-size:2.3cqw;color:#cfd6ff;white-space:nowrap}
+/* ===== 試煉畫面：藍色玻璃面板 ===== */
+#battle{--ink:#fff;--muted:#dbe5ff;--gold-hi:#ffe9ae;--short:#ff7d73;--long:#5fe3a0}
+#battle .b-top{background:none;border:0;padding:10px 10px 4px}
+#battle .ghost,#battle .b-floor,#battle .b-bal,#battle .m-info,#battle .streak{background:linear-gradient(#24408ee6,#101e55e6);box-shadow:inset 0 0 0 1.5px #e2b85a,inset 0 2px 4px #ffffff22,0 0 0 1px #0b1436,0 3px 8px #0a143488;border:0}
+#battle .ghost{border-radius:999px;padding:7px 14px;font:900 13px var(--f-title);color:#fff}
+#battle .b-floor{border-radius:999px;padding:6px 22px;font-size:16px;background-clip:border-box;-webkit-background-clip:border-box;color:#ffe9ae;text-shadow:0 1px 0 #0b1436}
+#battle .b-floor.boss{background:linear-gradient(#8e2030e6,#4a0c18e6);color:#ffd9d0}
+#battle .b-bal{border-radius:999px;padding:4px 14px 4px 5px;color:#fff}
+#battle .b-bal .coin{width:24px;height:24px;font-size:11px}
+#battle .m-info{top:6px;left:12px;right:12px;border-radius:999px;padding:5px 12px}
+#battle .m-name{text-shadow:0 1px 0 #0b1436}
+#battle .hp{height:12px;border-radius:999px;background:#0b1436;box-shadow:inset 0 0 0 1px #e2b85a}
+#battle .streak{top:44px;right:12px}
+#battle .pips i{background:#0b1436;box-shadow:inset 0 0 0 1px #e2b85a}
+#battle .pips i.on{background:linear-gradient(135deg,#fff7d0,#f0b030);box-shadow:inset 0 0 0 1px #fff3c4,0 0 8px #ffc65a,0 0 14px #ffb030}
+#battle .stage{padding-top:52px}
+#battle .stage::before{background:radial-gradient(ellipse,#17275c99 0%,#2f4a9844 50%,transparent 72%);box-shadow:0 0 0 1.5px #ffe9aeaa,0 0 0 5px #ffffff22,0 0 22px #9cc4ff88}
+#battle .chart-card.gild,#battle .result.gild{border:0;border-radius:14px;background:linear-gradient(160deg,#1c3a96b8,#0e2068c7 45%,#0a174ed1);background-blend-mode:normal;-webkit-backdrop-filter:blur(7px) saturate(1.2);backdrop-filter:blur(7px) saturate(1.2);
+  box-shadow:inset 0 0 0 1.5px #a9c8ffcc,inset 0 0 0 3px #1b2c6a66,inset 0 0 26px #6fa8ff55,inset 0 1px 0 #fff8,0 0 0 1.5px #e2b85a,0 0 18px #7fb0ff88,0 8px 20px #0a143488}
+#battle .chart-card.gild::before,#battle .result.gild::before{inset:-9px;border:0;border-radius:0;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M12 0l2.4 9.6L24 12l-9.6 2.4L12 24l-2.4-9.6L0 12l9.6-2.4z' fill='%23f3cd6c' stroke='%23fff6d0' stroke-width='.7'/%3E%3C/svg%3E") 50% 0/20px 20px no-repeat,url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M12 0l2.4 9.6L24 12l-9.6 2.4L12 24l-2.4-9.6L0 12l9.6-2.4z' fill='%23f3cd6c' stroke='%23fff6d0' stroke-width='.7'/%3E%3C/svg%3E") 50% 100%/20px 20px no-repeat,url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M12 0l2.4 9.6L24 12l-9.6 2.4L12 24l-2.4-9.6L0 12l9.6-2.4z' fill='%23f3cd6c' stroke='%23fff6d0' stroke-width='.7'/%3E%3C/svg%3E") 0 0/16px 16px no-repeat,url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M12 0l2.4 9.6L24 12l-9.6 2.4L12 24l-2.4-9.6L0 12l9.6-2.4z' fill='%23f3cd6c' stroke='%23fff6d0' stroke-width='.7'/%3E%3C/svg%3E") 100% 0/16px 16px no-repeat,url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M12 0l2.4 9.6L24 12l-9.6 2.4L12 24l-2.4-9.6L0 12l9.6-2.4z' fill='%23f3cd6c' stroke='%23fff6d0' stroke-width='.7'/%3E%3C/svg%3E") 0 100%/16px 16px no-repeat,url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M12 0l2.4 9.6L24 12l-9.6 2.4L12 24l-2.4-9.6L0 12l9.6-2.4z' fill='%23f3cd6c' stroke='%23fff6d0' stroke-width='.7'/%3E%3C/svg%3E") 100% 100%/16px 16px no-repeat;filter:drop-shadow(0 0 4px #ffe9aecc);z-index:1}
+#battle .chart-card{margin:6px 14px 0;padding:14px 12px 10px}
+#battle .sym{font-size:15px;color:#ffe9ae;text-shadow:0 1px 0 #0b1436}
+#battle .sym small{color:#dbe5ff}
+#battle .chart-head .ghost{background:#0b143688;box-shadow:inset 0 0 0 1px #a9c8ff99;border-radius:8px;padding:4px 9px}
+#battle .tabs{background:#0b143688;box-shadow:inset 0 0 0 1px #a9c8ff99;border-radius:8px}
+#battle .tabs button{color:#dbe5ff}
+#battle .tabs button.on{background:linear-gradient(#fff3c4,#e8bd5a 55%,#b8862f);color:#1b2550;border-radius:6px}
+#battle .chart-foot{margin:2px -12px -10px;padding:9px 12px 11px;border-top:1px solid #a9c8ff88;box-shadow:inset 0 1px 0 #0b143688;color:#eaf0ff;font-size:12px;background:#0b143655;border-radius:0 0 14px 14px}
+#battle .actions{padding:16px 12px 14px;gap:10px;grid-template-columns:repeat(3,1fr);align-items:stretch}
+#battle .act,#battle .act.flat{font-size:21px;letter-spacing:.08em;padding:12px 4px;justify-content:center;white-space:nowrap}
+#battle .act small{font-size:11px;letter-spacing:.04em}
+#battle .act{border-radius:12px;box-shadow:inset 0 -5px 0 #0005,inset 0 2px 0 #fff6,inset 0 0 0 1.5px #ffffff55,0 0 0 2px #7a5220,0 0 0 4px #f0c866,0 0 0 5px #7a5220,0 0 14px #ffe9ae77,0 6px 12px #0a143499}
+#battle .act.flat{background:radial-gradient(ellipse at 50% 0%,#e6eefaaa,transparent 60%),linear-gradient(#4a63a8,#1b2c6a)}
+#battle .result{margin:0 14px 18px}
+#battle .facts dt{color:#c3d2f5}
+#battle .btn.dim{background:#0b143688;color:#fff;box-shadow:inset 0 0 0 1.5px #a9c8ff}
+#battle .btn.gold{background:linear-gradient(#fff3c4,#e8bd5a 50%,#b8862f);color:#1b2550;box-shadow:inset 0 0 0 1px #fff8,0 0 0 1px #7a5220,0 3px 8px #0a143488}
+.plaque{width:min(300px,80vw);aspect-ratio:3;margin:-4px 0 0;padding:0 0 1.5%;border-radius:0;background:center/100% 100% no-repeat;box-shadow:none;font-size:17px;color:#3a2a12;text-shadow:0 1px 0 #fff;filter:drop-shadow(0 4px 6px #0006)}
+.plaque::before,.plaque::after{display:none}
+.plaque:active{filter:brightness(1.06) drop-shadow(0 4px 6px #0006)}
+/* ===== 開場：星空之門 ===== */
+#title{background:linear-gradient(#070b1f,#131a42 55%,#2a2858)}
+#title canvas,#title .hero{display:none}
+.t-scene{position:absolute;left:0;right:0;bottom:0;height:calc(min(100vw,480px) * 1.7768);background:center/100% 100% no-repeat;transform-origin:50% 40%;animation:tSceneIn 2.6s cubic-bezier(.2,.7,.2,1) both;-webkit-mask-image:linear-gradient(transparent 0,#000 7%);mask-image:linear-gradient(transparent 0,#000 7%)}
+@keyframes tSceneIn{from{transform:scale(1.22);filter:brightness(1.8) blur(3px);opacity:0}35%{opacity:1}to{transform:none;filter:none;opacity:1}}
+#title .t-center{top:calc(100% - min(100vw,480px) * 1.7768 * .6)}
+#title .t-center::before{content:"";position:absolute;inset:-28px -10px;z-index:-1;background:radial-gradient(ellipse 62% 58% at 50% 50%,#0c1236e0,#0c1236a6 50%,transparent 80%);pointer-events:none}
+#title.entered .t-center{top:5%}
+#title.entered .t-center::before{opacity:0}
+.gate-card.gild{--ink:#fff;--muted:#d9d3f2;--gold-hi:#ffe9ae;--gold:#f3d58a;color:#fff;border:0;border-radius:18px;padding:18px 16px;background:linear-gradient(165deg,#2a2466d9,#1a1a52e0 50%,#12143fe6);background-blend-mode:normal;-webkit-backdrop-filter:blur(10px) saturate(1.2);backdrop-filter:blur(10px) saturate(1.2);box-shadow:inset 0 0 0 1px #f3d58acc,inset 0 0 0 4px #0c123655,inset 0 0 30px #8f7bff33,0 0 22px #ffd98a44,0 12px 30px #070b1f99}
+.gate-card.gild::before{inset:5px;border:1px solid #f3d58a44;border-radius:14px}
+.gate .seg{background:#0c123699;box-shadow:inset 0 0 0 1px #f3d58a77;border-radius:999px;padding:4px}
+.gate .seg button{border-radius:999px;color:#d9d3f2}
+.gate .seg button.on{background:linear-gradient(#fff3c4,#f0c877 55%,#d9a24e);color:#2a2258;box-shadow:0 0 10px #ffd98a88}
+.gate .form label{color:#e6e0fa}
+.gate .form input{background:#0c1236aa;box-shadow:inset 0 0 0 1px #b9a8ff88;border-radius:10px;color:#fff}
+.gate .form input::placeholder{color:#a9a3cc}
+.gate .form input:focus{outline:2px solid #f3d58a;box-shadow:inset 0 0 0 1px #f3d58a,0 0 12px #ffd98a55}
+.gate .btn{border-radius:999px}
+.gate .btn.gold{background:linear-gradient(#fff3c4,#f0c877 50%,#d9a24e);color:#2a2258;box-shadow:inset 0 0 0 1px #fff8,0 0 16px #ffd98a77,0 4px 10px #070b1f88}
+.gate .linkish{color:#ffe9ae}
+.gate .err{color:#ffb3ab}
+#title .tap{top:auto;bottom:calc(9% + env(safe-area-inset-bottom,0px));background:#0c1236b3;box-shadow:inset 0 0 0 1px #f3d58aaa,0 0 16px #ffd98a55;color:#fff3d0}
+.title-screen.entered .t-scene{filter:brightness(.55);transition:filter .8s}
+@media (prefers-reduced-motion:reduce){.t-scene{animation:none}}
+/* ===== 主畫面：星空之門 ===== */
+#app{--w:min(100vw,480px);--ih:calc(var(--w) * 1.7768)}
+.map{background:linear-gradient(#070b1f,#131a42 55%,#2a2858)}
+.map canvas{display:none}
+.scene{position:absolute;left:0;right:0;bottom:0;height:var(--ih);background:center/100% 100% no-repeat}
+.scene::before{content:"";position:absolute;inset:0;background:radial-gradient(circle at 12.5% 7.6%,#161d48 0,#161d48 9.5%,transparent 15%),radial-gradient(ellipse 30% 5% at 78% 5.2%,#12183f 0,#12183fee 60%,transparent 100%),linear-gradient(#131a42 0,#151b45 6.5%,#1a1f4a00 10.5%)}
+.scene-glow{position:absolute;left:50%;top:37.8%;width:34%;aspect-ratio:1;transform:translate(-50%,-50%);border-radius:50%;background:radial-gradient(circle,#fff8d8cc 0,#ffe9a866 22%,#9fc4ff22 48%,transparent 70%);mix-blend-mode:screen;animation:sceneGlow 3.6s ease-in-out infinite}
+@keyframes sceneGlow{50%{opacity:.45;transform:translate(-50%,-50%) scale(1.25)}}
+.scene-stars{position:absolute;inset:0 0 auto 0;height:34%;background:radial-gradient(1.5px 1.5px at 8% 30%,#fff,transparent),radial-gradient(1.2px 1.2px at 22% 62%,#ffe9ae,transparent),radial-gradient(1.6px 1.6px at 37% 18%,#fff,transparent),radial-gradient(1.2px 1.2px at 55% 44%,#cfe0ff,transparent),radial-gradient(1.6px 1.6px at 68% 12%,#fff,transparent),radial-gradient(1.2px 1.2px at 81% 55%,#ffe9ae,transparent),radial-gradient(1.5px 1.5px at 93% 26%,#fff,transparent),radial-gradient(1px 1px at 46% 78%,#fff,transparent),radial-gradient(1px 1px at 14% 86%,#cfe0ff,transparent);animation:twinkle 4s ease-in-out infinite}
+@keyframes twinkle{50%{opacity:.45}}
+@media (prefers-reduced-motion:reduce){.scene-glow,.scene-stars{animation:none}}
+.topbar{padding:12px 14px 0;align-items:center}
+#meFrame{width:auto;max-width:54vw;aspect-ratio:auto;background:none!important;filter:none;display:flex;align-items:center;gap:10px}
+#meFrame .av-wrap{position:relative;left:auto;top:auto;transform:none;width:58px;height:58px;flex:none}
+#meFrame .av-wrap::after{content:"✦";position:absolute;left:-5px;top:42%;font-size:11px;color:#ffe9ae;text-shadow:0 0 6px #ffd26a}
+#meFrame .avatar{border-radius:50%;box-shadow:0 0 0 1.5px #f3d58a,0 0 0 4px #0c1236aa,0 0 0 5px #f3d58a66,0 0 14px #ffd98a66;background:#1b2250}
+#meFrame .me-side{position:static;height:auto;display:block;min-width:0}
+#meFrame .me-row .name{display:block;font:700 16px var(--f-title);letter-spacing:.06em;color:#fff3d0;text-shadow:0 1px 3px #0b1436;padding-bottom:6px;border-bottom:1.5px solid #f3d58a;min-width:84px;max-width:100%}
+.wallet{width:auto;aspect-ratio:auto;margin:0;background:#0c123699!important;filter:none;display:flex;align-items:center;gap:8px;height:34px;padding:0 10px 0 4px;border-radius:999px;box-shadow:inset 0 0 0 1px #f3d58aaa,0 0 10px #0b143688}
+.wallet .wu{position:static;transform:none;flex:none;width:26px;height:26px;border-radius:50%;display:grid;place-items:center;font:900 13px var(--f-display);color:#6a430c;text-shadow:none;background:radial-gradient(circle at 35% 30%,#fff6cf,#f0c25a 45%,#b97a1f);box-shadow:inset 0 0 0 1.5px #fbe6a4,0 0 8px #ffd26a88}
+.wallet b{position:static;height:auto;display:block;font:600 15px var(--f-display);color:#fff7e0;text-shadow:none;letter-spacing:.02em}
+.wallet .wplus{position:static;transform:none;width:22px;height:22px;font:400 20px/1 var(--f-display);color:#fff3d0}
+.demo-bar{margin:10px 14px 0;background:#0c123699;box-shadow:inset 0 0 0 1px #f3d58a66;color:#e9e3f5}
+.help-btn{margin:10px 14px 0 0;width:34px;height:34px}
+.help-btn::before{display:none}
+.help-btn span{inset:0;font:600 17px var(--f-display);color:#fff3d0;background:#0c123699;box-shadow:inset 0 0 0 1px #f3d58aaa}
+.ticker{height:34px;margin:-34px 58px 0 14px;background:#0c123699;box-shadow:inset 0 0 0 1px #f3d58aaa}
+#tkTxt{font-weight:600;color:#fff3d0}
+.plaque{width:auto;aspect-ratio:auto;margin:10px 0 0;padding:5px 20px 6px;border-radius:999px;background:#0c123699!important;box-shadow:inset 0 0 0 1px #f3d58aaa;filter:none;font:700 14px var(--f-title);letter-spacing:.14em;color:#fff3d0;text-shadow:none}
+.plaque:active{filter:brightness(1.2)}
+.fill,.fill2,.gem{display:none}
+.enter,.enter.boss{position:absolute;z-index:2;left:50%;bottom:calc(var(--ih) * .515);width:calc(var(--w) * .34);height:calc(var(--ih) * .05);aspect-ratio:auto;transform:translateX(-50%);padding:0;border-radius:999px;background:linear-gradient(#5b4a86f2,#3b3170f2)!important;box-shadow:inset 0 0 0 1.5px #f3d58a,0 0 14px #ffd98a88;filter:none;font:700 clamp(15px,calc(var(--w) * .05),22px) var(--f-title);letter-spacing:.14em;color:#fff3d0;text-shadow:0 0 8px #ffd98a}
+.enter.boss{background:linear-gradient(#8a2a44f2,#541430f2)!important}
+.enter.art-txt{background:none!important;box-shadow:none}
+.enter:active{transform:translateX(-50%) scale(.96)}
+.enter.art-txt::after{content:"";display:block;position:absolute;inset:-6px -10px;border-radius:999px;box-shadow:0 0 18px #ffe9ae99,inset 0 0 12px #ffe9ae55;animation:twinkle 2.4s ease-in-out infinite}
+.dock{position:absolute;z-index:2;left:0;right:0;bottom:0;height:calc(var(--ih) * .135);padding:0 3%;gap:0;grid-template-columns:1fr 1fr 1fr 1fr}
+.dock-btn{max-width:none;width:100%;height:100%;aspect-ratio:auto;background:none!important;filter:none;border-radius:16px}
+.dock-btn em{opacity:0}
+.dock-btn:active{background:radial-gradient(circle,#ffe9ae44,transparent 65%)!important;transform:none}
+
+.hero-pick{position:absolute;inset:0;z-index:30;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;padding:24px 18px;text-align:center;overflow-y:auto;background:radial-gradient(ellipse at 50% 30%,#1c2c58f5,#070b1cfa)}
+.hero-pick h2{margin:0;font-size:26px;letter-spacing:.12em;color:#f6e3a6;text-shadow:0 2px 10px #000}
+.hp-k{margin:0;font-size:11px;letter-spacing:.34em;color:#d9ac4a}
+.hp-s{margin:0 0 8px;font-size:13px;color:#c9d2ea}
+.hp-list{display:grid;grid-template-columns:1fr 1fr;gap:14px;width:100%;max-width:380px}
+.hp-card{padding:0 0 10px;border-radius:14px;overflow:hidden;border:2px solid #6b5a34;background:#101833;color:#e9e3d0;cursor:pointer;transition:transform .15s,box-shadow .15s,border-color .15s,opacity .15s}
+.hp-card img{display:block;width:100%;aspect-ratio:1;object-fit:cover}
+.hp-card b{display:block;margin-top:9px;font-size:16px;letter-spacing:.2em}
+.hp-list:has(.on) .hp-card:not(.on){opacity:.5}
+.hp-card.on{border-color:#ffd772;transform:translateY(-4px);box-shadow:0 0 0 2px #fff3c4,0 0 26px #ffcf5a99}
+.hp-card:focus-visible,.hp-go:focus-visible{outline:3px solid #fff;outline-offset:2px}
+.hp-go{margin-top:14px;min-width:230px;padding:14px 22px;border-radius:999px;border:2px solid #fff0bf;background:linear-gradient(#f3cf6a,#b8842a);color:#2a1a04;font:inherit;font-weight:800;font-size:16px;letter-spacing:.1em;cursor:pointer;box-shadow:0 6px 16px #0008}
+.hp-go:disabled{filter:grayscale(.8);opacity:.6;cursor:default}
+.warning{position:absolute;inset:0;z-index:20;display:flex;flex-direction:column;justify-content:center;gap:16px;padding-block:24px;text-align:center;background:radial-gradient(ellipse at center,#4a0808f2,#0a0000fa)}
+.warning::before{content:"";position:absolute;inset:0;background:radial-gradient(circle at 50% 45%,#ff2a2a33,transparent 60%);animation:alarm 1s ease-in-out infinite;pointer-events:none}
+@keyframes alarm{50%{opacity:.2}}
+.hazard{position:relative;height:30px;background:repeating-linear-gradient(-45deg,#ff2b2b 0 16px,#1a0000 16px 32px);background-size:45.25px 45.25px;animation:haz 1s linear infinite;box-shadow:0 0 18px #ff000088}
+@keyframes haz{to{background-position:45.25px 0}}
+.warn-in{position:relative;display:grid;gap:12px;padding:0 20px}
+.warn-word{font:900 clamp(40px,13vw,64px) var(--f-display);color:#ff3b3b;letter-spacing:.14em;text-shadow:0 0 26px #ff0000cc,0 3px 0 #300;animation:blink .9s steps(2) infinite}
+@keyframes blink{50%{opacity:.35}}
+.warn-sub{font:900 22px var(--f-title);letter-spacing:.08em}
+.warn-event{font:700 16px var(--f-title);color:var(--gold-hi)}
+.warn-note{margin:0 auto;max-width:30em;font-size:13.5px;line-height:1.7;color:#f2d8d0}
+
+/* 面板 */
+.sheet{position:absolute;inset:0;z-index:30;display:flex;align-items:flex-end;background:#000c}
+.sheet-card{width:100%;max-height:88%;overflow-y:auto;border-radius:14px 14px 0 0;padding:16px 16px calc(18px + env(safe-area-inset-bottom,0px))}
+.sheet-head{position:relative;display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+.sheet-head h2{margin:0;font:900 21px var(--f-title);letter-spacing:.12em}
+.x{width:34px;height:34px;border-radius:50%;border:0;background:#0007;box-shadow:inset 0 0 0 1px #8a5f22;font-size:16px}
+#sheetBody{position:relative}
+.seg{display:flex;gap:6px;margin-bottom:12px;background:#000a;padding:4px;border-radius:8px;box-shadow:inset 0 0 0 1px #3a2a14}
+.seg button{flex:1;border:0;background:none;padding:8px;border-radius:5px;font:900 14px var(--f-title);color:var(--muted)}
+.seg button.on{background:linear-gradient(#f2d28a,#b8862f 55%,#7a5220);color:#1a1408}
+.lb{list-style:none;margin:0;padding:0;display:grid;gap:6px}
+.lb li{display:grid;grid-template-columns:36px minmax(0,1fr) auto;align-items:center;gap:10px;padding:8px 10px;border-radius:6px;background:linear-gradient(90deg,#ffffff0c,#ffffff04);box-shadow:inset 0 0 0 1px #ffffff12}
+.lb li.me{box-shadow:inset 0 0 0 1px var(--gold);background:linear-gradient(90deg,#d4a44630,#d4a4460a)}
+.rk{font:900 17px var(--f-display);text-align:center;color:var(--muted);font-variant-numeric:tabular-nums}
+.rk.r1{color:#ffd76a;text-shadow:0 0 10px #ffb84a}.rk.r2{color:#e4eaf0}.rk.r3{color:#dca274}
+.nm b{display:block;font-size:14px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.nm span{font-size:11px;color:var(--muted)}
+.val{font:800 15px var(--f-display);font-variant-numeric:tabular-nums;text-align:right;color:var(--gold-hi)}
+.val small{display:block;font:500 11px var(--f-body);color:var(--muted)}
+.hint{font-size:12.5px;line-height:1.6;color:var(--muted);margin:10px 0 0}
+.titles{display:grid;gap:6px;list-style:none;padding:0;margin:0}
+.titles li{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:9px 12px;border-radius:6px;background:#ffffff06;box-shadow:inset 0 0 0 1px #ffffff12}
+.titles li.got{box-shadow:inset 0 0 0 1px var(--gold-lo)}
+.titles li.cur{box-shadow:inset 0 0 0 1px var(--gold-hi);background:#d4a44626}
+.titles .tn{font:900 15px var(--f-title)}
+.titles li:not(.got) .tn{color:var(--dim)}
+.titles .tv{font:700 12px var(--f-display);color:var(--muted);font-variant-numeric:tabular-nums}
+.now-title{display:grid;gap:8px;margin-bottom:14px;padding:12px;border-radius:8px;background:#0007;box-shadow:inset 0 0 0 1px var(--gold-lo)}
+.now-title b{font:900 24px var(--f-title);letter-spacing:.1em}
+.meter{height:8px;border-radius:2px;background:#000a;overflow:hidden;box-shadow:inset 0 0 0 1px #3a2a14}
+.meter i{display:block;height:100%;background:linear-gradient(90deg,#8a5f22,#f8e2a0)}
+.stats{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:12px 0}
+.stat{padding:10px;border-radius:6px;background:#ffffff08;box-shadow:inset 0 0 0 1px #ffffff12}
+.stat span{display:block;font-size:11.5px;color:var(--muted)}
+.stat b{font:800 18px var(--f-display);font-variant-numeric:tabular-nums}
+.form{display:grid;gap:10px}
+.form label{display:grid;gap:4px;font-size:12.5px;color:var(--muted)}
+.form input{width:100%;padding:11px 12px;border-radius:6px;border:0;box-shadow:inset 0 0 0 1px #6e4b1e,inset 0 2px 6px #000;background:#0a0805;color:var(--ink);font:500 15px var(--f-body)}
+.form input:focus{outline:2px solid var(--gold);outline-offset:0}
+.err{color:#ff8f85;font-size:13px;min-height:1.2em;margin:0}
+.linkish{background:none;border:0;padding:0;color:var(--gold-hi);text-decoration:underline;font-size:13px;justify-self:start}
+.code{display:flex;gap:8px;align-items:center;margin:12px 0}
+.code input{flex:1;min-width:0;padding:11px 12px;border-radius:6px;border:1px dashed var(--gold);background:#0009;color:var(--gold-hi);font:600 15px var(--f-body)}
+.big-plus{font:900 36px var(--f-display)}
+.toast{position:absolute;left:50%;bottom:calc(160px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);z-index:60;max-width:calc(100% - 32px);padding:10px 16px;border-radius:6px;background:#000e;box-shadow:inset 0 0 0 1px #8a5f22,0 6px 16px #000;font-size:13.5px;line-height:1.5;text-align:center}
+
+/* 開場 */
+.title-screen{position:absolute;inset:0;z-index:40;overflow:hidden;background:linear-gradient(#12235e,#3f68b8 38%,#9db9e6 62%,#f3dcb4 82%,#fff6e4);cursor:pointer;-webkit-tap-highlight-color:transparent}
+.title-screen canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
+.t-center{position:absolute;left:0;right:0;top:22%;display:flex;flex-direction:column;align-items:center;gap:8px;padding:0 16px;transition:transform .9s cubic-bezier(.3,.7,.2,1),top .9s cubic-bezier(.3,.7,.2,1),opacity .6s}
+.logo{position:relative;margin:0;font:900 clamp(30px,9.6vw,48px)/1.15 var(--f-display);letter-spacing:.03em;white-space:nowrap;
+  background:linear-gradient(105deg,transparent 40%,#ffffffcc 48%,transparent 56%) 220% 0/250% 100% no-repeat,linear-gradient(180deg,#fffdf4 0%,#ffe9ae 30%,#e2a93c 50%,#7a4c12 53%,#e9b85a 72%,#fff3c8 100%);
+  -webkit-background-clip:text;background-clip:text;color:transparent;-webkit-text-stroke:1px #2a1806;
+  filter:drop-shadow(0 3px 0 #1b0f03) drop-shadow(0 0 18px #000a) drop-shadow(0 0 26px #ffb84a88);opacity:0;animation:slam .7s 1s cubic-bezier(.3,1.4,.4,1) forwards,shine 3.2s 2s ease-in-out infinite}
+@keyframes slam{from{opacity:0;transform:scale(2.4);filter:blur(10px)}to{opacity:1;transform:none}}
+@keyframes shine{0%{background-position:220% 0,0 0}55%,100%{background-position:-120% 0,0 0}}
+.logo-pre{display:flex;align-items:center;gap:10px;margin-bottom:-4px;font:700 clamp(11px,3.3vw,15px) var(--f-display);letter-spacing:.3em;padding-left:.3em;text-transform:uppercase;white-space:nowrap;color:#ffe9ae;text-shadow:0 1px 2px #000,0 0 10px #000,0 0 14px #ffb84a88;opacity:0;animation:fade .8s .6s forwards}
+.logo-pre i{width:22px;height:1px;background:linear-gradient(90deg,transparent,#ffe9ae)}.logo-pre i:last-child{transform:scaleX(-1)}
+.logo-sub{display:flex;align-items:center;gap:12px;font:700 clamp(12px,3.4vw,15px) var(--f-title);letter-spacing:.3em;padding-left:.3em;white-space:nowrap;color:#fff3d0;text-shadow:0 1px 3px #000,0 0 10px #000;opacity:0;animation:fade .8s 1.6s forwards}
+.logo-sub span{width:34px;height:1px;background:linear-gradient(90deg,transparent,#fff3d0,transparent)}
+.hero{position:absolute;left:50%;bottom:-1%;width:min(96vw,430px);transform:translateX(-50%);opacity:0;animation:heroIn 1.6s .2s ease-out forwards;transition:opacity .5s}
+.hero img{position:relative;width:100%;height:auto;display:block;user-select:none;-webkit-user-drag:none;filter:brightness(1.02) saturate(1.05) drop-shadow(0 6px 14px #0006) drop-shadow(0 0 10px #fff3d066);animation:heroIdle 4.5s ease-in-out infinite;-webkit-mask-image:linear-gradient(#000 88%,transparent 99%);mask-image:linear-gradient(#000 88%,transparent 99%)}
+.hero-shadow{position:absolute;left:6%;right:6%;bottom:3%;height:11%;border-radius:50%;background:radial-gradient(ellipse,#3a260c99 0%,#3a260c44 45%,transparent 72%)}
+@keyframes heroIn{from{opacity:0;transform:translateX(-50%) translateY(46px) scale(1.1)}to{opacity:1;transform:translateX(-50%)}}
+@keyframes heroIdle{50%{transform:translateY(-3px)}}
+.tap{position:absolute;left:50%;top:53%;transform:translateX(-50%);border:0;background:#06091acc;box-shadow:inset 0 0 0 1px #f8e2a066,0 4px 18px #000a;border-radius:999px;padding:10px 22px 10px 28px;font:900 16px var(--f-title);letter-spacing:.4em;color:#fff7dc;text-shadow:0 0 12px #ffbf4a;opacity:0;animation:fade .6s 2.1s forwards,breathe 1.8s 2.7s ease-in-out infinite;white-space:nowrap}
+@keyframes breathe{50%{opacity:.45}}
+@keyframes fade{to{opacity:1}}
+.t-foot{position:absolute;left:0;right:0;bottom:calc(14px + env(safe-area-inset-bottom,0px));text-align:center;font:600 11px var(--f-display);letter-spacing:.2em;color:#ffffff55}
+.tflash{position:absolute;inset:0;background:#fff;opacity:0;pointer-events:none;animation:flash .9s 1.15s ease-out}
+@keyframes flash{0%{opacity:0}15%{opacity:.75}100%{opacity:0}}
+.title-screen.entered{cursor:default}
+.title-screen.entered .t-center{top:9%;transform:translateY(-28%) scale(.72)}
+.title-screen.entered .hero{opacity:0!important}
+.title-screen.entered .tap,.title-screen.entered .t-foot{display:none}
+.title-screen.leave{animation:leave .8s forwards}
+@keyframes leave{0%{filter:none}30%{filter:brightness(2.5)}100%{opacity:0;filter:brightness(3)}}
+.gate{position:absolute;inset:0;z-index:45;display:flex;align-items:flex-end;justify-content:center;padding:0 16px calc(24px + env(safe-area-inset-bottom,0px));pointer-events:none}
+.gate-card{width:100%;max-width:420px;max-height:70%;overflow-y:auto;padding:18px 16px;border-radius:12px;pointer-events:auto;animation:rise .6s cubic-bezier(.2,.8,.2,1)}
+@keyframes rise{from{opacity:0;transform:translateY(40px)}}
+.gate-card #gateBody{position:relative}
+
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;animation-delay:0s!important;animation-iteration-count:1!important;transition-duration:.01ms!important}}
+/* ===== 試煉畫面：金框素材 ===== */
+#battle .b-top{display:grid;grid-template-columns:23% 41% 28%;justify-content:space-between;align-items:center;padding:6px 6px 0}
+#battle .ghost#bExit{background:var(--sp-back) center/100% 100% no-repeat;box-shadow:none;border:0;border-radius:0;aspect-ratio:235/115;padding:0;display:grid;place-items:center;font-size:clamp(12px,3.6vw,15px);color:#fff}
+#battle .b-floor,#battle .b-floor.boss{background:var(--sp-title) center/100% 100% no-repeat;box-shadow:none;border:0;border-radius:0;aspect-ratio:425/165;padding:0 0 1%;display:grid;place-items:center;font-size:clamp(15px,4.6vw,20px);color:#ffe9ae}
+#battle .b-floor.boss{color:#ffb3a8;font-size:clamp(12px,3.6vw,16px)}
+#battle .b-bal{background:var(--sp-bal) center/100% 100% no-repeat;box-shadow:none;border:0;border-radius:0;aspect-ratio:280/115;padding:0 9% 0 36%;justify-content:center;font-size:clamp(12px,3.6vw,15px)}
+#battle .b-bal .coin{display:none}
+#battle .b-bal::before{content:"U";position:absolute;left:21%;top:50%;transform:translate(-50%,-52%);font:900 clamp(10px,3vw,13px) var(--f-display);color:#7a4c0c}
+#battle .b-bal{position:relative}
+#battle .m-info{background:var(--sp-hp) center/100% 100% no-repeat;box-shadow:none;border:0;border-radius:0;top:0;left:4px;right:4px;aspect-ratio:995/103;padding:0 7.5% 0 6.5%;gap:8px}
+#battle .m-name{font-size:clamp(11px,3.3vw,14px)}
+#battle .hp{height:26%;background:#061040;box-shadow:inset 0 0 0 1px #f3d58a66}
+#battle .streak{background:var(--sp-streak) center/100% 100% no-repeat;box-shadow:none;border:0;border-radius:0;top:calc((100vw - 8px) * .104 + 2px);right:4px;width:31%;aspect-ratio:315/92;padding:0;justify-content:center;gap:6px}
+@media (min-width:480px){#battle .streak{top:52px}}
+#battle .stage{padding-top:0}
+#battle .chart-card.gild{background:var(--sp-chart) center/100% 100% no-repeat;box-shadow:none;border:0;border-radius:0;position:relative;display:block;margin:0 4px;padding:0;aspect-ratio:1015/720;-webkit-backdrop-filter:none;backdrop-filter:none}
+#battle .chart-card.gild::before{display:none}
+#battle .chart-head{position:absolute;left:17%;right:7.6%;top:9%;height:17.5%}
+#battle .sym{font-size:clamp(12px,3.5vw,15px);line-height:1.25}#battle .sym small{font-size:clamp(9px,2.6vw,11px);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}#battle .sym{overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
+#battle #chart{position:absolute;left:7.3%;top:28.6%;width:85.6%;height:67%;border-radius:10px;background:#081240d1}
+#battle .chart-foot{background:var(--sp-text) center/100% 100% no-repeat;box-shadow:none;border:0;border-radius:0;margin:-2px 8px 0;padding:5.2% 8% 5.6%;font-size:clamp(11px,3.1vw,12.5px);line-height:1.55;color:#f1f3ff}
+#battle .actions{gap:0;padding:2px 2px 10px;grid-template-columns:348fr 336fr 340fr}
+#battle .act,#battle .act.flat,#battle .act.long,#battle .act.short{background:center/100% 100% no-repeat;box-shadow:none;border-radius:0;aspect-ratio:340/235;padding:0;font-size:clamp(17px,5.2vw,22px)}
+#battle .act.long{background-image:var(--sp-bl)}#battle .act.flat{background-image:var(--sp-bm)}#battle .act.short{background-image:var(--sp-br)}
+#battle .act small{font-size:clamp(9px,2.7vw,11px)}
+#battle .act.picked{outline:0;filter:drop-shadow(0 0 8px #ffe9ae) brightness(1.15)}
+#battle .lots{margin:6px 14px 0}
+/* 戰鬥畫面一屏放完：怪物區吃剩下的高度，盤面高度有上限 */
+#battle .stage{flex:1 1 0;height:auto;min-height:118px;padding:0 16px 6px}
+#battle .monster,#battle .monster.boss{height:min(100% - 34px,min(60vw,240px));width:auto;aspect-ratio:1;margin-bottom:-4px}
+#battle .monster.boss{height:min(100% - 26px,min(70vw,285px))}
+#battle .stage::before{width:min(52vw,220px);height:22px;bottom:4px}
+#battle .chart-card.gild{flex:none;aspect-ratio:auto;height:min(calc((min(100vw,480px) - 8px) * .709),35vh)}
+#battle .chart-foot{flex:none;padding:4.4% 8% 4.8%;line-height:1.45}
+#battle .lots{flex:none;margin:2px 14px 0;padding:5px 12px}
+#battle .lots-seg button{padding:5px 8px}
+#battle .actions{flex:none;padding:0 2px 6px}
+#battle .result{flex:none}
+#battle .chart-foot{display:none}
+#battle .b-floor,#battle .b-floor.boss{padding:3.5% 0 0 .06em;line-height:1}
+#battle .b-bal{padding:1% 11% 0 39%;line-height:1}
+#battle .b-bal::before{left:26.5%;transform:translate(-50%,-46%)}
+#battle .ghost#bExit{padding-top:1%;line-height:1}
+.sheet-card.gild{overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain}
+.sheet:not(.art) #sheetBody{padding:18px 18px 20px}
+.sheet .rules{font-size:14px;line-height:1.75}
+/* 怪物區固定較矮，盤面吃剩下的高度（金框用九宮格拉伸，上緣標題列不變形） */
+#battle{--cw:calc(min(100vw,480px) - 8px)}
+#battle .stage{flex:none;height:clamp(118px,21vh,180px);min-height:0}
+#battle .chart-card.gild{flex:1 1 0;height:auto;min-height:calc(var(--cw) * .5);background:none;box-sizing:border-box;border-style:solid;border-color:transparent;border-width:calc(var(--cw) * .183) calc(var(--cw) * .071) calc(var(--cw) * .033);border-image:var(--sp-chart) 134 52 24 52 fill / calc(var(--cw) * .183) calc(var(--cw) * .071) calc(var(--cw) * .033) stretch}
+#battle .chart-head{left:calc(var(--cw) * .099);right:calc(var(--cw) * .004);top:calc(var(--cw) * -.122);height:calc(var(--cw) * .108)}
+#battle #chart{left:0;top:0;width:100%;height:100%}
+#battle .monster,#battle .monster.boss{filter:drop-shadow(0 6px 10px #000a) drop-shadow(0 0 16px #b9a8ff88)}
+#battle .monster.boss{filter:drop-shadow(0 6px 10px #000a) drop-shadow(0 0 18px #ff8a7a99)}
+#battle .stage{height:clamp(128px,24vh,205px);overflow:visible;z-index:1}
+#battle .monster,#battle .monster.boss{height:calc(100% - 40px);margin-bottom:-10px}
+#battle .stage::before{bottom:0}
+#battle .act,#battle .act.flat{letter-spacing:0;text-align:center;align-items:center;justify-content:center;gap:2px;line-height:1.1;padding:0 0 1%}
+#battle .act small{letter-spacing:0;line-height:1.2}
+#battle .act.flat{padding-right:1.2%}#battle .act.short{padding-right:1.6%}
+.t-scene,.scene{isolation:isolate}
+.bg-full{position:absolute;inset:0;z-index:-1;background:center/100% 100% no-repeat;opacity:0;transition:opacity .5s}
+.bg-full.on{opacity:1}
+.ac-assets.adm{margin-top:2.4cqw;box-shadow:inset 0 0 0 1.5px #ff9d8a,0 0 12px #ff9d8a44}
+.adm h3{color:#ffb3a8}
+.adm-row{display:flex;align-items:center;gap:2cqw}
+.adm-row label{font-size:3.2cqw;color:#f1f3ff;white-space:nowrap}
+.adm-row input{flex:1;min-width:0;padding:2cqw;border:0;border-radius:2.4cqw;background:#0b123acc;box-shadow:inset 0 0 0 1px #f3d58a99;color:#fff;font:700 max(16px,3.6cqw) var(--f-display);text-align:center}
+.adm button{border:0;border-radius:999px;padding:2.2cqw 4cqw;font:900 3.4cqw var(--f-title);cursor:pointer;background:linear-gradient(#fff3c4,#f0c877 50%,#d9a24e);color:#141d5c}
+.adm .adm-reset{width:100%;margin-top:2cqw;background:#0b123acc;color:#ffb3a8;box-shadow:inset 0 0 0 1.5px #ff9d8a}
+.adm-msg{margin:1.6cqw 0 0;font-size:2.8cqw;color:#e6e9ff;text-align:center}
+.top-r{display:flex;flex-direction:column;align-items:flex-end;gap:6px;flex:none}
+.risk{display:flex;align-items:center;gap:6px;height:28px;padding:0 10px 0 8px;border-radius:999px;background:#0c123699;box-shadow:inset 0 0 0 1px #f3d58aaa}
+.rk-sh{display:flex;gap:3px}
+.rk-sh svg,.sn-sh svg{width:15px;height:17px;fill:#0b123a;stroke:#f3d58a88;stroke-width:1.4}
+.rk-sh svg.on,.sn-sh svg.on{fill:#f0c66a;stroke:#fff3c4;filter:drop-shadow(0 0 3px #ffd26a)}
+.rk-t{font:700 12px var(--f-display);color:#fff3d0;font-variant-numeric:tabular-nums}
+.rk-t:empty{display:none}
+.sn-sh{display:flex;justify-content:center;gap:8px;margin:2px 0 12px}.sn-sh svg{width:26px;height:29px}
+.enter.rest{background:linear-gradient(#3a3f66f2,#22264af2)!important;box-shadow:inset 0 0 0 1.5px #9aa3c8;color:#d5daf0;text-shadow:none;cursor:not-allowed;width:calc(var(--w) * .46);font-size:clamp(13px,calc(var(--w) * .04),18px);letter-spacing:.06em}
+.adm-r2{margin-top:2cqw}.adm .adm-alt{flex:1;padding:2.2cqw 1cqw;font-size:3cqw;background:#0b123acc;color:#ffe9ae;box-shadow:inset 0 0 0 1.5px #f3d58a}
+.adm .adm-alt[aria-pressed=true]{background:linear-gradient(#fff3c4,#f0c877 50%,#d9a24e);color:#141d5c}
+</style>
+</head>
+<body>
+
+<div id="app">
+  <header class="topbar">
+    <div class="me" id="meFrame">
+      <div class="av-wrap"><span class="laurel" data-n="11" data-r="43"></span>
+        <button class="avatar" id="avatar" aria-label="我的帳號"><svg viewBox="0 0 64 64" aria-hidden="true">
+      <defs><linearGradient id="avSky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#3b5fa8"/><stop offset="1" stop-color="#f2b46a"/></linearGradient>
+      <linearGradient id="avHood" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#8a5a2c"/><stop offset="1" stop-color="#3c2412"/></linearGradient></defs>
+      <rect width="64" height="64" fill="url(#avSky)"/>
+      <path d="M40 64V30l6-18 6 18v34z" fill="#c9b79a" opacity=".55"/>
+      <path d="M6 66Q8 44 22 40L32 46 42 40Q56 44 58 66Z" fill="#2f4a3a"/>
+      <path d="M22 41Q32 50 42 41L40 52Q32 58 24 52Z" fill="#b5372c"/>
+      <path d="M14 34Q12 10 32 8Q52 10 50 34Q48 44 40 46L32 50 24 46Q16 44 14 34Z" fill="url(#avHood)"/>
+      <path d="M20 31Q20 18 32 17Q44 18 44 31Q44 40 32 44Q20 40 20 31Z" fill="#f0c9a0"/>
+      <path d="M20 28Q22 17 32 17Q42 17 44 28Q38 22 32 23Q25 22 20 28Z" fill="#5a3a1e"/>
+      <circle cx="27" cy="31" r="1.8" fill="#2a1a10"/><circle cx="37" cy="31" r="1.8" fill="#2a1a10"/>
+      <path d="M28 37Q32 40 36 37" stroke="#8a4a32" stroke-width="1.6" fill="none" stroke-linecap="round"/>
+      <path d="M14 34Q12 10 32 8" stroke="#ffe2a8" stroke-width="1.5" fill="none" opacity=".7"/>
+    </svg></button>
+      </div>
+      <div class="me-side">
+        <div class="me-row"><span class="lvl" id="uLv" hidden title="目前挑戰的試煉">1</span><span class="name" id="uName">訪客</span></div>
+        <div class="title-chip" id="uTitle" hidden>尚未登入</div>
+      </div>
+    </div>
+    <div class="top-r"><div class="wallet" id="purse" aria-label="本金"><span class="wu" aria-hidden="true">U</span><b id="uBal">10,000</b><button class="wplus" id="walletPlus" aria-label="邀請好友賺 U">+</button></div><div class="risk" id="riskPill" hidden><span class="rk-sh" id="riskSh"></span><span class="rk-t" id="riskT"></span></div></div>
+  </header>
+  <div class="demo-bar" id="demoBar" hidden></div>
+
+  <main class="map" id="map"><canvas id="mapCv"></canvas><div class="scene" id="scene"><i class="scene-glow"></i></div><div class="scene-stars" aria-hidden="true"></div></main>
+  <button class="help-btn" id="btnAccount" aria-label="規則說明"><span>?</span></button>
+  <div class="ticker" id="ticker" hidden role="status" aria-live="off"><span class="tk-ico" aria-hidden="true">✦</span><div class="tk-win"><span id="tkTxt"></span></div></div>
+  <button class="plaque" data-act="battle" id="towerRib">試煉 01</button>
+  <div class="fill"></div>
+  <button class="enter" id="btnBattle" data-act="battle"><span id="battleTxt">進入試煉</span></button>
+  <div class="gem" aria-hidden="true"><img id="gemImg" class="gem-img" alt=""><svg viewBox="0 0 60 70"><defs><linearGradient id="gemG" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#f2fbff"/><stop offset=".45" stop-color="#6fc0ff"/><stop offset="1" stop-color="#1f5fd0"/></linearGradient></defs>
+    <ellipse class="gem-ring" cx="30" cy="58" rx="20" ry="6" fill="none" stroke="#3f8cff" stroke-width="2"/>
+    <ellipse cx="30" cy="58" rx="11" ry="3.2" fill="#2a6fe0" opacity=".45"/>
+    <g class="gem-body"><path d="M30 4L44 28L30 52L16 28Z" fill="url(#gemG)" stroke="#0b2a66" stroke-width="1.6" stroke-linejoin="round"/><path d="M30 4V52M16 28H44" stroke="#fff" stroke-width="1" opacity=".75"/><path d="M30 4L44 28L30 28Z" fill="#fff" opacity=".28"/></g></svg></div>
+  <div class="fill2"></div>
+
+  <nav class="dock" aria-label="主選單">
+    <button class="dock-btn" data-act="titles"><span class="ico"><span class="laurel" data-n="9" data-r="42"></span><svg viewBox="0 0 24 24"><path d="M3 8l4.5 4L12 5l4.5 7L21 8l-2 11H5z"/></svg></span><em>稱號</em></button>
+    <button class="dock-btn" data-act="rank"><span class="ico"><span class="laurel" data-n="9" data-r="42"></span><svg viewBox="0 0 24 24"><path d="M7 4h10v5a5 5 0 0 1-10 0zM7 6H4a3 3 0 0 0 3 4M17 6h3a3 3 0 0 1-3 4M12 14v4M8 21h8M9 18h6"/></svg></span><em>排行榜</em></button>
+    <button class="dock-btn" data-act="account"><span class="ico"><span class="laurel" data-n="9" data-r="42"></span><svg viewBox="0 0 24 24"><path d="M5 20V11M10 20V5M15 20v-7M20 20V9M3 20h18"/></svg></span><em>戰績</em></button>
+    <button class="dock-btn" data-act="invite"><span class="ico"><span class="laurel" data-n="9" data-r="42"></span><svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c1-3.5 3.5-5.5 6.5-5.5s5.5 2 6.5 5.5M18 8v6M15 11h6"/></svg></span><em>邀請好友</em></button>
+  </nav>
+
+  <section class="screen" id="battle" hidden aria-label="戰鬥">
+    <div class="b-top"><button class="ghost" id="bExit">← 地圖</button><div class="b-floor metal-text" id="bFloor">試煉 01</div><div class="b-bal"><span class="coin">U</span><span id="bBal">10,000</span></div></div>
+    <div class="stage" id="stage">
+      <div class="m-info"><div class="m-name" id="mName"></div><div class="hp"><i id="mHp"></i></div></div>
+      <div class="streak" id="streak" title="連續答對 3 次額外 +500 U"><span>連勝</span><b id="stN">0</b><div class="pips" id="stPips"><i></i><i></i><i></i></div></div>
+      <div class="monster" id="monster"></div>
+<div class="summon" id="summon"><i></i><i></i></div>
+      <div class="claw" id="claw"></div>
+    </div>
+    <div class="chart-card gild">
+      <div class="chart-head">
+        <div class="sym" id="cSym"></div>
+        <div style="display:flex;gap:6px;align-items:center;flex:none"><button class="ghost" id="bRules" style="padding:4px 9px;font-size:12px">規則</button><div class="tabs" role="tablist"><button data-tf="15m" class="on">15m</button><button data-tf="1h">1H</button></div></div>
+      </div>
+      <canvas id="chart"></canvas>
+    </div>
+    <div class="chart-foot" id="cFoot"></div>
+    <div class="lots" id="lots" hidden><span class="lots-k">手數</span><div class="lots-seg" role="radiogroup" aria-label="手數倍數"><button data-m="1" role="radio">1 倍</button><button data-m="2" role="radio">2 倍</button><button data-m="3" role="radio">3 倍</button></div><span class="lots-v" id="lotsV"></span></div>
+    <div class="actions" id="actions">
+      <button class="act long" data-dir="L">做多<small>▲ 向上斬擊</small></button>
+      <button class="act flat" data-dir="N">不進場<small>◆ 識破陷阱</small></button>
+      <button class="act short" data-dir="S">做空<small>▼ 向下劈砍</small></button>
+    </div>
+    <div class="result gild" id="result" hidden></div>
+  </section>
+
+  <div class="wave" id="wave" hidden aria-hidden="true"><div class="wave-band"></div><div class="wave-txt"><b id="waveMain"></b><span id="waveSub"></span></div></div>
+  <canvas class="fx" id="fxCv" aria-hidden="true"></canvas>
+
+  <section class="hero-pick" id="heroPick" hidden role="dialog" aria-label="選擇角色">
+    <p class="hp-k">CHOOSE YOUR HERO</p>
+    <h2>選擇你的冒險者</h2>
+    <p class="hp-s">選好之後，會成為你左上角的頭像</p>
+    <div class="hp-list" id="hpList"></div>
+    <button class="hp-go" id="hpGo" disabled>選擇角色</button>
+  </section>
+  <section class="stage-note" id="stageNote" hidden role="alertdialog" aria-labelledby="stageT">
+    <div class="sn-card">
+      <div id="stageBody"></div>
+      <button class="hp-go" id="stageNext"></button>
+    </div>
+  </section>
+  <section class="warning" id="warning" hidden role="alertdialog" aria-label="魔王警告">
+    <div class="hazard"></div>
+    <div class="warn-in">
+      <div class="warn-word">WARNING</div>
+      <div class="warn-sub" id="wSub">試煉 10 · 魔王</div>
+      <div class="warn-event" id="wEvent"></div>
+      <p class="warn-note" id="wNote"></p>
+      <div class="row"><button class="btn dim" id="wBack">先撤退</button><button class="btn gold" id="wGo">迎戰魔王</button></div>
+    </div>
+    <div class="hazard"></div>
+  </section>
+
+  <div class="sheet" id="sheet" hidden>
+    <div class="sheet-card gild" role="dialog" aria-modal="true" aria-labelledby="sheetTitle">
+      <div class="sheet-head"><h2 class="metal-text" id="sheetTitle"></h2><button class="x" id="sheetClose" aria-label="關閉">✕</button></div>
+      <div id="sheetBody"></div>
+    </div>
+  </div>
+
+  <section class="title-screen" id="title" aria-label="開場畫面">
+    <canvas id="titleCv"></canvas>
+    <div class="t-scene" id="tScene"><i class="scene-glow"></i></div><div class="scene-stars" aria-hidden="true"></div>
+    <div class="t-center">
+      <div class="logo-pre" id="logoPre"><i></i><span>The Breakthrough</span><i></i></div>
+      <h1 class="logo" id="logoText">Gates of Ordeal</h1>
+      <div class="logo-sub" id="logoSub"><span></span>破局紀元：試煉之門<span></span></div>
+    </div>
+    <div class="hero" aria-hidden="true"><div class="hero-shadow"></div><img id="heroImg" alt="" draggable="false"></div>
+    <button class="tap" id="tapStart">載入中…</button>
+    <div class="t-foot" id="tFoot"></div>
+    <div class="tflash"></div>
+  </section>
+  <section class="gate" id="gate" hidden aria-label="登入或註冊">
+    <div class="gate-card gild"><div id="gateBody"></div></div>
+  </section>
+  <div class="toast" id="toast" hidden></div>
+</div>
+
+<script>
+/* 怪物圖（去背 WebP，內嵌在檔案裡） */
+const MON_SRC = {
+  wolf: 'img/mon.webp',
+  bear: 'img/mon2.webp',
+  deer: 'img/mon3.webp',
+  griffin: 'img/mon4.webp',
+  panther: 'img/mon5.webp',
+  bull: 'img/mon6.webp',
+  dragon: 'img/mon7.webp',
+  raptor: 'img/mon8.webp',
+  hound: 'img/mon9.webp',
+  fox: 'img/mon10.webp',
+  horse: 'img/mon11.webp',
+  wyvern: 'img/mon12.webp',
+  goat: 'img/mon13.webp',
+  serpent: 'img/mon14.webp'
+};
+
+/* 主畫面與開場共用的神殿插畫（JPEG，內嵌在檔案裡） */
+const HOME_SRC = 'data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==';
+
+/* 開場畫面的冒險者（去背 WebP） */
+const HERO_SRC = 'data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==';
+
+/* 打怪畫面的塔內背景 */
+const HEROES = { f: { name: '魔法師', img: 'img/heroes.webp' }, m: { name: '劍士', img: 'img/heroes2.webp' } };
+const WALLET_SRC = 'data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==';
+const PLAQUE_SRC = 'data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==';
+const ME_SRC = 'data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==';
+const DOCK_SRC = {titles:'data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==',rank:'data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==',account:'data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==',invite:'data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=='};
+const ENTER_SRC = { full: 'data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==', blank: 'data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==' };
+const GEM_SRC = 'data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==';
+const NIGHT_SRC = 'img/night.webp';
+const NIGHT_TINY = 'data:image/webp;base64,UklGRowBAABXRUJQVlA4IIABAAAQCgCdASocADIAPtVap0yoJSOiM/ZqqQAaiWYAnTMcAArdWSlnlUtJuz4p8oTwivLw10jZ/yJ45fAAXFtNdYaPyOCEzQLK6LIHxpPKiowLxVyA/vLKH+LIAAD+3iCMhLws+hfWwyxHWAGr4j35Q1VrWmKHjZHqQIuNgbsPSN1f2fRDHb42Xpmg629143SNbVV6qIcSSuK1OtTJe54LrrnUkUwVl/arg5d30tDbyQabCjZO5sGH0CFGzci8LdGq8kWq93Tp7uWH9qUpxpX3tiC/uwpH1FJKRF2zceaYsB46Tgac9gBADsIDMbh8KVLSb5tPx5VpoA0kwqq8PcJlrVPnkFWkOfxZ8AdhDcYHpiNOyn8ltaCIBg3eh3fa2KIEbKoqegJ4XqoE9AjA/NPt+5+7yqmY9j6sKo8Uh1HPpbZiafAe5cPPaYqUY540h9AaV/S0wkScCRcoGGSqCc66pYak1nneBNGKZCp2joCoR31z/f70OwoiaYy5P0BVpEwXAAA=';
+const OPEN_SRC = 'img/open.webp';
+const OPEN_TINY = 'data:image/webp;base64,UklGRoABAABXRUJQVlA4IHQBAABwCQCdASocADIAPt1cp02opSOiMBQMARAbiWYAgpbaGCU3gUu8pyQEVwzW6QKsNbXLdZMekBJgOahJd8LaTQ9oDtpmgJZv2+B7HadaV0nYLmeLyMAA/vWJuLiyiPjf/wA/d2qMwS9ThNcvjHDd6FXdfzVGG3p2Wpkc8xKP/6vesZDJiyyCsfoKpDPusPbPXOH8wqexfNt8quNzGGaco1SwgAbIQmdazdwDO3X30xXFUj8fwf5aP9WxeAbZDRs6LpPR0SDIamoxpEHg7S9Uheygfrxk6sBZJWXdntD/ZvRTw1A1Mi0OB5QEUTiUwvOS7bccAGC9pKv4uFq7qB7V7L15pQISTgCzVrulK+hcwG5JGMVu31mKSW9hF3keshLxFG/CbSNla9dWSWz/47bRP7bZvYbJqJ7vcTYdcj+wK/eORVL+sEW94qqIfNtpZjQpUS6bx/Xo2AnXkNce7bKPJmBePf7x8vyEG2yLYExtivUAOraAAAA=';
+const ACCT_SRC = 'img/acct.webp';
+const INV_SRC = 'img/inv.webp';
+const TITLES_SRC = 'img/titles.webp';
+const SP = {back:'img/sp.webp',title:'img/sp2.webp',bal:'img/sp3.webp',hp:'img/sp4.webp',streak:'img/sp5.webp',chart:'img/sp6.webp',text:'img/sp7.webp',bl:'img/sp8.webp',bm:'img/sp9.webp',br:'img/sp10.webp'};
+const INSIDE_SRC = 'img/inside.webp';
+
+/* ================= 設定 ================= */
+const CONFIG = {
+  gamePre: 'The Breakthrough',   // 大標上面的小字
+  gameName: 'Gates of Ordeal',   // 開場畫面的大標
+  gameNameEn: '破局紀元：試煉之門',         // 大標下面的小字
+  // 新 Firebase 專案（tower-of-trade）。設為 null＝示範模式（資料只存在這台裝置、盤面為模擬）。
+  firebase: {
+    apiKey: "AIzaSyCsVHqZOwqAE20T8eb7QneO7_eljtv_E-0",
+    authDomain: "tower-of-trade.firebaseapp.com",
+    projectId: "tower-of-trade",
+    storageBucket: "tower-of-trade.firebasestorage.app",
+    messagingSenderId: "637732244476",
+    appId: "1:637732244476:web:fdee667878eac2c7794079"
+  },
+  // 題目、答案、總層數都由出題引擎（Apps Script）寫進這些集合
+  collections: { users: 'tq2_users', emails: 'tq2_emailIndex', floors: 'tq2_floors', answers: 'tq2_answers', meta: 'tq2_meta/tower' },
+  start: 10000, invite: 5000,
+  adminEmail: 'chan37fx@gmail.com',   // 管理員：可跳關、重置自己的紀錄（firestore.rules 裡也有同一個信箱）
+  lotFrom: 51,
+  riskFrom: 101, riskMax: 5, riskMin: 30,   // 風控額度：第幾道試煉起、幾次、幾分鐘回 1 次（firestore.rules 裡也有同樣的數字）   // 從第幾道試煉開始可以選 1～3 倍手數（firestore.rules 裡也有同一個數字）
+  stake: 300, bossStake: 500,      // 一般關 ±300、魔王關 ±500（正式模式以引擎寫入的金額為準）
+  streakEvery: 3, streakBonus: 500, // 每連續答對 3 次額外 +500（要和 firestore.rules 一致）
+  minRankGames: 20,
+  // 各商品的判定點數（只用在「規則說明」和示範模式；正式模式每一層的點數由引擎寫在題目裡）
+  points: { gold: 10, btc: 300, nasdaq: 90, dow: 70 },
+  assetNames: { gold: '黃金', btc: '比特幣', nasdaq: '納斯達克', dow: '道瓊' },
+  // 以下三項只有示範模式會用到；正式模式的總層數由引擎決定
+  baseFloors: 100, floorsPerDay: 5, launchDate: '2026-10-01'
+};
+const DEMO_ASSETS = {
+  gold:   { name: '黃金現貨 (XAU/USD)',   base: 4200,  vol: .0009, dp: 2 },
+  btc:    { name: '比特幣 (BTC/USDT)',    base: 83000, vol: .0024, dp: 1 },
+  nasdaq: { name: '納斯達克100指數',       base: 29000, vol: .0012, dp: 2 },
+  dow:    { name: '道瓊工業指數',          base: 47000, vol: .0009, dp: 2 }
+};
+const EVENT_INFO = {   // mon：這種魔王關出場的怪物
+  NFP:  { name: '美國非農就業報告', boss: '非農獅鷲', mon: 'griffin', data: true },
+  CPI:  { name: '美國 CPI 通膨數據', boss: '通膨翼龍', mon: 'wyvern',  data: true },
+  FOMC: { name: '聯準會利率決議',   boss: '利率蒼龍', mon: 'dragon',  data: true },
+  VOL:  { name: '劇烈波動盤面',     boss: '暴波晶龍', mon: 'serpent', data: false }
+};
+const TITLES = [
+  [10000, '韭菜新手'], [11500, '見習交易員'], [13500, 'K線學徒'], [16000, '趨勢獵人'], [19000, '波段騎士'],
+  [23000, '盤面術士'], [28000, '多空將軍'], [34000, '市場霸主'], [41000, '傳奇操盤手'], [50000, '神預測之王']
+];
+const DIRS = { L: 'bull', S: 'bear', N: 'neutral' };
+const DIR_LABEL = { bull: '做多 ▲', bear: '做空 ▼', neutral: '不進場 ◆' };
+const FAMILIES = [   // 每 10 道試煉換一種
+  { k: 'deer', n: '盤整靈鹿' }, { k: 'fox', n: '假突破妖狐' }, { k: 'wolf', n: '洗盤星狼' }, { k: 'panther', n: '插針影豹' }, { k: 'bull', n: '多頭晶牛' },
+  { k: 'bear', n: '空頭晶熊' }, { k: 'raptor', n: '獵價鷹隼' }, { k: 'hound', n: '停損甲犬' }, { k: 'horse', n: '趨勢天馬' }, { k: 'goat', n: '回檔晶羊' }
+];
+const DEMO_BOTS = [
+  ['夜盤遊俠', 15400, 61, 33], ['黃金獵手', 13800, 52, 33], ['布林之眼', 12600, 40, 27], ['均線修士', 12200, 47, 36],
+  ['斐波那契', 11400, 30, 23], ['量價先知', 10800, 14, 10], ['停損騎士', 9600, 22, 24], ['順勢者', 9200, 9, 13]
+].map(([n, bal, w, l], i) => ({ uid: 'bot' + i, name: '（示範）' + n, balance: bal, peak: bal + 400, wins: w, losses: l, total: w + l,
+  rankBp: w + l >= CONFIG.minRankGames ? Math.floor(w * 10000 / (w + l)) : -1, bot: true , invites: Math.max(0, 6 - i * 2) }));
+
+/* ================= 小工具 ================= */
+const $ = s => document.querySelector(s);
+const fmt = n => Math.round(n).toLocaleString('en-US');
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+const clamp = (v, a = 0, b = 1) => Math.max(a, Math.min(b, v));
+const lerp = (a, b, t) => a + (b - a) * t;
+const esc = s => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+function rng(seed) { let a = seed >>> 0; return () => { a = a + 0x6D2B79F5 | 0; let t = Math.imul(a ^ a >>> 15, 1 | a); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
+function hash(str) { let h = 2166136261; for (let i = 0; i < str.length; i++) { h ^= str.charCodeAt(i); h = Math.imul(h, 16777619); } return h >>> 0; }
+function titleOf(peak) { let t = TITLES[0][1]; for (const [v, n] of TITLES) if ((peak || 0) >= v) t = n; return t; }
+function taipeiDate(ms = Date.now()) { return new Date(ms + 8 * 36e5).toISOString().slice(0, 10); }
+function daysBetween(a, b) { return Math.round((Date.parse(b + 'T00:00:00Z') - Date.parse(a + 'T00:00:00Z')) / 864e5); }
+function store(k, v) { try { if (v === undefined) return JSON.parse(localStorage.getItem(k)); localStorage.setItem(k, JSON.stringify(v)); } catch (e) { return null; } }
+const reduceMotion = () => window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+/* ================= 塔層與題目 ================= */
+/* 題目 q：{ floor, name, assetKey, vis:[[o,h,l,c]…40 根 15 分 K], h1:[1 小時 K], pts(判定點數), sourceHour, sessionLabel, boss, stake }
+   答案 ans：{ answer, pts, finalMove, maxUp, maxDown, rev:[隱藏的 3 根], sourceTime, stake }——作答後才拿得到 */
+function totalFloors() { return S.live ? S.total : CONFIG.baseFloors + CONFIG.floorsPerDay * Math.max(0, daysBetween(CONFIG.launchDate, taipeiDate())); }
+function dpOf(q) { const p = Math.abs(q.vis[q.vis.length - 1][3]); return p >= 10000 ? 1 : p >= 10 ? 2 : 4; }
+/* 判定（和出題引擎相同）。A＝題目最後一根 K 的收盤價，P＝該商品的判定點數，C3＝第 3 根的收盤價
+   做多：3 根裡最高價碰到 A+P，且 C3 沒有低於 A
+   做空：3 根裡最低價碰到 A−P，且 C3 沒有高於 A
+   盤整：其餘（上下都沒碰到；或碰到了但 C3 收回 A 的另一邊）
+   上下都碰到時，看 C3 在 A 的哪一邊 */
+function judgeQ(vis, rev, pts) {
+  const a = vis[vis.length - 1][3], c3 = rev[rev.length - 1][3];
+  const hi = Math.max(...rev.map(c => c[1])), lo = Math.min(...rev.map(c => c[2]));
+  const upHit = hi >= a + pts, dnHit = lo <= a - pts;
+  let answer = 'neutral';
+  if (upHit && dnHit) answer = c3 > a ? 'bull' : c3 < a ? 'bear' : 'neutral';
+  else if (upHit) answer = c3 >= a ? 'bull' : 'neutral';
+  else if (dnHit) answer = c3 <= a ? 'bear' : 'neutral';
+  return { answer, finalMove: c3 - a, maxUp: hi - a, maxDown: a - lo };
+}
+const cvCandles = a => (a || []).map(x => [+x.open, +x.high, +x.low, +x.close]);
+function floorFromDoc(d) {
+  return { floor: +d.floor, name: d.name || '', assetKey: d.assetKey || '', vis: cvCandles(d.candles15m), h1: cvCandles(d.candles1h), pts: +d.points,
+    sourceHour: d.sourceHour || '', sessionLabel: d.sessionLabel || '', boss: d.boss ? { type: EVENT_INFO[d.boss] ? d.boss : 'VOL' } : null, stake: +d.stake || CONFIG.stake };
+}
+function ansFromDoc(a) { return { answer: a.answer, pts: +a.points, finalMove: +a.finalMove, maxUp: +a.maxUp, maxDown: +a.maxDown, rev: cvCandles(a.reveal15m), sourceTime: a.sourceTime || '', stake: Math.trunc(+a.stake) || CONFIG.stake }; }
+/* 示範模式用的模擬盤面（正式模式不會用到） */
+function demoFloor(n) {
+  if (S.floors[n]) return S.floors[n];
+  const r = rng(hash('floor' + n)), boss = n % 10 === 0, keys = Object.keys(DEMO_ASSETS);
+  const key = boss ? keys[(n / 10) % 4] : ['gold', 'gold', 'btc', 'nasdaq', 'dow'][Math.floor(r() * 5)];
+  const A = DEMO_ASSETS[key], pts = CONFIG.points[key], x = r(), want = boss ? (x < .5 ? 'bull' : 'bear') : x < .2 ? 'neutral' : x < .6 ? 'bull' : 'bear';
+  let all, j;
+  for (let tries = 0; tries < 80; tries++) {
+    all = []; let p = A.base * (.9 + r() * .2), trend = 0;
+    for (let i = 0; i < 163; i++) {
+      if (i % 24 === 0) trend = (r() - .5) * A.vol * .8;
+      const fut = i >= 160, v = A.vol * (fut ? (want === 'neutral' ? .35 : boss ? 3.2 : 1.8) : 1) * (.5 + r());
+      const o = p, c = o * (1 + (fut && want === 'neutral' ? 0 : trend) + (r() - .5) * 2 * v);
+      all.push([o, Math.max(o, c) * (1 + r() * v * .9), Math.min(o, c) * (1 - r() * v * .9), c].map(z => +z.toFixed(A.dp))); p = all[i][3];
+    }
+    j = judgeQ(all.slice(120, 160), all.slice(160), pts);
+    if (j.answer === want) break;
+  }
+  const h1 = [];
+  for (let i = 0; i < 160; i += 4) { const g = all.slice(i, i + 4); h1.push([g[0][0], Math.max(...g.map(c => c[1])), Math.min(...g.map(c => c[2])), g[3][3]]); }
+  const type = ['NFP', 'CPI', 'FOMC'][(n / 10) % 3], m = Math.floor(r() * 96) * 15, stake = boss ? CONFIG.bossStake : CONFIG.stake;
+  return (S.floors[n] = { floor: n, name: A.name, assetKey: key, vis: all.slice(120, 160), h1, pts, demo: true, stake,
+    sourceHour: boss ? (type === 'FOMC' ? '02:00' : '20:30') : String(Math.floor(m / 60)).padStart(2, '0') + ':' + String(m % 60).padStart(2, '0'),
+    sessionLabel: boss ? '美洲盤' : '', boss: boss ? { type } : null,
+    _ans: { ...j, pts, rev: all.slice(160), sourceTime: '示範用模擬盤面', stake } });
+}
+async function getFloorQ(n) {
+  if (S.floors[n]) return S.floors[n];
+  if (!S.live) return demoFloor(n);
+  const d = await FB.getFloor(n);
+  if (!d) throw new Error('MISSING');
+  return (S.floors[n] = floorFromDoc(d));
+}
+
+/* ================= 後端：共用 ================= */
+function newUserDoc(name, referrer, ts) {
+  return { name, balance: CONFIG.start, peak: CONFIG.start, wins: 0, losses: 0, total: 0, rankBp: -1, floor: 0, streak: 0, bestStreak: 0, invites: 0, referrerUid: referrer || null, createdAt: ts };
+}
+/* 結算一題：答對 +stake、答錯 −stake；連勝每滿 streakEvery 次再 +streakBonus。firestore.rules 會用同一套算法驗證 */
+function settle(d, ok, stake) {
+  const streak = ok ? (d.streak || 0) + 1 : 0, bonus = ok && streak % CONFIG.streakEvery === 0 ? CONFIG.streakBonus : 0;
+  return { streak, bonus, delta: ok ? stake + bonus : -stake };
+}
+function applyAnswer(d, ok, stake) {
+  const st = settle(d, ok, stake);
+  const wins = (d.wins || 0) + (ok ? 1 : 0), losses = (d.losses || 0) + (ok ? 0 : 1), total = (d.total || 0) + 1, balance = d.balance + st.delta;
+  return { wins, losses, total, balance, peak: Math.max(d.peak || 0, balance), floor: (d.floor || 0) + 1,
+    streak: st.streak, bestStreak: Math.max(d.bestStreak || 0, st.streak),
+    rankBp: total >= CONFIG.minRankGames ? Math.floor(wins * 10000 / total) : -1 };
+}
+function norm(uid, email, d) {
+  return { uid, email, name: d.name || '交易員', balance: d.balance, peak: d.peak || d.balance, wins: d.wins || 0, losses: d.losses || 0,
+    total: d.total || 0, floor: d.floor || 0, streak: d.streak || 0, bestStreak: d.bestStreak || 0, invites: d.invites || 0,
+    nameAt: d.nameAt ? (d.nameAt.toMillis ? d.nameAt.toMillis() : +d.nameAt) : 0,
+    riskFull: riskFullOf(d), riskTest: !!d.riskTest };
+}
+const RENAME_MS = 14 * 864e5;
+/* 風控額度：存「起算時間 riskBase」和「欠幾次 riskDebt」，回滿的時間 = riskBase + riskDebt × 30 分鐘 */
+const RISK_MS = () => CONFIG.riskMin * 60000;
+function riskFullOf(d) { const b = d.riskBase; if (!b || !d.riskDebt) return 0; return (b.toMillis ? b.toMillis() : +b || Date.now()) + d.riskDebt * RISK_MS(); }
+const riskExempt = () => isAdmin() && !S.user.riskTest;   // 管理員預設不受限；在管理員工具打開「套用風控額度」後就和一般玩家一樣
+function riskOn(u) { return !!u && !riskExempt() && (u.floor || 0) + 1 >= CONFIG.riskFrom; }
+function riskLeft(u) { const rest = Math.max(0, (u.riskFull || 0) - Date.now()); return Math.max(0, CONFIG.riskMax - Math.ceil(rest / RISK_MS())); }
+function riskNextMs(u) { const rest = (u.riskFull || 0) - Date.now(); return rest > 0 ? (rest % RISK_MS() || RISK_MS()) : 0; }
+const mmss = ms => { const t = Math.ceil(ms / 1000); return String(Math.floor(t / 60)).padStart(2, '0') + ':' + String(t % 60).padStart(2, '0'); };
+const riskHit = (n, choice, ok, admin) => !ok && choice !== 'neutral' && n >= CONFIG.riskFrom && !admin;
+const isAdmin = () => !!S.user && String(S.user.email || '').toLowerCase() === CONFIG.adminEmail;
+/* 各商品勝率：每層的（商品、對錯）存在這台裝置；缺的層在正式模式會從雲端補回來 */
+const HIST = {
+  key() { return 'tq2h:' + (S.user ? S.user.uid : ''); },
+  get() { try { return JSON.parse(localStorage.getItem(this.key()) || '{}'); } catch (e) { return this.mem || (this.mem = {}); } },
+  put(h) { this.mem = h; try { localStorage.setItem(this.key(), JSON.stringify(h)); } catch (e) {} },
+  add(n, k, ok) { const h = this.get(); h[n] = [k, ok ? 1 : 0]; this.put(h); },
+  norm(k) { k = String(k || '').toLowerCase(); return /gold|xau/.test(k) ? 'gold' : /btc|bitcoin/.test(k) ? 'btc' : /nas|nq|ndx/.test(k) ? 'nasdaq' : /dow|ym|dji/.test(k) ? 'dow' : ''; },
+  async fill() {
+    const h = this.get(), need = []; for (let n = 1; n <= (S.user.floor || 0); n++) if (!h[n]) need.push(n);
+    for (let i = 0; i < need.length; i += 10) {
+      const got = await Promise.all(need.slice(i, i + 10).map(n => B.histOne(n).catch(() => null)));
+      got.forEach((r, j) => { if (r) h[need[i + j]] = r; });
+    }
+    if (need.length) this.put(h);
+    const out = { gold: [0, 0], btc: [0, 0], nasdaq: [0, 0], dow: [0, 0] };
+    Object.values(h).forEach(([k, ok]) => { const a = out[this.norm(k)]; if (a) { a[0] += ok; a[1]++; } });
+    return out;
+  }
+};
+function sortBoard(rows, kind) {
+  if (kind === 'net') return rows.filter(r => (r.invites || 0) > 0).sort((a, b) => b.invites - a.invites || b.balance - a.balance).slice(0, 50);
+  if (kind === 'rate') return rows.filter(r => (r.rankBp ?? -1) >= 0).sort((a, b) => b.rankBp - a.rankBp || b.total - a.total).slice(0, 50);
+  return rows.sort((a, b) => b.balance - a.balance).slice(0, 50);
+}
+
+/* 示範模式：資料只存在這台裝置 */
+const LOCAL = {
+  key: 'tq3_demo_db', mem: null,
+  db() { if (!this.mem) this.mem = store(this.key) || { users: {}, session: null }; return this.mem; },
+  save() { store(this.key, this.mem); },
+  view(em) { const u = this.db().users[em]; return norm(em, u.email, u); },
+  async init(onUser) { this.onUser = onUser; const d = this.db(); onUser(d.session && d.users[d.session] ? this.view(d.session) : null); },
+  async loadTower() {},
+  async signUp({ email, pw, name, refEmail }) {
+    const d = this.db(), em = email.toLowerCase();
+    if (d.users[em]) throw new Error('EMAIL_USED');
+    let ref = null;
+    if (refEmail) { ref = refEmail.toLowerCase(); if (!d.users[ref]) throw new Error('REF_NOT_FOUND'); }
+    d.users[em] = { ...newUserDoc(name, ref, Date.now()), email, pw: hash(pw + em) };
+    if (ref) { d.users[ref].balance += CONFIG.invite; d.users[ref].invites = (d.users[ref].invites || 0) + 1; }
+    d.session = em; this.save(); this.onUser(this.view(em));
+  },
+  async signIn({ email, pw }) {
+    const d = this.db(), em = email.toLowerCase(), u = d.users[em];
+    if (!u || u.pw !== hash(pw + em)) throw new Error('BAD_LOGIN');
+    d.session = em; this.save(); this.onUser(this.view(em));
+  },
+  hero() { const d = this.db(); return d.session && d.users[d.session] ? d.users[d.session].hero || null : null; },
+  async setHero(h) { const d = this.db(); d.users[d.session].hero = h; this.save(); },
+  async rename(name) { const d = this.db(), u = d.users[d.session]; if (u.nameAt && Date.now() - u.nameAt < RENAME_MS) throw new Error('RENAME_WAIT'); u.name = name; u.nameAt = Date.now(); this.save(); return this.view(d.session); },
+  async histOne() { return null; },
+  async adminSet(patch) { const d = this.db(); Object.assign(d.users[d.session], patch); this.save(); return this.view(d.session); },
+  async clearVote() {},
+  async signOut() { this.db().session = null; this.save(); this.onUser(null); },
+  async resetPw() { throw new Error('DEMO_RESET'); },
+  async refresh() { const d = this.db(); return d.session ? this.view(d.session) : null; },
+  async pendingVote() { return null; },
+  async play(n, choice, mult = 1) {
+    const d = this.db(), u = d.users[d.session];
+    mult = n >= CONFIG.lotFrom && [2, 3].includes(mult) && u.balance >= demoFloor(n)._ans.stake * mult ? mult : 1;
+    if ((u.floor || 0) !== n - 1) throw new Error('ALREADY');
+    const ans = demoFloor(n)._ans;
+    const patch = applyAnswer(u, choice === ans.answer, ans.stake * mult), hit = riskHit(n, choice, choice === ans.answer, d.session === CONFIG.adminEmail && !u.riskTest);
+    if (hit) { if (riskFullOf(u) > Date.now()) patch.riskDebt = u.riskDebt + 1; else { patch.riskBase = Date.now(); patch.riskDebt = 1; } }
+    d.users[d.session] = { ...u, ...patch }; this.save();
+    return { user: this.view(d.session), ans, choice, mult, hit };
+  },
+  async leaderboard(kind) {
+    const rows = Object.entries(this.db().users).map(([k, u]) => ({ uid: k, ...u })).concat(DEMO_BOTS.map(b => ({ ...b })));
+    return sortBoard(rows, kind);
+  }
+};
+
+/* 正式模式：Firebase Auth + Firestore。答案鎖在 tq2_answers，送出選擇後才讀得到；本金變動由 firestore.rules 驗證 */
+function loadScript(src) { return new Promise((res, rej) => { const s = document.createElement('script'); s.src = src; s.onload = res; s.onerror = () => rej(new Error('無法載入 ' + src)); document.head.appendChild(s); }); }
+const FB = {
+  async init(onUser) {
+    const v = '10.12.2';
+    for (const m of ['app', 'auth', 'firestore']) await loadScript(`https://www.gstatic.com/firebasejs/${v}/firebase-${m}-compat.js`);
+    firebase.initializeApp(CONFIG.firebase);
+    this.auth = firebase.auth(); this.db = firebase.firestore();
+    const C = CONFIG.collections;
+    this.U = this.db.collection(C.users); this.E = this.db.collection(C.emails);
+    this.F = this.db.collection(C.floors); this.A = this.db.collection(C.answers);
+    await this.loadTower();
+    await new Promise(resolve => {
+      let first = true;
+      this.auth.onAuthStateChanged(async u => {
+        if (!u) { this.uid = null; onUser(null); }
+        else { try { onUser(await this._load(u)); } catch (e) { console.error(e); toast('讀取帳號資料失敗：' + e.message); onUser(null); } }
+        if (first) { first = false; resolve(); }
+      });
+    });
+  },
+  async loadTower() { const s = await this.db.doc(CONFIG.collections.meta).get(); S.total = s.exists ? (+s.data().total || 0) : 0; },
+  async getFloor(n) { const s = await this.F.doc(String(n)).get(); return s.exists ? s.data() : null; },
+  async _load(u) {
+    if (this._signup) await this._signup.catch(() => {});
+    this.uid = u.uid; this.email = u.email;
+    const ref = this.U.doc(u.uid);
+    let s = await ref.get();
+    if (!s.exists) { await this._create(u, u.displayName || u.email.split('@')[0], null); s = await ref.get(); }
+    return norm(u.uid, u.email, s.data());
+  },
+  async _create(u, name, refUid) {
+    const inc = firebase.firestore.FieldValue.increment, b = this.db.batch();
+    b.set(this.U.doc(u.uid), newUserDoc(name, refUid, firebase.firestore.FieldValue.serverTimestamp()));
+    b.set(this.E.doc(u.email.toLowerCase()), { uid: u.uid });
+    if (refUid) b.update(this.U.doc(refUid), { balance: inc(CONFIG.invite), invites: inc(1) });
+    await b.commit();
+  },
+  async signUp({ email, pw, name, refEmail }) {
+    let refUid = null;
+    if (refEmail) { const r = await this.E.doc(refEmail.toLowerCase()).get(); if (!r.exists) throw new Error('REF_NOT_FOUND'); refUid = r.data().uid; }
+    this._signup = (async () => {
+      const cred = await this.auth.createUserWithEmailAndPassword(email, pw);
+      await cred.user.updateProfile({ displayName: name });
+      await this._create(cred.user, name, refUid);
+    })();
+    try { await this._signup; } finally { this._signup = null; }
+    onUserChanged(await this.refresh());
+  },
+  async signIn({ email, pw }) { await this.auth.signInWithEmailAndPassword(email, pw); },
+  hero() { const u = this.auth && this.auth.currentUser, m = u && /^hero:([mf])$/.exec(u.photoURL || ''); return m ? m[1] : null; },
+  async setHero(h) { await this.auth.currentUser.updateProfile({ photoURL: 'hero:' + h }); },
+  async rename(name) {
+    try { await this.U.doc(this.uid).update({ name, nameAt: firebase.firestore.FieldValue.serverTimestamp() }); }
+    catch (e) { throw new Error(e.code === 'permission-denied' ? 'RENAME_WAIT' : e.message); }
+    this.auth.currentUser.updateProfile({ displayName: name }).catch(() => {});
+    return this.refresh();
+  },
+  async signOut() { await this.auth.signOut(); },
+  async resetPw(email) { await this.auth.sendPasswordResetEmail(email); },
+  async refresh() { if (!this.uid) return null; const s = await this.U.doc(this.uid).get(); return s.exists ? norm(this.uid, this.email, s.data()) : null; },
+  _vote(n) { return this.F.doc(String(n)).collection('votes').doc(this.uid); },
+  async adminSet(patch) { await this.U.doc(this.uid).update(patch); return this.refresh(); },
+  async clearVote(n) { await this._vote(n).delete(); },
+  /* 回補某一層的紀錄（商品、對錯），給戰績碑算各商品勝率用 */
+  async histOne(n) {
+    const [f, v] = await Promise.all([this.F.doc(String(n)).get(), this._vote(n).get()]);
+    if (!f.exists || !v.exists) return null;
+    const a = await this.A.doc(String(n)).get(); if (!a.exists) return null;
+    return [f.data().assetKey || '', v.data().choice === a.data().answer ? 1 : 0];
+  },
+  /* 已送出選擇但還沒結算（例如中途斷線）的那一層，回傳當時的選擇 */
+  async pendingVote(n) { try { const v = await this._vote(n).get(); return v.exists ? v.data().choice : null; } catch (e) { return null; } },
+  /* 1. 送出選擇（只能送一次，送出後不能改） 2. 這時才讀得到答案 3. 結算本金 */
+  async play(n, choice, mult = 1) {
+    mult = n >= CONFIG.lotFrom && [2, 3].includes(mult) ? mult : 1;
+    const vref = this._vote(n);
+    try { await vref.set(mult > 1 ? { choice, ts: Date.now(), mult } : { choice, ts: Date.now() }); }
+    catch (e) { const v = await vref.get().catch(() => null); if (!v || !v.exists) throw e; choice = v.data().choice; mult = v.data().mult || 1; }
+    const a = await this.A.doc(String(n)).get();
+    if (!a.exists) throw new Error('MISSING');
+    const ans = ansFromDoc(a.data()), ref = this.U.doc(this.uid); let out;
+    const ok = choice === ans.answer, hit = riskHit(n, choice, ok, String(this.email).toLowerCase() === CONFIG.adminEmail && !(S.user && S.user.riskTest));
+    /* 額度是否還在恢復中由伺服器時間判定；手機時鐘不準時第一次可能猜錯，就換另一種再送一次 */
+    const attempt = flip => this.db.runTransaction(async tx => {
+      const d = (await tx.get(ref)).data();
+      if ((d.floor || 0) !== n - 1) throw new Error('ALREADY');
+      const patch = applyAnswer(d, ok, ans.stake * mult);
+      if (hit) { const active = (riskFullOf(d) > Date.now()) !== flip;
+        if (active && d.riskBase) patch.riskDebt = (d.riskDebt || 0) + 1; else { patch.riskBase = firebase.firestore.FieldValue.serverTimestamp(); patch.riskDebt = 1; } }
+      tx.update(ref, patch); out = { ...d, ...patch };
+    });
+    try { await attempt(false); } catch (e) { if (!hit || e.code !== 'permission-denied') throw e; await attempt(true); }
+    const user = hit ? (await this.refresh()) || norm(this.uid, this.email, out) : norm(this.uid, this.email, out);
+    return { user, ans, choice, mult, hit };
+  },
+  async leaderboard(kind) {
+    const s = await this.U.orderBy(kind === 'rate' ? 'rankBp' : kind === 'net' ? 'invites' : 'balance', 'desc').limit(50).get();
+    return sortBoard(s.docs.map(x => ({ uid: x.id, ...x.data() })), kind);
+  }
+};
+let B = CONFIG.firebase && CONFIG.firebase.apiKey ? FB : LOCAL;
+const ERR = {
+  EMAIL_USED: '這個信箱已經註冊過了，請直接登入。', 'auth/email-already-in-use': '這個信箱已經註冊過了，請直接登入。',
+  REF_NOT_FOUND: '找不到這個推薦人信箱。請確認對方已註冊，或把欄位留空。', REF_SELF: '推薦人不能填自己的信箱。',
+  BAD_LOGIN: '信箱或密碼不正確。', 'auth/invalid-credential': '信箱或密碼不正確。', 'auth/wrong-password': '信箱或密碼不正確。', 'auth/user-not-found': '信箱或密碼不正確。',
+  'auth/weak-password': '密碼至少要 6 個字元。', 'auth/invalid-email': '信箱格式不正確。', 'auth/too-many-requests': '嘗試次數太多，請稍後再試。',
+  DEMO_RESET: '示範模式沒有寄信功能，正式上線後才能重設密碼。'
+};
+const errMsg = e => ERR[e.code] || ERR[e.message] || ('發生錯誤：' + (e.message || e));
+
+/* ================= 狀態 ================= */
+const S = { user: null, total: 0, floors: {}, live: false, battle: null, tf: '15m', sheet: null, boardKind: 'rate', authTab: 'register', entered: false, ready: null };
+function onUserChanged(u) {
+  S.user = u; renderHome();
+  if (S.entered && !u) showGate();
+  if (S.sheet) { if (u) openSheet(S.sheet); else closeSheet(); }
+}
+
+/* ================= 主畫面與開場：插畫 + 動態光效 ================= */
+/* 神殿插畫（設計座標 400×600）以「寬度貼齊、底部對齊」顯示，兩側的牛熊雕像不會被裁掉；上方不足的地方補上延伸的天空。 */
+const HOME = { W: 400, H: 600 };
+const HOME_ART = new Image();
+let HOME_READY = false;
+HOME_ART.onload = () => { HOME_READY = true; if (S.entered) mapFrame(performance.now()); };
+HOME_ART.src = HOME_SRC;
+/* 神殿插畫：火盆位置、殿門、階梯（相對比例） */
+const BRAZIERS = [[.293, .59], [.708, .59], [.21, .665], [.79, .665], [.137, .75], [.87, .75], [.357, .515], [.642, .515], [.39, .482], [.61, .482], [.42, .46], [.58, .46]];
+const DOOR = { x: .5, y: .462 };
+const MAP = { fog: [], sky: [], low: [], shade: [], motes: [], glints: [], raf: 0, last: 0 };   // fog / sky 兩組雲開場也共用
+const rnd = (a, b) => a + Math.random() * (b - a);
+function soft(g, x, y, rx, ry, color, alpha) {
+  g.save(); g.translate(x, y); g.scale(1, ry / rx);
+  const gr = g.createRadialGradient(0, 0, 0, 0, 0, rx);
+  gr.addColorStop(0, color.replace('A', alpha)); gr.addColorStop(1, color.replace('A', 0));
+  g.fillStyle = gr; g.beginPath(); g.arc(0, 0, rx, 0, Math.PI * 2); g.fill(); g.restore();
+}
+function makeGrain() {
+  try {
+    const c = document.createElement('canvas'); c.width = c.height = 128; const g = c.getContext('2d'), im = g.createImageData(128, 128), r = rng(5);
+    for (let i = 0; i < im.data.length; i += 4) { const v = 110 + r() * 40; im.data[i] = im.data[i + 1] = im.data[i + 2] = v; im.data[i + 3] = 255; }
+    g.putImageData(im, 0, 0);
+    document.documentElement.style.setProperty('--grain', `url(${c.toDataURL()})`);
+  } catch (e) {}
+}
+function prepCanvas(cv) {
+  const W = cv.clientWidth, H = cv.clientHeight; if (!W || !H) return null;
+  const dpr = Math.min(2, window.devicePixelRatio || 1);
+  if (cv.width !== Math.round(W * dpr) || cv.height !== Math.round(H * dpr)) { cv.width = Math.round(W * dpr); cv.height = Math.round(H * dpr); }
+  const g = cv.getContext('2d'); g.setTransform(1, 0, 0, 1, 0, 0); g.clearRect(0, 0, cv.width, cv.height);
+  return { g, dpr, W, H };
+}
+function drawFog(g, t, list, span, color) {
+  for (const f of list) { const x = ((f.x + t * f.sp) % (span + 240) + span + 240) % (span + 240) - 120; soft(g, x, f.y + Math.sin(t * .35 + f.p) * 4, f.rx, f.rx * f.k, color, f.a); }
+}
+function drawMotes(g, dt, list, max, D, top) {
+  if (list.length < max && Math.random() < .5) list.push({ x: rnd(0, D.W), y: D.H + 6, vy: rnd(8, 26), vx: rnd(-5, 5), s: rnd(.5, 1.7), p: rnd(0, 6), life: 0 });
+  g.globalCompositeOperation = 'lighter';
+  for (const m of list) {
+    m.life += dt; m.y -= m.vy * dt; m.x += (m.vx + Math.sin(m.life * 1.5 + m.p) * 6) * dt;
+    const a = clamp((m.y - D.H * top) / (D.H * (1 - top))) * clamp(m.life * 1.5) * .9;
+    g.fillStyle = `rgba(255,${205 + 40 * a | 0},130,${a})`; g.beginPath(); g.arc(m.x, m.y, m.s, 0, 7); g.fill();
+  }
+  g.globalCompositeOperation = 'source-over';
+  for (let i = list.length - 1; i >= 0; i--) if (list[i].y < D.H * top) list.splice(i, 1);
+}
+function initMapFx() {
+  const r = rng(3);
+  MAP.fog = Array.from({ length: 9 }, () => ({ x: r() * 640, y: 470 + r() * 120, rx: 70 + r() * 80, k: .26 + r() * .12, sp: (r() < .5 ? -1 : 1) * (3 + r() * 6), a: .3 + r() * .25, p: r() * 6 }));
+  MAP.fog.push({ x: 40, y: 395, rx: 60, k: .3, sp: 2.5, a: .28, p: 1 }, { x: 420, y: 380, rx: 64, k: .3, sp: -2.2, a: .28, p: 3 });
+  MAP.low = Array.from({ length: 9 }, () => ({ x: r() * 640, y: 545 + r() * 190, rx: 80 + r() * 80, k: .3 + r() * .1, sp: (r() < .5 ? -1 : 1) * (3 + r() * 5), a: .5 + r() * .3, p: r() * 6 }));
+  MAP.shade = Array.from({ length: 7 }, () => ({ x: r() * 640, y: 560 + r() * 170, rx: 70 + r() * 70, k: .28 + r() * .1, sp: (r() < .5 ? -1 : 1) * (2 + r() * 4), a: .16 + r() * .12, p: r() * 6 }));
+  MAP.sky = Array.from({ length: 7 }, () => ({ x: r() * 640, y: -r() * 300, rx: 60 + r() * 70, k: .3 + r() * .12, sp: (r() < .5 ? -1 : 1) * (2 + r() * 4), a: .35 + r() * .3, p: r() * 6 }));
+}
+/* 畫神殿場景（主畫面與開場共用）。呼叫前先設好座標轉換；ext＝插畫上方要補多高的天空（設計座標） */
+function drawTemple(g, t, dt, ext, fx, extB) {
+  const D = HOME;
+  if (extB > 0) {   // 插畫下方不夠高時，往下補一片雲海
+    g.fillStyle = '#f7ece8'; g.fillRect(0, D.H - 1, D.W, extB + 2);
+  }
+  if (ext > 0) {
+    const gr = g.createLinearGradient(0, -ext, 0, 0); gr.addColorStop(0, '#2f63b8'); gr.addColorStop(.55, '#5a8fd2'); gr.addColorStop(1, '#7ea4d4');
+    g.fillStyle = gr; g.fillRect(0, -ext - 1, D.W, ext + 2);
+  }
+  if (HOME_READY) {
+    if (ext > 0) {   // 把插畫最上緣的天空鏡射上去，再往上淡入漸層，接縫就看不出來
+      const strip = Math.min(64, ext);
+      g.save(); g.scale(1, -1); g.drawImage(HOME_ART, 0, 0, HOME_ART.width, HOME_ART.height * strip / D.H, 0, 0, D.W, strip); g.restore();
+      const fd = g.createLinearGradient(0, -strip, 0, 0); fd.addColorStop(0, 'rgba(100,150,214,1)'); fd.addColorStop(1, 'rgba(126,164,212,0)');
+      g.fillStyle = fd; g.fillRect(0, -strip - 1, D.W, strip + 1);
+    }
+    g.drawImage(HOME_ART, 0, 0, D.W, D.H);
+    if (extB > 0) {   // 讓插畫底部的雲淡入下方補的雲海，看不出接縫
+      const fb = g.createLinearGradient(0, D.H - 80, 0, D.H); fb.addColorStop(0, 'rgba(247,236,232,0)'); fb.addColorStop(1, 'rgba(247,236,232,1)');
+      g.fillStyle = fb; g.fillRect(0, D.H - 80, D.W, 81);
+    }
+  } else { g.fillStyle = '#7ea4d4'; g.fillRect(0, 0, D.W, D.H); }
+  if (ext > 0) drawFog(g, t, MAP.sky, D.W, 'rgba(255,250,244,A)');
+  g.globalCompositeOperation = 'lighter';
+  // 殿門的聖光：呼吸的光暈，加上沿著階梯灑下來的光
+  const dx = DOOR.x * D.W, dy = DOOR.y * D.H, br = .5 + .5 * Math.sin(t * 1.3);
+  soft(g, dx, dy, 40 + br * 8, 50 + br * 10, 'rgba(255,236,170,A)', .26 + br * .14);
+  g.save(); g.translate(dx, dy);
+  for (let k = -3; k <= 3; k++) {
+    const a = k * .16 + Math.sin(t * .5 + k) * .03, len = 250;
+    const gr = g.createLinearGradient(0, 0, 0, len); gr.addColorStop(0, `rgba(255,240,190,${.065 + .03 * Math.sin(t * 1.1 + k * 2)})`); gr.addColorStop(1, 'rgba(255,240,190,0)');
+    g.save(); g.rotate(a); g.fillStyle = gr; g.beginPath(); g.moveTo(-5, 0); g.lineTo(5, 0); g.lineTo(26, len); g.lineTo(-26, len); g.closePath(); g.fill(); g.restore();
+  }
+  g.restore();
+  // 火盆：搖曳的火光
+  BRAZIERS.forEach(([x, y], i) => {
+    const fl = .55 + .25 * Math.sin(t * 7 + i * 1.7) + .2 * Math.sin(t * 13.3 + i * 2.9), X = x * D.W, Y = y * D.H, big = y > .55 ? 1 : .6;
+    soft(g, X, Y - 3 * big, 17 * big, 22 * big, 'rgba(255,190,90,A)', .32 * fl + .12);
+    soft(g, X, Y - 5 * big - fl * 2, 4.5 * big, 8 * big, 'rgba(255,250,220,A)', .55 * fl);
+  });
+  // 金飾上的閃光
+  if (fx.glints.length < 7 && Math.random() < .08) fx.glints.push({ x: rnd(.06, .94) * D.W, y: rnd(.18, .62) * D.H, life: 0, max: rnd(.6, 1.2), s: rnd(4, 9) });
+  for (const q of fx.glints) {
+    q.life += dt; const a = Math.sin(Math.PI * clamp(q.life / q.max)), r2 = q.s * a;
+    g.strokeStyle = `rgba(255,250,225,${a})`; g.lineWidth = 1; g.beginPath(); g.moveTo(q.x - r2, q.y); g.lineTo(q.x + r2, q.y); g.moveTo(q.x, q.y - r2 * 1.4); g.lineTo(q.x, q.y + r2 * 1.4); g.stroke();
+    soft(g, q.x, q.y, r2 * .9 + 1, r2 * .9 + 1, 'rgba(255,245,200,A)', a * .7);
+  }
+  fx.glints = fx.glints.filter(q => q.life < q.max);
+  g.globalCompositeOperation = 'source-over';
+  drawMotes(g, dt, fx.motes, 30, D, .3);
+
+}
+function mapFrame(now) {
+  const f = prepCanvas($('#mapCv')); if (!f) return;
+  const { g, dpr, W, H } = f, D = HOME, s = W / D.W, t = now / 1000, dt = Math.min(.05, (now - (MAP.last || now)) / 1000); MAP.last = now;
+  // 殿門放在畫面高度 52% 的位置：上面留天空給頭像與本金，下面的階梯和雲海留給按鈕
+  const oy = Math.min(H * .52 - DOOR.y * D.H * s, H * .3), extB = Math.max(0, (H - oy) / s - D.H);
+  g.setTransform(s * dpr, 0, 0, s * dpr, 0, oy * dpr);
+  drawTemple(g, t, dt, oy / s, MAP, extB);
+  if (extB > 0) { drawFog(g, t, MAP.shade, D.W, 'rgba(196,170,196,A)'); drawFog(g, t, MAP.low, D.W, 'rgba(255,253,250,A)'); }
+
+  drawFog(g, t, MAP.fog, D.W, 'rgba(255,252,246,A)');   // 腳下流動的雲海
+}
+function mapLoop(now) {
+  MAP.raf = 0;
+  if (!S.entered || !$('#battle').hidden) return;
+  mapFrame(now);
+  if (!reduceMotion()) MAP.raf = requestAnimationFrame(mapLoop);
+}
+function startMapLoop() { if (!MAP.raf) MAP.raf = requestAnimationFrame(mapLoop); }
+function refreshTower() {
+  const total = totalFloors(), cleared = S.user ? Math.min(S.user.floor, total) : 0;
+  $('#towerRib').textContent = !total ? '塔正在建造中' : cleared >= total ? `已通過全部 ${total} 道試煉` : `${trial(cleared + 1)} ／ 共 ${total}`;
+  tickerPoll();
+}
+
+/* ================= 開場（同一座神殿，鏡頭從殿門拉遠到全景） ================= */
+const TITLE = { raf: 0, motes: [], glints: [], t0: 0, last: 0 };
+function titleLoop(now) {
+  TITLE.raf = 0; if ($('#title').hidden) return;
+  const f = prepCanvas($('#titleCv')); if (!f) { TITLE.raf = requestAnimationFrame(titleLoop); return; }
+  const { g, dpr, W, H } = f, D = HOME, s = W / D.W, oy = H - D.H * s, t = now / 1000, dt = Math.min(.05, (now - (TITLE.last || now)) / 1000); TITLE.last = now;
+  if (!TITLE.t0) TITLE.t0 = now;
+  // 鏡頭：一開始貼近發光的殿門，緩緩拉遠到整座神殿，之後輕微呼吸
+  const e = clamp((now - TITLE.t0) / 2800), ease = 1 - Math.pow(1 - e, 3);
+  const z = 1 + .42 * (1 - ease) + .012 + .012 * Math.sin(t * .3);
+  const px = DOOR.x * D.W * s, py = oy + (DOOR.y + .06) * D.H * s;      // 縮放的中心：殿門
+  const tx = px * (1 - z), ty = py * (1 - z) + oy * z;
+  g.setTransform(s * z * dpr, 0, 0, s * z * dpr, tx * dpr, ty * dpr);
+  drawTemple(g, t, dt, Math.max(0, ty / (s * z)) + 2, TITLE, 0);
+  drawFog(g, t, MAP.fog, D.W, 'rgba(255,252,246,A)');
+  // 上下壓暗，讓標題和冒險者站得出來
+  g.setTransform(dpr, 0, 0, dpr, 0, 0);
+  const gr = g.createLinearGradient(0, 0, 0, H); gr.addColorStop(0, 'rgba(8,16,44,.78)'); gr.addColorStop(.3, 'rgba(8,16,44,.12)'); gr.addColorStop(.6, 'rgba(8,16,44,0)'); gr.addColorStop(1, 'rgba(20,14,8,.72)');
+  g.fillStyle = gr; g.fillRect(0, 0, W, H);
+  if (!reduceMotion()) TITLE.raf = requestAnimationFrame(titleLoop);
+}
+function startTitle() { $('#title').hidden = false; $('#title').classList.remove('leave', 'entered'); TITLE.t0 = 0; if (!TITLE.raf) TITLE.raf = requestAnimationFrame(titleLoop); }
+async function onTitleTap() {
+  const sec = $('#title'); if (sec.classList.contains('entered') || S.entering) return;
+  S.entering = true; $('#tapStart').textContent = '連線中…';
+  try { await S.ready; } catch (e) {}
+  S.entering = false; $('#tapStart').textContent = '點擊畫面開始';
+  if (S.user) enterWorld(); else showGate();
+}
+function showGate() {
+  $('#battle').hidden = true; S.battle = null; closeSheet();
+  if ($('#title').hidden) startTitle();
+  $('#title').classList.add('entered'); S.entered = false;
+  $('#gate').hidden = false; renderAuth($('#gateBody'));
+}
+let AV_DEFAULT = null;
+function paintAvatar() {
+  const a = $('#avatar'); if (AV_DEFAULT === null) AV_DEFAULT = a.innerHTML;
+  const h = S.user && B.hero();
+  a.innerHTML = h && HEROES[h] ? `<img src="${HEROES[h].img}" alt="">` : AV_DEFAULT;
+}
+function pickHero() {
+  const el = $('#heroPick'); if (!el.hidden) return;
+  let sel = null; const go = $('#hpGo');
+  $('#hpList').innerHTML = Object.entries(HEROES).map(([k, v]) => `<button type="button" class="hp-card" data-h="${k}" aria-pressed="false"><img src="${v.img}" alt=""><b>${v.name}</b></button>`).join('');
+  go.disabled = true; go.textContent = '選擇角色';
+  el.querySelectorAll('.hp-card').forEach(c => c.onclick = () => {
+    sel = c.dataset.h; el.querySelectorAll('.hp-card').forEach(x => { const on = x === c; x.classList.toggle('on', on); x.setAttribute('aria-pressed', on); });
+    go.disabled = false; go.textContent = `以${HEROES[sel].name}踏入試煉之門`;
+  });
+  go.onclick = async () => {
+    if (!sel) return; go.disabled = true; go.textContent = '處理中…';
+    try { await B.setHero(sel); el.hidden = true; paintAvatar(); }
+    catch (e) { toast('儲存失敗：' + e.message); go.disabled = false; go.textContent = '再試一次'; }
+  };
+  el.hidden = false;
+}
+function enterWorld() {
+  const sec = $('#title'); $('#gate').hidden = true; sec.classList.add('leave');
+  S.entered = true; renderHome();
+  $('#map').classList.remove('intro'); void $('#map').offsetWidth; $('#map').classList.add('intro');
+  startMapLoop();
+  setTimeout(() => { sec.hidden = true; sec.classList.remove('leave', 'entered'); }, 800);
+}
+
+/* 月桂葉外框：兩側各一排葉子沿著圓弧往上長，頂端一顆星、上下各一顆藍寶石 */
+function laurelSVG(n, R) {
+  let leaves = '';
+  for (const side of [-1, 1]) for (let i = 0; i < n; i++) {
+    const th = (24 + i * (128 / (n - 1))) * Math.PI / 180, x = side * Math.sin(th) * R, y = Math.cos(th) * R;
+    const rot = Math.atan2(side * Math.cos(th), Math.sin(th)) * 180 / Math.PI + side * (i % 2 ? 34 : -14), sc = 1 - i * .035;
+    leaves += `<path d="M0 1C3.6 -2.5 3.6 -8.5 0 -12.5C-3.6 -8.5 -3.6 -2.5 0 1Z" transform="translate(${x.toFixed(1)} ${y.toFixed(1)}) rotate(${rot.toFixed(1)}) scale(${sc.toFixed(2)})"/>`;
+  }
+  const gem = y => `<path d="M0 ${y - 5}L3.6 ${y}L0 ${y + 5}L-3.6 ${y}Z" fill="url(#lGem)" stroke="#0b2a66" stroke-width=".7"/>`;
+  return `<svg viewBox="-50 -50 100 100" aria-hidden="true"><defs>
+    <linearGradient id="lGold" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fff3c4"/><stop offset=".5" stop-color="#e3b450"/><stop offset="1" stop-color="#a8721f"/></linearGradient>
+    <linearGradient id="lGem" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#e6f6ff"/><stop offset="1" stop-color="#1f5fd0"/></linearGradient></defs>
+    <g fill="url(#lGold)" stroke="#7a5220" stroke-width=".6" stroke-linejoin="round">${leaves}
+    <path d="M0 ${-R - 13}L2.4 ${-R - 6.5}L8 ${-R - 5}L2.4 ${-R - 3.5}L0 ${-R + 2}L-2.4 ${-R - 3.5}L-8 ${-R - 5}L-2.4 ${-R - 6.5}Z"/></g>
+    ${gem(R + 1)}</svg>`;
+}
+
+/* ================= 首頁 ================= */
+const trial = n => '試煉 ' + String(n).padStart(2, '0');
+function renderHome() {
+  const u = S.user, total = totalFloors();
+  paintAvatar(); if (u && !B.hero()) pickHero();
+  $('#uName').textContent = u ? u.name : '訪客';
+  $('#uTitle').textContent = u ? titleOf(u.peak) : '尚未登入';
+  const prev = $('#uBal').textContent, now = u ? fmt(u.balance) : fmt(CONFIG.start);
+  $('#uBal').textContent = now;
+  if (u && prev !== now) { const p = $('#purse'); p.classList.remove('pulse'); void p.offsetWidth; p.classList.add('pulse'); }
+  const cleared = u ? Math.min(u.floor, total) : 0;
+  refreshTower();
+  const bossNext = (cleared + 1) % 10 === 0 && cleared < total, eb = $('#btnBattle');
+  const resting = !!u && cleared < total && riskOn(u) && riskLeft(u) === 0;
+  $('#btnBattle').classList.toggle('rest', resting);
+  $('#battleTxt').textContent = !total ? '建造中' : cleared >= total ? '明日再戰' : resting ? `休息中 ${mmss(riskNextMs(u))}` : bossNext ? '挑戰魔王' : '進入試煉';
+  { const eb = $('#btnBattle'), plain = $('#battleTxt').textContent === '進入試煉'; eb.classList.toggle('art-txt', plain); eb.style.backgroundImage = `url(${plain ? ENTER_SRC.full : ENTER_SRC.blank})`; }
+  eb.classList.toggle('boss', !!total && bossNext); eb.classList.toggle('off', !total || cleared >= total);
+  $('#uLv').textContent = u ? Math.min(cleared + 1, Math.max(total, 1)) : 1;
+  $('#bBal').textContent = u ? fmt(u.balance) : '—';
+  const notes = [];
+  if (!S.live) notes.push(S.cloudFailed ? '連不到雲端，暫以示範模式執行：帳號與本金只存在這台裝置，盤面為模擬。' : '示範模式：帳號與本金只存在這台裝置，盤面為模擬。');
+  else if (!total) notes.push('塔還在建造中：題庫建立完成後就能開始挑戰。');
+  $('#demoBar').hidden = !notes.length; $('#demoBar').textContent = notes.join(' ');
+  if (S.entered && $('#battle').hidden) startMapLoop();
+}
+function act(a) { if (a === 'battle') return startFloor(); openSheet(a); }
+
+/* ================= 戰鬥場景與怪物 ================= */
+function monsterFor(ctx) {
+  const img = (k, tint) => `<img src="${MON_SRC[k]}" alt="" draggable="false"${tint ? ` style="filter:${tint}"` : ''}>`;
+  if (ctx.boss) { const ev = EVENT_INFO[ctx.boss.type] || EVENT_INFO.VOL; return { html: img(ev.mon), name: `${ev.boss} Lv.${ctx.floor}`, boss: true }; }
+  const fam = FAMILIES[Math.floor((ctx.floor - 1) / 10) % FAMILIES.length];
+  return { html: img(fam.k), name: `${fam.n} Lv.${ctx.floor}` };
+}
+
+/* ================= K 線圖 ================= */
+let CSSV = null;
+function cssv() { if (!CSSV) { const cs = getComputedStyle(document.getElementById('battle')); CSSV = n => cs.getPropertyValue(n).trim(); } return CSSV; }
+function drawChart(reveal) {
+  const b = S.battle; if (!b) return;
+  const q = b.q, cv = $('#chart'), V = cssv(), dpr = window.devicePixelRatio || 1;
+  const W = cv.clientWidth, H = cv.clientHeight; if (!W || !H) return;
+  cv.width = W * dpr; cv.height = H * dpr;
+  const g = cv.getContext('2d'); g.setTransform(dpr, 0, 0, dpr, 0, 0); g.clearRect(0, 0, W, H);
+  const is15 = S.tf === '15m' || !q.h1.length;
+  const vis = is15 ? q.vis.slice(-44) : q.h1.slice(-40);
+  const fut = is15 && b.ans ? b.ans.rev.slice(0, reveal) : [];
+  const slots = vis.length + (is15 ? 3 : 0), shown = vis.concat(fut);
+  let lo = Infinity, hi = -Infinity;
+  for (const [, h, l] of shown) { lo = Math.min(lo, l); hi = Math.max(hi, h); }
+  const last = q.vis[q.vis.length - 1][3];
+  if (is15) { lo = Math.min(lo, last - q.pts); hi = Math.max(hi, last + q.pts); }
+  const pad = (hi - lo) * 0.08 || hi * 0.001; lo -= pad; hi += pad;
+  const axisW = 58, plotW = W - axisW - 4, top = 8, bot = H - 18, step = plotW / (slots + 1);
+  const Y = p => top + (hi - p) / (hi - lo) * (bot - top);
+  const dp = dpOf(q);
+  g.font = '10.5px "Noto Sans TC", sans-serif'; g.textBaseline = 'middle';
+  for (let k = 0; k <= 4; k++) {
+    const p = lo + (hi - lo) * k / 4, y = Y(p);
+    g.strokeStyle = '#ffffff12'; g.lineWidth = 1; g.beginPath(); g.moveTo(0, y); g.lineTo(plotW, y); g.stroke();
+    g.fillStyle = V('--muted'); g.textAlign = 'left'; g.fillText(p.toFixed(dp), plotW + 6, y);
+  }
+  const bw = Math.max(2, step * 0.62);
+  if (is15) {   // 判定帶：上緣＝現價＋點數，下緣＝現價－點數
+    const xb = step * vis.length, yu = Y(last + q.pts), yd = Y(last - q.pts);
+    g.fillStyle = '#d4a44618'; g.fillRect(xb, yu, plotW - xb, yd - yu);
+    g.strokeStyle = '#d4a44688'; g.setLineDash([3, 3]); g.beginPath(); g.moveTo(xb, yu); g.lineTo(plotW, yu); g.moveTo(xb, yd); g.lineTo(plotW, yd); g.stroke(); g.setLineDash([]);
+  }
+  shown.forEach(([o, h, l, c], i) => {
+    const x = step * (i + 0.5), up = c >= o, isF = i >= vis.length, col = up ? V('--long') : V('--short');
+    g.strokeStyle = col; g.fillStyle = col; g.lineWidth = 1;
+    if (isF) { g.shadowColor = V('--gold-hi'); g.shadowBlur = 10; }
+    g.beginPath(); g.moveTo(x, Y(h)); g.lineTo(x, Y(l)); g.stroke();
+    const y1 = Y(Math.max(o, c)), y2 = Y(Math.min(o, c));
+    g.fillRect(x - bw / 2, y1, bw, Math.max(1, y2 - y1)); g.shadowBlur = 0;
+  });
+  if (is15) {
+    const xb = step * vis.length;
+    g.setLineDash([4, 4]); g.strokeStyle = V('--gold'); g.beginPath(); g.moveTo(xb, top); g.lineTo(xb, bot); g.stroke(); g.setLineDash([]);
+    g.fillStyle = V('--gold-hi'); g.textAlign = 'center'; g.fillText('現在', xb, bot + 9);
+    for (let k = fut.length; k < 3; k++) {
+      const x = step * (vis.length + k + 0.5), yh = (top + bot) / 2, hw = Math.max(bw + 2, 10);
+      g.strokeStyle = V('--gold'); g.setLineDash([3, 3]); g.strokeRect(x - hw / 2, yh - 26, hw, 52); g.setLineDash([]);
+      g.fillStyle = V('--gold-hi'); g.fillText('?', x, yh);
+    }
+  } else { g.fillStyle = V('--muted'); g.textAlign = 'right'; g.fillText('1H 輔助視角（只到現在這一刻）', plotW, bot + 9); }
+  const yl = Y(last);
+  g.setLineDash([2, 3]); g.strokeStyle = V('--gold-hi'); g.beginPath(); g.moveTo(0, yl); g.lineTo(plotW, yl); g.stroke(); g.setLineDash([]);
+  g.fillStyle = V('--gold'); g.fillRect(plotW + 2, yl - 8, axisW, 16);
+  g.fillStyle = '#1a1408'; g.textAlign = 'left'; g.fillText(last.toFixed(dp), plotW + 6, yl);
+}
+
+/* ================= 戰鬥特效：飛彈、命中、換層橫幅 ================= */
+const FX = { parts: [], raf: 0 };
+function relPos(el) { const a = $('#app').getBoundingClientRect(), r = el.getBoundingClientRect(); return { x: r.left - a.left + r.width / 2, y: r.top - a.top + r.height / 2 }; }
+function fxLoop(now) {
+  FX.raf = 0;
+  const cv = $('#fxCv'), W = cv.clientWidth, H = cv.clientHeight, dpr = Math.min(2, window.devicePixelRatio || 1);
+  if (cv.width !== Math.round(W * dpr) || cv.height !== Math.round(H * dpr)) { cv.width = Math.round(W * dpr); cv.height = Math.round(H * dpr); }
+  const g = cv.getContext('2d'); g.setTransform(dpr, 0, 0, dpr, 0, 0); g.clearRect(0, 0, W, H);
+  g.globalCompositeOperation = 'lighter';
+  const next = [];
+  for (const p of FX.parts) {
+    const k = (now - p.t0) / p.dur;
+    if (k < 0) { next.push(p); continue; }
+    if (p.type === 'bolt') {
+      const e = Math.min(1, k), t = e * e * (3 - 2 * e) * .35 + e * e * .65, u = 1 - t;
+      const x = u * u * p.x0 + 2 * u * t * p.cx + t * t * p.x1, y = u * u * p.y0 + 2 * u * t * p.cy + t * t * p.y1;
+      p.trail.push([x, y]); if (p.trail.length > 12) p.trail.shift();
+      for (let i = 1; i < p.trail.length; i++) {
+        const a = i / p.trail.length;
+        g.strokeStyle = `rgba(${p.c},${a * .8})`; g.lineWidth = 1 + a * 7; g.lineCap = 'round';
+        g.beginPath(); g.moveTo(p.trail[i - 1][0], p.trail[i - 1][1]); g.lineTo(p.trail[i][0], p.trail[i][1]); g.stroke();
+      }
+      let gr = g.createRadialGradient(x, y, 0, x, y, 22); gr.addColorStop(0, 'rgba(255,255,255,1)'); gr.addColorStop(.25, `rgba(${p.c},.9)`); gr.addColorStop(1, `rgba(${p.c},0)`);
+      g.fillStyle = gr; g.beginPath(); g.arc(x, y, 22, 0, 7); g.fill();
+      if (k >= 1) { if (!p.done) { p.done = true; impact(p.x1, p.y1, p.c, now); p.onHit && p.onHit(); } } else next.push(p);
+    } else if (p.type === 'ring') {
+      if (k < 1) { g.strokeStyle = `rgba(${p.c},${1 - k})`; g.lineWidth = 5 * (1 - k) + 1; g.beginPath(); g.arc(p.x, p.y, 8 + k * p.r, 0, 7); g.stroke();
+        const gr = g.createRadialGradient(p.x, p.y, 0, p.x, p.y, p.r * .9); gr.addColorStop(0, `rgba(255,255,255,${(1 - k) * .9})`); gr.addColorStop(1, 'rgba(255,255,255,0)'); g.fillStyle = gr; g.beginPath(); g.arc(p.x, p.y, p.r * .9, 0, 7); g.fill(); next.push(p); }
+    } else if (p.type === 'spark') {
+      if (k < 1) { const x = p.x + p.vx * k, y = p.y + p.vy * k + 60 * k * k; g.strokeStyle = `rgba(${p.c},${1 - k})`; g.lineWidth = 2.2 * (1 - k) + .4;
+        g.beginPath(); g.moveTo(x, y); g.lineTo(x - p.vx * .09, y - p.vy * .09); g.stroke(); next.push(p); }
+    }
+  }
+  g.globalCompositeOperation = 'source-over';
+  FX.parts = next;
+  if (next.length) FX.raf = requestAnimationFrame(fxLoop);
+}
+function fxKick() { if (!FX.raf) FX.raf = requestAnimationFrame(fxLoop); }
+function impact(x, y, c, now) {
+  FX.parts.push({ type: 'ring', x, y, c, r: 46, t0: now, dur: 340 });
+  for (let i = 0; i < 12; i++) { const a = Math.random() * Math.PI * 2, v = 50 + Math.random() * 110; FX.parts.push({ type: 'spark', x, y, c, vx: Math.cos(a) * v, vy: Math.sin(a) * v - 20, t0: now, dur: 380 + Math.random() * 200 }); }
+}
+/* 從按下的按鈕丟出 n 顆光彈打向怪物；每顆命中時呼叫 onHit(i)，全部命中後結束 */
+function throwAttack(fromEl, toEl, c, n, onHit) {
+  return new Promise(resolve => {
+    const a = relPos(fromEl), b = relPos(toEl), H = $('#app').clientHeight, now = performance.now();
+    a.y = Math.min(a.y, H - 20);
+    const size = toEl.getBoundingClientRect().width;
+    if (reduceMotion()) { for (let i = 0; i < n; i++) onHit(i); resolve(); return; }
+    for (let i = 0; i < n; i++) {
+      const side = i % 2 ? 1 : -1, spread = 60 + Math.random() * 120;
+      FX.parts.push({ type: 'bolt', c, trail: [], t0: now + i * 115, dur: 430,
+        x0: a.x + (Math.random() - .5) * 30, y0: a.y,
+        x1: b.x + (Math.random() - .5) * size * .45, y1: b.y + (Math.random() - .5) * size * .35,
+        cx: (a.x + b.x) / 2 + side * spread, cy: (a.y + b.y) / 2 + (Math.random() - .3) * 60,
+        onHit: () => { onHit(i); if (i === n - 1) setTimeout(resolve, 160); } });
+    }
+    fxKick();
+  });
+}
+function popDmg(kind, big) {
+  const st = $('#stage'), d = document.createElement('div'), m = $('#monster');
+  d.className = 'dmg ' + kind; d.textContent = fmt((big ? 2600 : 900) + Math.random() * (big ? 2400 : 1500));
+  d.style.left = (m.offsetLeft + m.offsetWidth * (.2 + Math.random() * .6)) + 'px'; d.style.top = (m.offsetTop + m.offsetHeight * (.15 + Math.random() * .5)) + 'px';
+  st.appendChild(d); setTimeout(() => d.remove(), 820);
+}
+function hitFlash() { const m = $('#monster'); m.classList.remove('hit'); void m.offsetWidth; m.classList.add('hit'); }
+/* 換層橫幅：「第 N 層」掃進來，接著怪物從法陣現身 */
+async function introBattle(ctx) {
+  const mon = $('#monster'), w = $('#wave'), sm = $('#summon');
+  if (!reduceMotion()) {
+    $('#waveMain').textContent = trial(ctx.floor);
+    $('#waveSub').textContent = ctx.boss ? 'BOSS BATTLE' : `TRIAL ${ctx.floor} / ${totalFloors()}`;
+    w.className = 'wave' + (ctx.boss ? ' boss' : ''); w.hidden = false; void w.offsetWidth;
+    await sleep(1150);
+    if (S.battle !== ctx) { w.hidden = true; return; }
+    sm.classList.remove('go'); void sm.offsetWidth; sm.classList.add('go');
+    mon.classList.remove('pre'); mon.classList.add('spawn');
+    await sleep(300); w.hidden = true;
+    await sleep(480);
+  } else mon.classList.remove('pre');
+  if (S.battle !== ctx) return;
+  mon.classList.remove('spawn');
+  ctx.locked = false; lockActs(false);
+}
+
+/* ================= 戰鬥流程 ================= */
+function needLogin() { if (S.user) return false; showGate(); return true; }
+const SHIELD = on => `<svg viewBox="0 0 20 22" class="${on ? 'on' : ''}" aria-hidden="true"><path d="M10 1l8 3v6c0 5.2-3.4 9.3-8 11C5.400 19.3 2 15.2 2 10V4z"/></svg>`;
+function stageNotice(kind) {
+  return new Promise(res => {
+    const st = CONFIG.stake, bs = CONFIG.bossStake, el = $('#stageNote');
+    $('#stageBody').innerHTML = kind === 'risk' ? `<p class="sn-k">STAGE II CLEAR</p><h2 id="stageT">第二階段試煉・通過</h2>
+      <p class="sn-p">恭喜你，冒險者！前 ${CONFIG.riskFrom - 1} 道試煉已全數通過。</p>
+      <p class="sn-p">從這一關開始啟用<b>「風控額度」</b>：你有 ${CONFIG.riskMax} 次額度，<b>做多或做空答錯</b>一次就扣 1 次。</p>
+      <div class="sn-sh">${SHIELD(1).repeat(CONFIG.riskMax)}</div>
+      <p class="sn-p">・額度每 ${CONFIG.riskMin} 分鐘恢復 1 次，不滿 ${CONFIG.riskMax} 次就開始倒數。<br>・${CONFIG.riskMax} 次全部用完會強制休息，恢復前不能進入試煉。<br>・選「不進場」答錯只扣本金，不扣額度。</p>
+      <p class="sn-p sn-w">連續虧損時最容易亂出手。額度用完就離開盤面，平復心態再回來。沒把握的盤，不進場也是一種判斷。</p>`
+      : `<p class="sn-k">STAGE I CLEAR</p><h2 id="stageT">第一階段試煉・通過</h2>
+      <p class="sn-p">恭喜你，冒險者！前 ${CONFIG.lotFrom - 1} 道試煉已全數通過。</p>
+      <p class="sn-p">從這一關開始解鎖<b>「手數」</b>：每一題出手前，都可以自由選擇 1～3 倍，賺和賠會一起放大。</p>
+      <table class="sn-t"><thead><tr><th>手數</th><th>一般關</th><th>魔王關</th></tr></thead><tbody>${[1, 2, 3].map(m => `<tr><th>${m} 倍</th><td>±${fmt(st * m)} U</td><td>±${fmt(bs * m)} U</td></tr>`).join('')}</tbody></table>
+      <p class="sn-p sn-w">倍數越高，贏得越快，輸得也越快。本金不夠賠的倍數無法選擇。請做好風控，量力而為。</p>`;
+    $('#stageNext').textContent = `前往${trial(kind === 'risk' ? CONFIG.riskFrom : CONFIG.lotFrom)}`;
+    el.hidden = false; el.scrollTop = 0; $('#stageNext').focus();
+    $('#stageNext').onclick = () => { el.hidden = true; res(); };
+  });
+}
+/* 主畫面右上角的盾牌、倒數，以及額度用完時鎖住「進入試煉」 */
+function riskPaint() {
+  const u = S.user, pill = $('#riskPill'); if (!pill) return;
+  if (u && riskExempt() && (u.floor || 0) + 1 >= CONFIG.riskFrom) {   // 管理員不受限：盾牌全滿，標示「不受限」
+    pill.hidden = false; $('#riskSh').innerHTML = SHIELD(1).repeat(CONFIG.riskMax); $('#riskT').textContent = '管理員不受限'; return;
+  }
+  const on = riskOn(u); pill.hidden = !on; if (!on) return;
+  const left = riskLeft(u), next = riskNextMs(u);
+  $('#riskSh').innerHTML = Array.from({ length: CONFIG.riskMax }, (_, i) => SHIELD(i < left)).join('');
+  $('#riskT').textContent = left >= CONFIG.riskMax ? '' : mmss(next);
+  pill.setAttribute('aria-label', `風控額度 ${left}／${CONFIG.riskMax}` + (next ? `，${mmss(next)} 後恢復 1 次` : ''));
+  const eb = $('#btnBattle'), locked = left === 0;
+  if (locked !== eb.classList.contains('rest')) renderHome();
+  else if (locked) $('#battleTxt').textContent = `休息中 ${mmss(next)}`;
+}
+setInterval(riskPaint, 1000);
+async function startFloor() {
+  if (needLogin() || S.starting) return;
+  S.starting = true;
+  try {
+    const f = S.user.floor + 1;
+    if (f > totalFloors() && S.live) { try { await B.loadTower(); } catch (e) {} renderHome(); }
+    const total = totalFloors();
+    if (!total) { toast('塔還在建造中，題庫建立完成後就能開始挑戰。'); return; }
+    if (f > total) { toast(`目前 ${total} 道試煉都打完了！每天台北時間 00:00 過後會再新增 ${CONFIG.floorsPerDay} 道。`); return; }
+    let q, pending;
+    try { [q, pending] = await Promise.all([getFloorQ(f), B.pendingVote(f)]); }
+    catch (e) { toast('這道試煉的盤面讀取失敗，請稍後再試。'); return; }
+    const ctx = { q, floor: f, boss: q.boss, label: trial(f) };
+    if (pending && isAdmin()) { try { await B.clearVote(f); pending = null; } catch (e) { toast('管理員：清除舊紀錄失敗，請確認已更新 Firestore 規則。'); } }
+    if (!pending && f === CONFIG.lotFrom && !S.lotSeen) { S.lotSeen = true; await stageNotice('lot'); }
+    if (!pending && f === CONFIG.riskFrom && !S.riskSeen) { S.riskSeen = true; await stageNotice('risk'); }
+    if (!pending && riskOn(S.user) && riskLeft(S.user) === 0) { toast(`風控額度已用完，先休息一下。${mmss(riskNextMs(S.user))} 後恢復 1 次。`); return; }
+    if (pending) { enterBattle(ctx, true); toast('上次在這道試煉已經出手，現在幫你結算。'); resolveBattle(pending); }
+    else if (q.boss) showWarning(ctx);
+    else enterBattle(ctx);
+  } finally { S.starting = false; }
+}
+function showWarning(ctx) {
+  const ev = EVENT_INFO[ctx.boss.type] || EVENT_INFO.VOL;
+  $('#wSub').textContent = `${trial(ctx.floor)} · ${ev.boss}`;
+  $('#wEvent').textContent = ev.data ? `數據魔王：${ev.name}公布` : `魔王關：${ev.name}`;
+  $('#wNote').textContent = (ev.data
+    ? '盤面停在數據公布前的最後一根 K 棒，公布瞬間常出現大幅跳動與上下插針。'
+    : '這一關的盤面波動特別劇烈，接下來 3 根 K 棒可能大漲、大跌，也可能騙線後回到原地。')
+    + `魔王關答對 +${ctx.q.stake} U、答錯 −${ctx.q.stake} U，想清楚再出手。`;
+  S.pending = ctx; $('#warning').hidden = false; $('#wGo').focus();
+}
+function renderStreak(n, flash) {
+  const k = n % CONFIG.streakEvery, full = n > 0 && k === 0;
+  $('#stN').textContent = n;
+  $('#stPips').innerHTML = Array.from({ length: CONFIG.streakEvery }, (_, i) => `<i class="${full || i < k ? 'on' : ''}"></i>`).join('');
+  $('#streak').classList.toggle('hot', !full && k === CONFIG.streakEvery - 1);
+  $('#streak').title = full ? '連勝獎勵已觸發' : `再連勝 ${CONFIG.streakEvery - k} 次 +${CONFIG.streakBonus} U`;
+  if (flash) { const el = $('#streak'); el.classList.remove('shake'); void el.offsetWidth; el.classList.add('shake'); }
+}
+function setTf(tf) { S.tf = tf; document.querySelectorAll('.tabs button').forEach(t => t.classList.toggle('on', t.dataset.tf === tf)); }
+function lockActs(on, pick) { document.querySelectorAll('.act').forEach(x => { x.disabled = on; x.classList.toggle('picked', !!pick && DIRS[x.dataset.dir] === pick); }); }
+function enterBattle(ctx, resume) {
+  S.battle = ctx; ctx.reveal = 0; ctx.locked = !resume; ctx.ans = null; setTf('15m');
+  const mon = monsterFor(ctx); ctx.monName = mon.name.replace(/ Lv\.\d+$/, '');
+  $('#monster').className = 'monster' + (mon.boss ? ' boss' : '') + (resume ? '' : ' pre');
+  $('#monster').innerHTML = mon.html;
+  // 塔內背景壓暗，讓怪物、K 線和文字看得清楚；魔王關再疊一層暗紅
+  $('#battle').classList.toggle('boss', !!mon.boss);
+  $('#battle').style.backgroundImage = (mon.boss ? 'linear-gradient(#5a0c1870,#3a081470 40%,#2a0612a6 70%,#1a040cc7)' : 'linear-gradient(#0a1c5024,#0a1c5033 40%,#0a174873 72%,#081238a6)') + `, url(${INSIDE_SRC})`;
+  $('#mName').textContent = mon.name; $('#mHp').style.width = '100%';
+  $('#bFloor').textContent = ctx.boss ? `${ctx.label} · 魔王` : ctx.label;
+  $('#bFloor').className = 'b-floor' + (ctx.boss ? ' boss' : ' metal-text');
+  { const L = $('#lots'), setM = m => { ctx.mult = m; L.querySelectorAll('button').forEach(x => { const on = +x.dataset.m === m; x.classList.toggle('on', on); x.setAttribute('aria-checked', on); }); $('#lotsV').textContent = `賺賠 ±${fmt(ctx.q.stake * m)} U`; };
+    L.hidden = !(ctx.floor >= CONFIG.lotFrom) || !!resume; L.classList.remove('locked'); setM(1);
+    L.querySelectorAll('button').forEach(x => { const m = +x.dataset.m; x.disabled = m > 1 && S.user.balance < ctx.q.stake * m; x.title = x.disabled ? '本金不足，無法選這個倍數' : ''; });
+    L.querySelectorAll('button').forEach(x => x.onclick = () => { if (!L.classList.contains('locked')) setM(+x.dataset.m); }); }
+  const q = ctx.q, ev = ctx.boss && (EVENT_INFO[ctx.boss.type] || EVENT_INFO.VOL), dp = dpOf(q), a = q.vis[q.vis.length - 1][3];
+  const when = q.sourceHour ? `台北 ${q.sourceHour}${q.sessionLabel ? ' · ' + q.sessionLabel : ''} · ` : '';
+  $('#cSym').innerHTML = `${esc(q.name)}<small>${ev ? '⚠ ' + esc(ev.data ? ev.name + '公布前一刻' : ev.name) + ' · ' : ''}${esc(when)}${q.demo ? '模擬盤面' : '真實歷史行情'}</small>`;
+  $('#cFoot').textContent = `現價 ${a.toFixed(dp)}，判定點數 ${q.pts} 點。之後 3 根裡碰到 ${(a + q.pts).toFixed(dp)} 且第 3 根收盤不低於現價＝做多；碰到 ${(a - q.pts).toFixed(dp)} 且第 3 根收盤不高於現價＝做空；其餘＝盤整，不進場勝。答對 +${q.stake} U、答錯 −${q.stake} U。`;
+  renderStreak(S.user.streak);
+  lockActs(!resume);
+  $('#actions').hidden = false; $('#result').hidden = true;
+  $('#battle').hidden = false; $('#battle').scrollTop = 0;
+  renderHome();
+  requestAnimationFrame(() => drawChart(0));
+  if (!resume) introBattle(ctx);
+}
+/* ================= 跑馬燈：從排行榜資料推算，不需要額外寫入 ================= */
+const TK = { prev: null, topW: null, topR: null, queue: [], base: [], i: 0, busy: false, last: 0 };
+async function tickerPoll() {
+  if (!S.user || document.hidden || Date.now() - TK.last < 5000) return;
+  TK.last = Date.now();
+  let w, r; try { [w, r] = await Promise.all([B.leaderboard('wealth'), B.leaderboard('rate')]); } catch (e) { return; }
+  const cur = {}; w.concat(r).forEach(u => { cur[u.uid] = { name: u.name, floor: u.floor || 0, peak: u.peak || 0 }; });
+  if (TK.prev) {
+    for (const [id, u] of Object.entries(cur)) {
+      const p = TK.prev[id]; if (!p) continue;
+      const k = Math.floor(u.floor / 10);
+      if (k > Math.floor(p.floor / 10)) TK.queue.push(`${u.name} 通過了${trial(k * 10)}！`);
+      if (titleOf(u.peak) !== titleOf(p.peak)) TK.queue.push(`${u.name} 獲得稱號「${titleOf(u.peak)}」！`);
+    }
+    if (w[0] && TK.topW && w[0].uid !== TK.topW) TK.queue.push(`${w[0].name} 登上財富榜第一名！`);
+    if (r[0] && r[0].uid !== TK.topR && (TK.topR || TK.seenR)) TK.queue.push(`${r[0].name} 登上勝率榜第一名！`);
+  }
+  TK.seenR = true; TK.prev = Object.assign(TK.prev || {}, cur); TK.topW = w[0] ? w[0].uid : null; TK.topR = r[0] ? r[0].uid : null;
+  const far = w.concat(r).reduce((a, u) => (u.floor || 0) > (a ? a.floor || 0 : 0) ? u : a, null);
+  TK.base = [];
+  if (w[0]) TK.base.push(`財富榜第一名：${w[0].name}（${fmt(w[0].balance)} U）`);
+  if (r[0]) TK.base.push(`勝率榜第一名：${r[0].name}（${(r[0].rankBp / 100).toFixed(1)}%）`);
+  if (far && far.floor >= 10) TK.base.push(`${far.name} 已通過${trial(Math.floor(far.floor / 10) * 10)}`);
+  tickerRun();
+}
+function tickerRun() {
+  if (TK.busy) return;
+  const msg = TK.queue.shift() || (TK.base.length ? TK.base[TK.i++ % TK.base.length] : null);
+  const box = $('#ticker'); if (!msg) { box.hidden = true; return; }
+  box.hidden = false; const el = $('#tkTxt'); el.textContent = msg; TK.busy = true;
+  const done = () => { TK.busy = false; tickerRun(); };
+  const W = el.parentElement.clientWidth, w = el.offsetWidth;
+  if (reduceMotion() || !el.animate || !W) { el.style.transform = 'none'; setTimeout(done, 5000); return; }
+  el.animate([{ transform: `translateX(${W}px)` }, { transform: `translateX(${-w}px)` }], { duration: (W + w) / 60 * 1000, easing: 'linear' }).onfinish = done;
+}
+setInterval(tickerPoll, 60000);
+function exitBattle() { $('#battle').hidden = true; $('#wave').hidden = true; FX.parts = []; S.battle = null; renderHome(); }
+function burst(stage, n) {
+  for (let i = 0; i < n; i++) {
+    const s = document.createElement('i'); s.className = 'spark';
+    const a = Math.random() * Math.PI * 2, r = 50 + Math.random() * 90;
+    s.style.setProperty('--dx', Math.cos(a) * r + 'px'); s.style.setProperty('--dy', Math.sin(a) * r - 30 + 'px');
+    stage.appendChild(s); setTimeout(() => s.remove(), 1000);
+  }
+}
+function popText(txt, good, dy = 0) { const p = document.createElement('div'); p.className = 'pop ' + (good ? 'good' : 'bad'); p.style.top = `calc(42% + ${dy}px)`; p.textContent = txt; $('#stage').appendChild(p); setTimeout(() => p.remove(), 1500); }
+/* 送出選擇 → 拿到答案 → 結算。選擇一送出就不能改 */
+async function resolveBattle(choice) {
+  const b = S.battle; if (!b || b.locked) return;
+  b.locked = true; lockActs(true, choice);
+  const before = S.user; let res;
+  $('#lots').classList.add('locked');
+  try { res = await B.play(b.floor, choice, b.mult || 1); }
+  catch (e) {
+    if (e.message === 'ALREADY') { toast('這道試煉已經結算過了。'); const u = await B.refresh().catch(() => null); if (u) S.user = u; exitBattle(); return; }
+    console.warn(e); b.locked = false; lockActs(false); $('#lots').classList.remove('locked');
+    toast(e.message === 'MISSING' ? '這道試煉的答案還沒準備好，請稍後再試。' : '連線失敗，請檢查網路後再出手一次。'); return;
+  }
+  const ans = res.ans, pick = res.choice, ok = pick === ans.answer, stake = ans.stake * (res.mult || 1), st = settle(before, ok, stake);
+  b.ans = ans; S.user = res.user; lockActs(true, pick); HIST.add(b.floor, b.q.assetKey, ok);
+  for (let r = 1; r <= 3; r++) { if (S.battle !== b) return; b.reveal = r; setTf('15m'); drawChart(r); await sleep(380); }
+  if (S.battle !== b) return;
+  const mon = $('#monster'), stage = $('#stage'), hp = $('#mHp');
+  $('#battle').scrollTo({ top: 0, behavior: 'smooth' }); await sleep(260);
+  if (S.battle !== b) return;
+  const btn = document.querySelector(`.act[data-dir="${{ bull: 'L', bear: 'S', neutral: 'N' }[pick]}"]`);
+  const shots = b.boss ? 7 : 5, kind = { bull: 'l', bear: 's', neutral: 'n' }[pick];
+  const color = { bull: '110,255,170', bear: '255,120,100', neutral: '170,205,255' }[pick];
+  const volley = () => throwAttack(btn, mon, color, shots, i => { hitFlash(); popDmg(kind, !!b.boss); hp.style.width = Math.max(0, 100 - (i + 1) / shots * 100) + '%'; });
+  if (ok) {
+    if (pick === 'neutral') {   // 先閃過怪物的撲擊，再反擊
+      mon.classList.add('dodge'); await sleep(420);
+      popText('MISS', true, -30); await sleep(420);
+      mon.classList.remove('dodge');
+    }
+    await volley();
+    if (S.battle !== b) return;
+    mon.classList.remove('hit'); mon.classList.add('dead'); burst(stage, 20); popText(`+${stake} U`, true);
+    impact(relPos(mon).x, relPos(mon).y, '255,255,255', performance.now()); fxKick();
+  } else {
+    mon.classList.add('lunge'); await sleep(300);
+    const cl = $('#claw'); cl.classList.remove('go'); void cl.offsetWidth; cl.classList.add('go');
+    $('#battle').classList.add('shake'); setTimeout(() => $('#battle').classList.remove('shake'), 500);
+    popText(`−${stake} U`, false);
+  }
+  renderStreak(st.streak, true);
+  if (st.bonus) { await sleep(650); burst(stage, 26); popText(`連勝 ${st.streak}！+${st.bonus} U`, true, -10); }
+  renderHome();
+  await sleep(550);
+  b.hit = !!res.hit;
+  if (S.battle === b) showResult(b, pick, ok, stake, st);
+}
+function showResult(b, pick, ok, stake, st) {
+  const q = b.q, ans = b.ans, dp = dpOf(q), total = totalFloors(), more = S.user.floor < total, rOn = riskOn(S.user), rLeft = rOn ? riskLeft(S.user) : CONFIG.riskMax, canNext = more && rLeft > 0, P = ans.pts;
+  const ev = b.boss && (EVENT_INFO[b.boss.type] || EVENT_INFO.VOL), who = b.monName;
+  const now = q.vis[q.vis.length - 1][3], c3 = ans.rev[ans.rev.length - 1][3];
+  const sg = v => (v > 0 ? '+' : v < 0 ? '−' : '') + Math.abs(v).toFixed(dp);
+  const upHit = ans.maxUp >= P, dnHit = ans.maxDown >= P;
+  let why;
+  if (upHit && dnHit) why = `上下都碰到 ±${P} 點，第 3 根收在現價${c3 > now ? '之上' : c3 < now ? '之下' : ''}`;
+  else if (upHit) why = c3 >= now ? `碰到 +${P} 點，第 3 根收盤沒有跌回現價之下` : `碰到 +${P} 點，但第 3 根收盤跌回現價之下`;
+  else if (dnHit) why = c3 <= now ? `碰到 −${P} 點，第 3 根收盤沒有漲回現價之上` : `碰到 −${P} 點，但第 3 根收盤漲回現價之上`;
+  else why = `上下都沒碰到 ±${P} 點`;
+  let head, line;
+  if (ok && pick === 'neutral') { head = '逃過陷阱！'; line = `你逃過了「${esc(who)}」設下的盤整陷阱，沒進場就是最好的進場。`; }
+  else if (ok) { head = b.boss ? '魔王討伐成功！' : '擊敗！'; line = `一刀斬下「${esc(who)}」。`; }
+  else if (ans.answer === 'neutral') { head = '掉進盤整陷阱！'; line = `「${esc(who)}」設下的是盤整陷阱，這一段其實不該進場。`; }
+  else if (pick === 'neutral') { head = '錯過行情！'; line = `你選擇觀望，「${esc(who)}」趁機發動攻擊。`; }
+  else { head = b.boss ? '被魔王反擊！' : '被反擊！'; line = `方向看反了，被「${esc(who)}」反擊。`; }
+  const ansTxt = `${{ bull: '做多', bear: '做空', neutral: '盤整' }[ans.answer]}（${why}）`;
+  const ansCls = ans.answer === 'neutral' ? 'flat-t' : ans.answer === 'bull' ? 'good-t' : 'bad-t';
+  $('#result').innerHTML = `
+    <div class="verdict"><h3 class="${ok ? 'good-t' : 'bad-t'}">${head}</h3>
+      <span class="amt ${ok ? 'good-t' : 'bad-t'}">${ok ? '+' + stake : '−' + stake} U</span></div>
+    <p class="hint" style="margin:-4px 0 0;position:relative">${line}</p>
+    ${st.bonus ? `<div class="bonus-row"><span>🔥 連勝 ${st.streak} 次獎勵</span><b>+${st.bonus} U</b></div>` : ''}
+    <dl class="facts">
+      <dt>你的判斷</dt><dd>${DIR_LABEL[pick]}</dd>
+      <dt>正確答案</dt><dd class="${ansCls}">${ansTxt}</dd>
+      <dt>現價</dt><dd>${now.toFixed(dp)}（做多線 ${(now + P).toFixed(dp)}／做空線 ${(now - P).toFixed(dp)}）</dd>
+      <dt>3 根走勢</dt><dd>最高 ${(now + ans.maxUp).toFixed(dp)}（${sg(ans.maxUp)}）・最低 ${(now - ans.maxDown).toFixed(dp)}（${sg(-ans.maxDown)}）・第 3 根收 ${c3.toFixed(dp)}（${sg(c3 - now)}）</dd>
+      ${rOn || b.hit ? `<dt>風控額度</dt><dd>${b.hit ? '<b class="bad-t">−1</b>・' : ''}剩 ${rLeft}／${CONFIG.riskMax}${!b.hit && !ok && pick === 'neutral' ? '（不進場不扣額度）' : ''}</dd>` : ''}
+      ${ans.sourceTime ? `<dt>盤面時間</dt><dd>${esc(ans.sourceTime)}${ev && ev.data ? '・' + esc(ev.name) : ''}</dd>` : ''}
+    </dl>
+    <div class="row"><button class="btn dim" id="rMap">回地圖</button>${canNext ? `<button class="btn gold" id="rNext">前往${trial(S.user.floor + 1)}</button>` : ''}</div>
+    ${canNext ? '' : more ? `<p class="hint" style="margin:0;position:relative;color:#ffe9ae">風控額度已用完，強制休息。先離開盤面平復心態，${mmss(riskNextMs(S.user))} 後恢復 1 次額度。</p>` : `<p class="hint" style="margin:0;position:relative">已打完目前所有試煉，每天台北時間 00:00 過後會再新增 ${CONFIG.floorsPerDay} 道。</p>`}`;
+  $('#actions').hidden = true; $('#result').hidden = false;
+  $('#rMap').onclick = exitBattle;
+  if (canNext) $('#rNext').onclick = startFloor;
+  $('#result').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+
+/* ================= 面板 ================= */
+function openSheet(kind) {
+  const u = S.user; if (!u) return showGate();
+  S.sheet = kind; const body = $('#sheetBody');
+  $('#sheet').classList.toggle('art', ['account', 'invite', 'titles'].includes(kind)); $('#sheet').hidden = false;
+  $('#sheetTitle').textContent = { rank: '排行榜', titles: '稱號殿', invite: '邀請好友', account: '戰績碑', rules: '規則說明' }[kind];
+  if (kind === 'rules') {
+    const P = CONFIG.points, N = CONFIG.assetNames;
+    body.innerHTML = `<div class="rules">
+      <h3>怎麼判定答案</h3>
+      <p>每一題會給你 40 根 15 分 K（可切換 1 小時 K），並隱藏接下來的 3 根。以「題目最後一根 K 的收盤價」當作<b>現價</b>，每個商品有固定的<b>判定點數</b>。</p>
+      <ul>
+        <li><b class="good-t">做多</b>：3 根裡的最高價碰到「現價＋點數」，而且第 3 根收盤<b>沒有低於</b>現價。</li>
+        <li><b class="bad-t">做空</b>：3 根裡的最低價碰到「現價－點數」，而且第 3 根收盤<b>沒有高於</b>現價。</li>
+        <li><b class="flat-t">盤整（不進場）</b>：上下都沒碰到；或是碰到了，但第 3 根收盤又收回現價的另一邊。</li>
+        <li>上下都碰到時，看第 3 根收盤在現價的哪一邊。</li>
+      </ul>
+      <h3>各商品的判定點數</h3>
+      <ul class="titles">${Object.keys(P).map(k => `<li class="got"><span class="tn">${N[k]}</span><span class="tv">${fmt(P[k])} 點</span></li>`).join('')}</ul>
+      <h3>例子</h3>
+      <p>黃金現價 4210，判定點數 10：<br>・3 根裡最高到 4220 以上，第 3 根收 4215 → <b class="good-t">做多</b><br>・最高到 4220 以上，但第 3 根收 4208 → <b class="flat-t">盤整</b><br>・最低到 4200 以下，第 3 根收 4204 → <b class="bad-t">做空</b></p>
+      <p>比特幣現價 83000，判定點數 300：<br>・最高到 83300 以上，第 3 根收盤不低於 83000 → <b class="good-t">做多</b><br>・最低到 82700 以下，第 3 根收盤不高於 83000 → <b class="bad-t">做空</b></p>
+      <h3>本金怎麼算</h3>
+      <ul>
+        <li>一般關：答對 +${CONFIG.stake} U，答錯 −${CONFIG.stake} U。</li>
+        <li>從${trial(CONFIG.lotFrom)}開始，每一題出手前可以選 1～3 倍手數，賺賠都乘上倍數（連勝獎勵不加倍）。本金不夠賠的倍數不能選。</li>
+        <li>魔王關（每 10 道試煉，數據公布前一刻的盤面）：答對 +${CONFIG.bossStake} U，答錯 −${CONFIG.bossStake} U。</li>
+        <li>風控額度：從${trial(CONFIG.riskFrom)}開始，做多或做空答錯一次扣 1 次額度（共 ${CONFIG.riskMax} 次，每 ${CONFIG.riskMin} 分鐘恢復 1 次）。用完會強制休息，恢復前不能進入試煉。不進場答錯只扣本金，不扣額度。</li>
+        <li>連勝：每連續答對 ${CONFIG.streakEvery} 次額外 +${CONFIG.streakBonus} U，答錯歸零。</li>
+        <li>每道試煉只能出手一次，送出後不能改。答對答錯都會前進到下一道。</li>
+        <li>邀請好友註冊並填你的信箱：+${fmt(CONFIG.invite)} U。</li>
+      </ul></div>`;
+    $('#sheet').hidden = false; return;
+  }
+  if (kind === 'rank') {
+    body.innerHTML = `<div class="seg" role="tablist"><button data-k="rate">勝率榜</button><button data-k="rich">財富榜</button><button data-k="net">人脈榜</button></div><ol class="lb" id="lb"><li><span></span><span class="nm"><b>讀取中…</b></span></li></ol><p class="hint" id="lbHint"></p>`;
+    body.querySelectorAll('.seg button').forEach(x => { x.classList.toggle('on', x.dataset.k === S.boardKind); x.onclick = () => { S.boardKind = x.dataset.k; openSheet('rank'); }; });
+    $('#lbHint').textContent = S.boardKind === 'rate' ? `累積 ${CONFIG.minRankGames} 戰以上才會上勝率榜，顯示前 50 名。排名為歷史累積。` : S.boardKind === 'net' ? `依成功邀請的好友人數排名，顯示前 50 名。每邀請一位 +${fmt(CONFIG.invite)} U。` : `依目前本金排名，顯示前 50 名。`;
+    loadBoard();
+  } else if (kind === 'titles') {
+    const peak = u.peak, cur = titleOf(peak), next = TITLES.find(([v]) => v > peak), prevV = [...TITLES].reverse().find(([v]) => v <= peak);
+    const pct = next && prevV ? Math.min(100, (peak - prevV[0]) / (next[0] - prevV[0]) * 100) : 100;
+    body.innerHTML = `<div class="acct ttl" style="background-image:url(${TITLES_SRC})">
+      <h2 class="ac-title">稱號殿</h2><button class="ac-x" id="acX" aria-label="關閉">✕</button>
+      <span class="tt-k">目前稱號</span><b class="tt-cur">${esc(cur)}</b>
+      <div class="tt-bar" role="progressbar" aria-valuenow="${pct.toFixed(0)}" aria-valuemin="0" aria-valuemax="100" aria-label="下一個稱號進度"><i style="width:${pct.toFixed(1)}%"></i></div>
+      <p class="tt-d">${next ? `最高本金 ${fmt(peak)} U，再 ${fmt(next[0] - peak)} U 解鎖「${esc(next[1])}」。解鎖後不會因為輸錢而失去。` : '所有稱號都已解鎖。'}</p>
+      ${TITLES.map(([v, n], k) => `<div class="tt-row ${peak >= v ? 'got' : ''} ${n === cur ? 'cur' : ''}" style="top:${(([598,689,778,867,958,1049,1140,1231,1324,1417][k] - 41) / 1684 * 100).toFixed(2)}%"><b>${n}</b><span>${peak >= v ? '已解鎖 · ' : ''}${fmt(v)} U</span></div>`).join('')}</div>`;
+    $('#acX').onclick = closeSheet;
+  } else if (kind === 'invite') {
+    body.innerHTML = `<div class="acct inv" style="background-image:url(${INV_SRC})">
+      <h2 class="ac-title">邀請好友</h2><button class="ac-x" id="acX" aria-label="關閉"></button>
+      <div class="iv-info"><b>+${fmt(CONFIG.invite)} U</b><p>朋友註冊時，在「推薦人信箱」填上你的信箱，你就會立刻拿到 ${fmt(CONFIG.invite)} U。</p></div>
+      <input class="iv-code" id="myCode" readonly value="${esc(u.email || '')}" aria-label="你的推薦人信箱"><button class="iv-copy" id="copyCode">複製</button>
+      <div class="ac-stat iv-s1"><span>已邀請</span><b>${u.invites} 人</b></div><div class="ac-stat iv-s2"><span>邀請獎勵累計</span><b>${fmt(u.invites * CONFIG.invite)} U</b></div></div>`;
+    $('#acX').onclick = closeSheet;
+    $('#copyCode').onclick = () => { const i = $('#myCode'); navigator.clipboard.writeText(i.value).then(() => toast('已複製你的推薦人信箱'), () => { i.select(); toast('請長按或按 Ctrl+C 複製'); }); };
+  } else if (kind === 'account') {
+    const rate = u.total ? (u.wins / u.total * 100).toFixed(1) + '%' : '—';
+    const cell = (i, k, v) => `<div class="ac-stat ac-s${i}"><span>${k}</span><b>${v}</b></div>`;
+    body.innerHTML = `<div class="acct" style="background-image:url(${ACCT_SRC})">
+      <h2 class="ac-title">戰績碑</h2><button class="ac-x" id="acX" aria-label="關閉"></button>
+      <div class="ac-name"><b>${esc(u.name)}</b><span>${esc(u.email || '')} ・ 稱號「${esc(titleOf(u.peak))}」</span><div class="rename" id="renameBox"></div></div>
+      ${cell(1, '本金', fmt(u.balance) + ' U')}${cell(2, '勝率', rate)}${cell(3, '戰績', `${u.wins} 勝 ${u.losses} 敗`)}${cell(4, '試煉', `${u.floor} / ${totalFloors()}`)}${cell(5, '目前連勝', u.streak + ' 次')}${cell(6, '最高連勝', u.bestStreak + ' 次')}
+      <button class="ac-out" id="logout">登出</button></div>
+      <div class="ac-assets"><h3>各商品勝率</h3><div class="aa-grid" id="aaGrid">${['gold', 'btc', 'nasdaq', 'dow'].map(k => `<div class="aa-c"><span>${CONFIG.assetNames[k]}</span><b>…</b><small>&nbsp;</small></div>`).join('')}</div></div>`;
+    if (isAdmin()) {
+      body.insertAdjacentHTML('beforeend', `<div class="ac-assets adm"><h3>管理員工具</h3>
+        <div class="adm-row"><label for="admN">跳到試煉</label><input id="admN" type="number" inputmode="numeric" min="1" max="${totalFloors()}" value="${Math.min(u.floor + 1, totalFloors())}"><button id="admGo">前往</button></div>
+        <div class="adm-row adm-r2"><button id="admRisk" class="adm-alt" aria-pressed="${u.riskTest}">套用風控額度：${u.riskTest ? '開' : '關'}</button><button id="admFill" class="adm-alt">補滿額度</button></div>
+        <button id="admReset" class="adm-reset">重置我的關卡紀錄</button><p class="adm-msg" id="admMsg">共 ${totalFloors()} 道試煉。跳關只改進度，本金和戰績不變。</p></div>`);
+      const msg = t => { const m = $('#admMsg'); if (m) m.textContent = t; };
+      const run = async (patch, done) => { try { const nu = await B.adminSet(patch); if (nu) S.user = nu; S.lotSeen = S.riskSeen = false; renderHome(); done(); } catch (e) { msg('失敗：' + (e.code === 'permission-denied' ? '請先更新 Firestore 規則' : e.message)); } };
+      $('#admGo').onclick = () => { const n = Math.floor(+$('#admN').value), t = totalFloors(); if (!(n >= 1 && n <= t)) return msg(`請輸入 1～${t}`); run({ floor: n - 1 }, () => { closeSheet(); toast(`已跳到${trial(n)}，按「進入試煉」開始。`); }); };
+      $('#admRisk').onclick = () => run({ riskTest: !u.riskTest }, () => { openSheet('account'); toast(u.riskTest ? '風控額度：管理員不受限。' : '風控額度：已套用，和一般玩家一樣會扣額度、會被鎖。'); });
+      $('#admFill').onclick = () => run({ riskDebt: 0 }, () => { closeSheet(); toast('風控額度已補滿。'); });
+      let armed = false;
+      $('#admReset').onclick = () => { if (!armed) { armed = true; $('#admReset').textContent = '再按一次確認重置'; return; }
+        run({ floor: 0, balance: CONFIG.start, peak: CONFIG.start, wins: 0, losses: 0, total: 0, streak: 0, bestStreak: 0, rankBp: -1, riskDebt: 0 }, () => { HIST.put({}); openSheet('account'); toast('已重置：回到試煉 01、本金 10,000 U。'); }); };
+    }
+    HIST.fill().then(o => { const g = $('#aaGrid'); if (!g || S.sheet !== 'account') return;
+      g.innerHTML = ['gold', 'btc', 'nasdaq', 'dow'].map(k => { const [w, t] = o[k]; return `<div class="aa-c"><span>${CONFIG.assetNames[k]}</span><b>${t ? (w / t * 100).toFixed(1) + '%' : '—'}</b><small>${t ? `${w} 勝 ${t - w} 敗` : '尚無紀錄'}</small></div>`; }).join(''); }).catch(() => {});
+    $('#acX').onclick = closeSheet;
+    $('#logout').onclick = async () => { closeSheet(); await B.signOut(); };
+    const rb = $('#renameBox'), left = u.nameAt ? u.nameAt + RENAME_MS - Date.now() : 0;
+    if (left > 0) rb.innerHTML = `<small>${Math.ceil(left / 864e5)} 天後可再改暱稱</small>`;
+    else {
+      rb.innerHTML = `<button class="ac-edit" id="rnOpen">✎ 修改暱稱</button>`;
+      $('#rnOpen').onclick = () => {
+        rb.closest('.ac-name').classList.add('editing');
+        rb.innerHTML = `<input id="rnIn" maxlength="16" aria-label="新暱稱（14 天內只能改一次）" value="${esc(u.name)}"><button id="rnGo">確定</button><p class="err" id="rnErr"></p>`;
+        const inp = $('#rnIn'); inp.focus(); inp.select();
+        $('#rnGo').onclick = async () => {
+          const v = inp.value.trim(), er = $('#rnErr');
+          if (!v) return er.textContent = '請輸入暱稱。';
+          if (v === u.name) return er.textContent = '新暱稱和現在的一樣。';
+          const go = $('#rnGo'); go.disabled = true;
+          try { const nu = await B.rename(v); if (nu) S.user = nu; renderHome(); openSheet('account'); toast('暱稱已更新。'); }
+          catch (e) { er.textContent = e.message === 'RENAME_WAIT' ? '暱稱每 14 天只能修改一次。' : '修改失敗：' + e.message; go.disabled = false; }
+        };
+      };
+    }
+  }
+  $('#sheet').classList.toggle('art', ['account', 'invite', 'titles'].includes(kind));
+  $('#sheet').hidden = false;
+}
+function renderAuth(body) {
+  const reg = S.authTab === 'register';
+  body.innerHTML = `<div class="seg"><button data-t="register" class="${reg ? 'on' : ''}">註冊帳號</button><button data-t="login" class="${reg ? '' : 'on'}">登入</button></div>
+    <form class="form" id="authForm" novalidate>
+      <label>信箱<input id="fEmail" type="email" autocomplete="email" required></label>
+      ${reg ? '<label>暱稱（排行榜顯示）<input id="fName" maxlength="16" required></label>' : ''}
+      <label>密碼${reg ? '（至少 6 碼）' : ''}<input id="fPw" type="password" autocomplete="${reg ? 'new-password' : 'current-password'}" required></label>
+      ${reg ? '<label>推薦人信箱（選填，填朋友註冊用的信箱）<input id="fRef" type="email" autocomplete="off"></label>' : ''}
+      <p class="err" id="fErr"></p>
+      <button class="btn gold" id="fGo" type="submit">${reg ? '註冊並領取 10,000 U' : '登入'}</button>
+      ${reg ? '' : '<button type="button" class="linkish" id="fReset">忘記密碼？寄重設信到我的信箱</button>'}
+    </form>`;
+  body.querySelectorAll('.seg button').forEach(x => x.onclick = () => { S.authTab = x.dataset.t; renderAuth(body); });
+  const err = t => ($('#fErr').textContent = t);
+  $('#authForm').onsubmit = async e => {
+    e.preventDefault();
+    const email = $('#fEmail').value.trim(), pw = $('#fPw').value, name = reg ? $('#fName').value.trim() : '', refEmail = reg ? $('#fRef').value.trim() : '';
+    const okMail = s => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(s);
+    if (!okMail(email)) return err('請輸入正確的信箱。');
+    if (reg && !name) return err('請輸入暱稱。');
+    if (pw.length < 6) return err('密碼至少要 6 個字元。');
+    if (refEmail && !okMail(refEmail)) return err('推薦人信箱格式不正確。');
+    if (refEmail && refEmail.toLowerCase() === email.toLowerCase()) return err(ERR.REF_SELF);
+    const go = $('#fGo'); go.disabled = true; go.textContent = '處理中…'; err('');
+    try {
+      if (reg) await B.signUp({ email, pw, name, refEmail }); else await B.signIn({ email, pw });
+      if (!S.user) await new Promise(r => setTimeout(r, 400));
+      enterWorld();
+      toast(reg ? (refEmail ? '歡迎加入！10,000 U 已入帳，推薦人也拿到獎勵了。' : '歡迎加入！10,000 U 已入帳。') : `歡迎回來，${S.user ? S.user.name : ''}！`);
+    } catch (ex) { err(errMsg(ex)); go.disabled = false; go.textContent = reg ? '註冊並領取 10,000 U' : '登入'; }
+  };
+  const rs = $('#fReset');
+  if (rs) rs.onclick = async () => { const email = $('#fEmail').value.trim(); if (!email) return err('先在上面輸入你的信箱。'); try { await B.resetPw(email); err(''); toast('重設密碼信已寄出，請到信箱收信。'); } catch (ex) { err(errMsg(ex)); } };
+}
+async function loadBoard() {
+  const kind = S.boardKind, list = $('#lb');
+  let rows; try { rows = await B.leaderboard(kind); } catch (e) { if (list) list.innerHTML = `<li><span></span><span class="nm"><b>排行榜讀取失敗</b><span>${esc(e.message)}</span></span></li>`; return; }
+  if (S.sheet !== 'rank' || S.boardKind !== kind || !$('#lb')) return;
+  if (!rows.length) { $('#lb').innerHTML = `<li><span></span><span class="nm"><b>還沒有人上榜</b><span>${kind === 'rate' ? `打滿 ${CONFIG.minRankGames} 戰就能上榜` : kind === 'net' ? '邀請第一位好友就能上榜' : '成為第一位挑戰者'}</span></span></li>`; return; }
+  const ranked = rows.map((r, i) => [r, i]), mi = S.user ? rows.findIndex(r => r.uid === S.user.uid) : -1;
+  const show = ranked;
+  $('#lb').innerHTML = show.map(([r, i]) => {
+    const me = S.user && r.uid === S.user.uid;
+    const v = kind === 'net' ? `${r.invites} 人<small>獎勵 ${fmt(r.invites * CONFIG.invite)} U</small>` : kind === 'rate' ? `${(r.rankBp / 100).toFixed(1)}%<small>${r.wins} 勝 ${r.total - r.wins} 敗</small>` : `${fmt(r.balance)} U<small>${r.wins || 0} 勝 ${r.losses || 0} 敗</small>`;
+    return `<li class="${me ? 'me' : ''} ${i < 3 ? 'top t' + (i + 1) : ''}"><span class="rk ${i < 3 ? 'r' + (i + 1) : ''}"><i>${i + 1}</i></span><span class="nm"><b>${esc(r.name || '交易員')}${me ? '（你）' : ''}</b><span>${esc(titleOf(r.peak || r.balance))}</span></span><span class="val">${v}</span></li>`;
+  }).join('');
+}
+function closeSheet() { $('#sheet').hidden = true; S.sheet = null; }
+let toastT;
+function toast(t) { const el = $('#toast'); el.textContent = t; el.hidden = false; clearTimeout(toastT); toastT = setTimeout(hideToast, 3200); }
+function hideToast() { $('#toast').hidden = true; }
+
+/* ================= 綁定與啟動 ================= */
+function bindUI() {
+  document.querySelectorAll('#app > [data-act], .dock [data-act]').forEach(x => x.onclick = () => act(x.dataset.act));
+  $('#avatar').onclick = () => openSheet('account');
+  $('#walletPlus').onclick = () => openSheet('invite');
+  $('#btnAccount').onclick = () => openSheet('rules');
+  $('#sheetClose').onclick = closeSheet;
+  $('#sheet').onclick = e => { if (e.target.id === 'sheet') closeSheet(); };
+  $('#bExit').onclick = exitBattle;
+  $('#bRules').onclick = () => openSheet('rules');
+  $('#wBack').onclick = () => { $('#warning').hidden = true; S.pending = null; };
+  $('#wGo').onclick = () => { $('#warning').hidden = true; const c = S.pending; S.pending = null; if (c) enterBattle(c); };
+  document.querySelectorAll('.act').forEach(x => x.onclick = () => resolveBattle(DIRS[x.dataset.dir]));
+  document.querySelectorAll('.tabs button').forEach(t => t.onclick = () => { setTf(t.dataset.tf); drawChart(S.battle ? S.battle.reveal : 0); });
+  $('#title').onclick = e => { if (!e.target.closest('.gate')) onTitleTap(); };
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') { if (!$('#sheet').hidden) closeSheet(); else if (!$('#warning').hidden) $('#wBack').click(); }
+    if ((e.key === 'Enter' || e.key === ' ') && !$('#title').hidden && !$('#title').classList.contains('entered') && document.activeElement === document.body) onTitleTap();
+  });
+  let rt; window.addEventListener('resize', () => { clearTimeout(rt); rt = setTimeout(() => { if (S.battle) drawChart(S.battle.reveal); if (S.entered) mapFrame(performance.now()); }, 120); });
+  document.addEventListener('visibilitychange', async () => { if (document.hidden) return; if (S.live) { try { await B.loadTower(); } catch (e) {} } renderHome(); if (S.entered) startMapLoop(); });
+}
+/* 先鋪一張很小的模糊底圖，大圖整張下載完才淡入，不會由上往下一段一段出現 */
+function softBg(el, tiny, src) {
+  el.style.backgroundImage = `url(${tiny})`;
+  const full = document.createElement('div'); full.className = 'bg-full'; el.prepend(full);
+  const im = new Image();
+  im.onload = () => { const show = () => { full.style.backgroundImage = `url(${src})`; full.classList.add('on'); }; im.decode ? im.decode().then(show, show) : show(); };
+  im.src = src;
+}
+function boot() {
+  $('#logoText').textContent = CONFIG.gameName;
+  $('#logoPre').querySelector('span').textContent = CONFIG.gamePre;
+  $('#logoSub').innerHTML = `<span></span>${esc(CONFIG.gameNameEn)}<span></span>`;
+  document.title = CONFIG.gameName + '｜' + CONFIG.gameNameEn;
+  $('#heroImg').src = HERO_SRC;
+  $('#gemImg').src = GEM_SRC;
+  Object.entries(SP).forEach(([k, v]) => $('#battle').style.setProperty('--sp-' + k, `url(${v})`));
+  $('#sheet').style.backgroundImage = `linear-gradient(#0b123a59,#141d5c40 45%,#0b123a59), url(${OPEN_SRC})`;
+  softBg($('#tScene'), OPEN_TINY, OPEN_SRC);
+  softBg($('#scene'), NIGHT_TINY, NIGHT_SRC);
+  $('#purse').style.backgroundImage = `url(${WALLET_SRC})`;
+  document.querySelectorAll('.dock-btn').forEach(b => b.style.backgroundImage = `url(${DOCK_SRC[b.dataset.act]})`);
+  $('#towerRib').style.backgroundImage = `url(${PLAQUE_SRC})`;
+  $('#meFrame').style.backgroundImage = `url(${ME_SRC})`;
+  document.querySelectorAll('.laurel').forEach(el => { el.innerHTML = laurelSVG(+el.dataset.n, +el.dataset.r); });
+  makeGrain(); bindUI(); initMapFx(); startTitle(); $('#tapStart').textContent = '點擊畫面開始';
+  S.ready = (async () => {
+    renderHome();
+    try { await B.init(onUserChanged); S.live = B === FB; }
+    catch (e) { console.warn(e); B = LOCAL; S.live = false; S.cloudFailed = true; await LOCAL.init(onUserChanged); }
+    renderHome();
+  })();
+}
+boot();
+</script>
+<script>addEventListener("load",()=>setTimeout(()=>{const q=["heroes.webp", "heroes2.webp", "night.webp", "acct.webp", "inside.webp", "inv.webp", "mon.webp", "mon10.webp", "mon11.webp", "mon12.webp", "mon13.webp", "mon14.webp", "mon2.webp", "mon3.webp", "mon4.webp", "mon5.webp", "mon6.webp", "mon7.webp", "mon8.webp", "mon9.webp", "sp.webp", "sp10.webp", "sp2.webp", "sp3.webp", "sp4.webp", "sp5.webp", "sp6.webp", "sp7.webp", "sp8.webp", "sp9.webp", "titles.webp"];(function n(){const f=q.shift();if(!f)return;const i=new Image();i.onload=i.onerror=n;i.src="img/"+f})()},1200));</script>
+</body>
+</html>
