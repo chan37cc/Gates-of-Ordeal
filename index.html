@@ -793,6 +793,17 @@ button{font:inherit;color:inherit;cursor:pointer}
 .enter.rest{background:linear-gradient(#3a3f66f2,#22264af2)!important;box-shadow:inset 0 0 0 1.5px #9aa3c8;color:#d5daf0;text-shadow:none;cursor:not-allowed;width:calc(var(--w) * .46);font-size:clamp(13px,calc(var(--w) * .04),18px);letter-spacing:.06em}
 .adm-r2{margin-top:2cqw}.adm .adm-alt{flex:1;padding:2.2cqw 1cqw;font-size:3cqw;background:#0b123acc;color:#ffe9ae;box-shadow:inset 0 0 0 1.5px #f3d58a}
 .adm .adm-alt[aria-pressed=true]{background:linear-gradient(#fff3c4,#f0c877 50%,#d9a24e);color:#141d5c}
+.story{position:absolute;inset:0;z-index:31;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;padding:60px 26px calc(40px + env(safe-area-inset-bottom,0px));background:#070b1f center bottom/cover no-repeat;cursor:pointer;text-align:center}
+.st-k{margin:0;font:700 11px var(--f-display);letter-spacing:.4em;color:#f3d58a}
+.st-text{min-height:9.5em;display:grid;place-items:center;max-width:340px}
+.st-text p{margin:0;font:600 clamp(17px,4.8vw,20px)/1.9 var(--f-title);letter-spacing:.06em;color:#fff7e6;text-shadow:0 2px 10px #070b1f,0 0 18px #070b1f;animation:stIn .7s ease-out both}
+.st-text b{color:#ffe9ae;font-weight:900}
+@keyframes stIn{from{opacity:0;transform:translateY(10px);filter:blur(4px)}to{opacity:1;transform:none;filter:none}}
+.st-dots{display:flex;gap:7px}.st-dots i{width:7px;height:7px;transform:rotate(45deg);background:#ffffff33;box-shadow:inset 0 0 0 1px #f3d58a88}.st-dots i.on{background:#ffe9ae;box-shadow:0 0 8px #ffd26a}
+.st-go{min-width:190px;margin-top:6px;background:#0c1236b3;color:#fff3d0;border:0;box-shadow:inset 0 0 0 1.5px #f3d58a,0 0 14px #ffd98a44}
+.st-go.last{background:linear-gradient(#fff3c4,#f0c877 50%,#d9a24e);color:#141d5c}
+.st-skip{position:absolute;right:14px;top:calc(14px + env(safe-area-inset-top,0px));border:0;background:#0c123699;box-shadow:inset 0 0 0 1px #f3d58a88;border-radius:999px;padding:7px 16px;font:700 13px var(--f-title);color:#e6e9ff;cursor:pointer}
+@media (prefers-reduced-motion:reduce){.st-text p{animation:none}}
 </style>
 </head>
 <body>
@@ -873,6 +884,13 @@ button{font:inherit;color:inherit;cursor:pointer}
   <div class="wave" id="wave" hidden aria-hidden="true"><div class="wave-band"></div><div class="wave-txt"><b id="waveMain"></b><span id="waveSub"></span></div></div>
   <canvas class="fx" id="fxCv" aria-hidden="true"></canvas>
 
+  <section class="story" id="story" hidden role="dialog" aria-label="開頭故事">
+    <button class="st-skip" id="stSkip">跳過</button>
+    <p class="st-k">PROLOGUE</p>
+    <div class="st-text" id="stText" aria-live="polite"></div>
+    <div class="st-dots" id="stDots" aria-hidden="true"></div>
+    <button class="hp-go st-go" id="stGo">繼續</button>
+  </section>
   <section class="hero-pick" id="heroPick" hidden role="dialog" aria-label="選擇角色">
     <p class="hp-k">CHOOSE YOUR HERO</p>
     <h2>選擇你的冒險者</h2>
@@ -1497,6 +1515,35 @@ function paintAvatar() {
   const h = S.user && B.hero();
   a.innerHTML = h && HEROES[h] ? `<img src="${HEROES[h].img}" alt="">` : AV_DEFAULT;
 }
+/* 開頭故事：註冊後、選角前播一次。點畫面一段一段往下，可以跳過 */
+const STORY = [
+  '當天空裂開，「試煉之門」裡跑出來的不是神話裡的惡龍，而是人類貪婪與恐懼變成的「心魔怪獸」。',
+  '衝動的狂狼誘惑你盲目追高，死不認錯的泥沼怪把凹單的人拖進深淵。這些怪物吞噬了大家的理智，把世界搞得烏煙瘴氣。',
+  '直到第一批「破局者」站了出來。',
+  '大家這才發現，怪物其實有弱點。只要關掉情緒，把「理性」當作武器，就能看穿牠們的把戲。',
+  '在這裡，你的每次攻擊都化為赤紅與翠綠的Ｋ線。看懂多空方向，該停損時果斷出手，就是打敗牠們的唯一法則。',
+  '現在，試煉之門已經打開了。',
+  '冒險者，握緊你手上那把名叫「紀律」的武器！用你看懂趨勢的雙眼，打贏這場屬於你的破局之戰！'
+];
+let STORY_P = null;
+function introStory() {
+  if (STORY_P) return STORY_P;
+  return STORY_P = new Promise(res => {
+    const el = $('#story'), box = $('#stText'), go = $('#stGo'); let i = 0;
+    el.style.backgroundImage = `linear-gradient(#070b1fd9,#0c1236cc 45%,#070b1fe6), url(${OPEN_SRC})`;
+    const done = () => { el.hidden = true; res(); };
+    const show = () => {
+      box.innerHTML = `<p>${esc(STORY[i]).replace(/「([^」]+)」/g, '「<b>$1</b>」')}</p>`;
+      $('#stDots').innerHTML = STORY.map((_, k) => `<i class="${k === i ? 'on' : ''}"></i>`).join('');
+      const last = i === STORY.length - 1; go.textContent = last ? '踏入試煉之門' : '繼續'; go.classList.toggle('last', last);
+    };
+    const next = () => { if (i < STORY.length - 1) { i++; show(); } else done(); };
+    go.onclick = e => { e.stopPropagation(); next(); };
+    $('#stSkip').onclick = e => { e.stopPropagation(); done(); };
+    el.onclick = next;
+    show(); el.hidden = false; go.focus();
+  });
+}
 function pickHero() {
   const el = $('#heroPick'); if (!el.hidden) return;
   let sel = null; const go = $('#hpGo');
@@ -1542,7 +1589,7 @@ function laurelSVG(n, R) {
 const trial = n => '試煉 ' + String(n).padStart(2, '0');
 function renderHome() {
   const u = S.user, total = totalFloors();
-  paintAvatar(); if (u && !B.hero()) pickHero();
+  paintAvatar(); if (u && !B.hero()) introStory().then(pickHero);
   $('#uName').textContent = u ? u.name : '訪客';
   $('#uTitle').textContent = u ? titleOf(u.peak) : '尚未登入';
   const prev = $('#uBal').textContent, now = u ? fmt(u.balance) : fmt(CONFIG.start);
@@ -1829,24 +1876,25 @@ const TK = { prev: null, topW: null, topR: null, queue: [], base: [], i: 0, busy
 async function tickerPoll() {
   if (!S.user || document.hidden || Date.now() - TK.last < 5000) return;
   TK.last = Date.now();
-  let w, r; try { [w, r] = await Promise.all([B.leaderboard('wealth'), B.leaderboard('rate')]); } catch (e) { return; }
-  const cur = {}; w.concat(r).forEach(u => { cur[u.uid] = { name: u.name, floor: u.floor || 0, peak: u.peak || 0 }; });
-  if (TK.prev) {
+  const BOARDS = [['wealth', '財富榜'], ['rate', '勝率榜'], ['net', '人脈榜']];
+  let lists; try { lists = await Promise.all(BOARDS.map(([k]) => B.leaderboard(k))); } catch (e) { return; }
+  const cur = {}; lists.flat().forEach(u => { cur[u.uid] = { name: u.name, floor: u.floor || 0, peak: u.peak || 0, streak: u.streak || 0 }; });
+  const top = lists.map(l => l.slice(0, 3).map(u => u.uid));
+  if (TK.prev) {   // 第一次只記錄現況，之後有變化才播
     for (const [id, u] of Object.entries(cur)) {
       const p = TK.prev[id]; if (!p) continue;
       const k = Math.floor(u.floor / 10);
       if (k > Math.floor(p.floor / 10)) TK.queue.push(`${u.name} 通過了${trial(k * 10)}！`);
-      if (titleOf(u.peak) !== titleOf(p.peak)) TK.queue.push(`${u.name} 獲得稱號「${titleOf(u.peak)}」！`);
+      if (titleOf(u.peak) !== titleOf(p.peak) && u.peak > p.peak) TK.queue.push(`${u.name} 獲得稱號「${titleOf(u.peak)}」！`);
+      const sk = Math.floor(u.streak / 5);
+      if (sk > Math.floor(p.streak / 5)) TK.queue.push(`${u.name} 達成 ${sk * 5} 連勝！`);
     }
-    if (w[0] && TK.topW && w[0].uid !== TK.topW) TK.queue.push(`${w[0].name} 登上財富榜第一名！`);
-    if (r[0] && r[0].uid !== TK.topR && (TK.topR || TK.seenR)) TK.queue.push(`${r[0].name} 登上勝率榜第一名！`);
+    top.forEach((ids, bi) => ids.forEach((id, rank) => {
+      const was = TK.top[bi].indexOf(id);
+      if (cur[id] && (was < 0 || was > rank)) TK.queue.push(`${cur[id].name} 登上${BOARDS[bi][1]}第 ${rank + 1} 名！`);
+    }));
   }
-  TK.seenR = true; TK.prev = Object.assign(TK.prev || {}, cur); TK.topW = w[0] ? w[0].uid : null; TK.topR = r[0] ? r[0].uid : null;
-  const far = w.concat(r).reduce((a, u) => (u.floor || 0) > (a ? a.floor || 0 : 0) ? u : a, null);
-  TK.base = [];
-  if (w[0]) TK.base.push(`財富榜第一名：${w[0].name}（${fmt(w[0].balance)} U）`);
-  if (r[0]) TK.base.push(`勝率榜第一名：${r[0].name}（${(r[0].rankBp / 100).toFixed(1)}%）`);
-  if (far && far.floor >= 10) TK.base.push(`${far.name} 已通過${trial(Math.floor(far.floor / 10) * 10)}`);
+  TK.prev = Object.assign(TK.prev || {}, cur); TK.top = top; TK.base = [];
   tickerRun();
 }
 function tickerRun() {
