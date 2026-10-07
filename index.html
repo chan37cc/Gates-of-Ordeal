@@ -1196,6 +1196,8 @@ async function getFloorQ(n) {
 }
 
 /* ================= 後端：共用 ================= */
+/* 交易本金：扣掉邀請獎勵後的本金。財富榜和本金稱號都只看這個數字 */
+const netOf = d => (d.balance || 0) - (d.invites || 0) * CONFIG.invite;
 function newUserDoc(name, referrer, ts) {
   return { name, balance: CONFIG.start, peak: CONFIG.start, wins: 0, losses: 0, total: 0, rankBp: -1, floor: 0, streak: 0, bestStreak: 0, invites: 0, referrerUid: referrer || null, createdAt: ts };
 }
@@ -1207,7 +1209,7 @@ function settle(d, ok, stake) {
 function applyAnswer(d, ok, stake) {
   const st = settle(d, ok, stake);
   const wins = (d.wins || 0) + (ok ? 1 : 0), losses = (d.losses || 0) + (ok ? 0 : 1), total = (d.total || 0) + 1, balance = d.balance + st.delta;
-  return { wins, losses, total, balance, peak: Math.max(d.peak || 0, balance), floor: (d.floor || 0) + 1,
+  return { wins, losses, total, balance, peak: Math.max(d.peak || 0, balance - (d.invites || 0) * CONFIG.invite), floor: (d.floor || 0) + 1,
     streak: st.streak, bestStreak: Math.max(d.bestStreak || 0, st.streak),
     rankBp: total >= CONFIG.minRankGames ? Math.floor(wins * 10000 / total) : -1 };
 }
@@ -1259,7 +1261,7 @@ const HIST = {
 function sortBoard(rows, kind) {
   if (kind === 'net') return rows.filter(r => (r.invites || 0) > 0).sort((a, b) => b.invites - a.invites || b.balance - a.balance).slice(0, 50);
   if (kind === 'rate') return rows.filter(r => (r.rankBp ?? -1) >= 0).sort((a, b) => b.rankBp - a.rankBp || b.total - a.total).slice(0, 50);
-  return rows.sort((a, b) => b.balance - a.balance).slice(0, 50);
+  return rows.sort((a, b) => netOf(b) - netOf(a)).slice(0, 50);
 }
 
 /* 示範模式：資料只存在這台裝置 */
@@ -1289,7 +1291,7 @@ const LOCAL = {
   async rename(name) { const d = this.db(), u = d.users[d.session]; if (u.nameAt && Date.now() - u.nameAt < RENAME_MS) throw new Error('RENAME_WAIT'); u.name = name; u.nameAt = Date.now(); this.save(); return this.view(d.session); },
   async histOne() { return null; },
   async setTitle(id) { const d = this.db(); d.users[d.session].title = id; this.save(); return this.view(d.session); },
-  async checkin() { const d = this.db(), u = d.users[d.session], day = taipeiDay(); if ((u.checkDay || 0) >= day) throw new Error('CHECKED'); u.balance += CONFIG.checkin; u.peak = Math.max(u.peak || 0, u.balance); u.checkDay = day; this.save(); return this.view(d.session); },
+  async checkin() { const d = this.db(), u = d.users[d.session], day = taipeiDay(); if ((u.checkDay || 0) >= day) throw new Error('CHECKED'); u.balance += CONFIG.checkin; u.peak = Math.max(u.peak || 0, netOf(u)); u.checkDay = day; this.save(); return this.view(d.session); },
   async adminSet(patch) { const d = this.db(); Object.assign(d.users[d.session], patch); this.save(); return this.view(d.session); },
   async clearVote() {},
   async signOut() { this.db().session = null; this.save(); this.onUser(null); },
@@ -1383,7 +1385,7 @@ const FB = {
       const d = (await tx.get(ref)).data();
       if ((d.checkDay || 0) >= day) throw new Error('CHECKED');
       const balance = d.balance + CONFIG.checkin;
-      tx.update(ref, { balance, peak: Math.max(d.peak || 0, balance), checkDay: day });
+      tx.update(ref, { balance, peak: Math.max(d.peak || 0, balance - (d.invites || 0) * CONFIG.invite), checkDay: day });
     });
     return this.refresh();
   },
@@ -1420,7 +1422,7 @@ const FB = {
     return { user, ans, choice, mult, hit };
   },
   async leaderboard(kind) {
-    const s = await this.U.orderBy(kind === 'rate' ? 'rankBp' : kind === 'net' ? 'invites' : 'balance', 'desc').limit(50).get();
+    const s = await this.U.orderBy(kind === 'rate' ? 'rankBp' : kind === 'net' ? 'invites' : 'balance', 'desc').limit(kind === 'rate' || kind === 'net' ? 50 : 200).get();
     return sortBoard(s.docs.map(x => ({ uid: x.id, ...x.data() })), kind);
   }
 };
@@ -2161,7 +2163,7 @@ function openSheet(kind) {
   if (kind === 'rank') {
     body.innerHTML = `<div class="seg" role="tablist"><button data-k="rate">勝率榜</button><button data-k="rich">財富榜</button><button data-k="net">人脈榜</button></div><ol class="lb" id="lb"><li><span></span><span class="nm"><b>讀取中…</b></span></li></ol><p class="hint" id="lbHint"></p>`;
     body.querySelectorAll('.seg button').forEach(x => { x.classList.toggle('on', x.dataset.k === S.boardKind); x.onclick = () => { S.boardKind = x.dataset.k; openSheet('rank'); }; });
-    $('#lbHint').textContent = S.boardKind === 'rate' ? `累積 ${CONFIG.minRankGames} 戰以上才會上勝率榜，顯示前 50 名。排名為歷史累積。` : S.boardKind === 'net' ? `依成功邀請的好友人數排名，顯示前 50 名。每邀請一位 +${fmt(CONFIG.invite)} U。` : `依目前本金排名，顯示前 50 名。`;
+    $('#lbHint').textContent = S.boardKind === 'rate' ? `累積 ${CONFIG.minRankGames} 戰以上才會上勝率榜，顯示前 50 名。排名為歷史累積。` : S.boardKind === 'net' ? `依成功邀請的好友人數排名，顯示前 50 名。每邀請一位 +${fmt(CONFIG.invite)} U。` : `依目前本金排名（不含邀請獎勵），顯示前 50 名。`;
     loadBoard();
   } else if (kind === 'titles') {
     const peak = u.peak, next = TITLES.find(([v]) => v > peak), prevV = [...TITLES].reverse().find(([v]) => v <= peak);
@@ -2175,7 +2177,7 @@ function openSheet(kind) {
         <h3 class="tg">本金稱號</h3><ul class="titles">${TITLES.map(([v, n], i) => row(wealthId(i), n, `最高本金 ${fmt(v)} U`, peak >= v, '')).join('')}</ul>
         ${ACH_GROUPS.map(([g, l]) => `<h3 class="tg">${g}</h3><ul class="titles">${l.map(a => { const [p, t] = achProg(a[0], u, st), got = p >= t;
           return row(a[0], a[1], a[2], got, a[0][0] === 'r' ? (u.total >= CONFIG.minRankGames ? `目前 ${p.toFixed(1)}%` : `需累積 ${CONFIG.minRankGames} 戰（${u.total}/${CONFIG.minRankGames}）`) : `${Math.min(p, t)}/${t}`); }).join('')}</ul>`).join('')}
-        <p class="hint">本金稱號解鎖後不會失去；勝率稱號要維持在門檻以上（至少 ${CONFIG.minRankGames} 戰），掉下去就會自動換回本金稱號。</p>`;
+        <p class="hint">邀請好友的獎勵不計入本金稱號。本金稱號解鎖後不會失去；勝率稱號要維持在門檻以上（至少 ${CONFIG.minRankGames} 戰），掉下去就會自動換回本金稱號。</p>`;
       body.scrollTop = keep;
       body.querySelectorAll('.wear').forEach(x => x.onclick = async () => { x.disabled = true;
         try { const nu = await B.setTitle(x.dataset.id); if (nu) S.user = nu; renderHome(); paint(); toast(`已配戴「${myTitle()}」`); }
@@ -2184,7 +2186,7 @@ function openSheet(kind) {
     paint(); HIST.fill().then(paint).catch(() => {});
   } else if (kind === 'invite') {
     body.innerHTML = `<div class="now-title" style="text-align:center"><span class="hint" style="margin:0">每邀請一位好友</span><b class="metal-text" style="font-size:38px;line-height:1.15">+${fmt(CONFIG.invite)} U</b>
-        <span class="hint" style="margin:0;text-align:left">朋友註冊時，在「推薦人信箱」填上你的信箱，你就會立刻拿到 ${fmt(CONFIG.invite)} U。</span></div>
+        <span class="hint" style="margin:0;text-align:left">朋友註冊時，在「推薦人信箱」填上你的信箱，你就會立刻拿到 ${fmt(CONFIG.invite)} U。這筆獎勵可以拿來出手，但不計入財富榜和稱號。</span></div>
       <div class="code"><input id="myCode" readonly value="${esc(u.email || '')}" aria-label="你的推薦人信箱"><button class="btn gold" id="copyCode" style="flex:none">複製</button></div>
       <div class="stats" style="margin-bottom:0"><div class="stat"><span>已邀請</span><b>${u.invites} 人</b></div><div class="stat"><span>邀請獎勵累計</span><b>${fmt(u.invites * CONFIG.invite)} U</b></div></div>`;
     $('#copyCode').onclick = () => { const i = $('#myCode'); navigator.clipboard.writeText(i.value).then(() => toast('已複製你的推薦人信箱'), () => { i.select(); toast('請長按或按 Ctrl+C 複製'); }); };
@@ -2280,7 +2282,7 @@ async function loadBoard() {
   const show = ranked;
   $('#lb').innerHTML = show.map(([r, i]) => {
     const me = S.user && r.uid === S.user.uid;
-    const v = kind === 'net' ? `${r.invites} 人<small>獎勵 ${fmt(r.invites * CONFIG.invite)} U</small>` : kind === 'rate' ? `${(r.rankBp / 100).toFixed(1)}%<small>${r.wins} 勝 ${r.total - r.wins} 敗</small>` : `${fmt(r.balance)} U<small>${r.wins || 0} 勝 ${r.losses || 0} 敗</small>`;
+    const v = kind === 'net' ? `${r.invites} 人<small>獎勵 ${fmt(r.invites * CONFIG.invite)} U</small>` : kind === 'rate' ? `${(r.rankBp / 100).toFixed(1)}%<small>${r.wins} 勝 ${r.total - r.wins} 敗</small>` : `${fmt(netOf(r))} U<small>${r.wins || 0} 勝 ${r.losses || 0} 敗</small>`;
     return `<li class="${me ? 'me' : ''} ${i < 3 ? 'top t' + (i + 1) : ''}"><span class="rk ${i < 3 ? 'r' + (i + 1) : ''}"><i>${i + 1}</i></span><span class="nm"><b>${esc(r.name || '交易員')}${me ? '（你）' : ''}</b><span>${esc(me ? myTitle() : shownTitle(r))}</span></span><span class="val">${v}</span></li>`;
   }).join('');
 }
