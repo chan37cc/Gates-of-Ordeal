@@ -369,7 +369,6 @@ button{font:inherit;color:inherit;cursor:pointer}
 .sheet .lb li.top{padding-block:12px;margin-inline:2px}
 .sheet .lb li.top .rk{width:46px;height:46px;font-size:20px;margin-left:-3px}
 .sheet .lb li.top .nm b{font-size:17px}.sheet .lb li.top .val{font-size:20px}
-.sheet .lb li.t1 .nm b::before{content:"♛ ";color:#ffd76a}
 .sheet .lb li.t3{margin-bottom:8px}
 .sheet .lb li.top.me{box-shadow:inset 0 0 0 2px #fff,inset 0 0 0 4px #ffe9ae,0 0 18px #ffd98a}
 .lots{display:flex;align-items:center;gap:10px;margin:12px 14px -4px;padding:7px 12px;border-radius:999px;background:linear-gradient(#24408ee6,#101e55e6);box-shadow:inset 0 0 0 1.5px #e2b85a,0 3px 8px #0a143488}
@@ -804,6 +803,39 @@ button{font:inherit;color:inherit;cursor:pointer}
 .st-go.last{background:linear-gradient(#fff3c4,#f0c877 50%,#d9a24e);color:#141d5c}
 .st-skip{position:absolute;right:14px;top:calc(14px + env(safe-area-inset-top,0px));border:0;background:#0c123699;box-shadow:inset 0 0 0 1px #f3d58a88;border-radius:999px;padding:7px 16px;font:700 13px var(--f-title);color:#e6e9ff;cursor:pointer}
 @media (prefers-reduced-motion:reduce){.st-text p{animation:none}}
+.checkin{position:relative;z-index:2;align-self:center;margin:8px 0 0;border:0;padding:7px 18px;border-radius:999px;background:linear-gradient(#fff3c4,#f0c877 50%,#d9a24e);color:#141d5c;font:900 13px var(--f-title);letter-spacing:.06em;cursor:pointer;box-shadow:inset 0 0 0 1px #fff8,0 0 0 1px #7a5220,0 0 14px #ffd98a;animation:ckPulse 1.8s ease-in-out infinite}
+@keyframes ckPulse{50%{box-shadow:inset 0 0 0 1px #fff8,0 0 0 1px #7a5220,0 0 24px #ffe9ae,0 0 6px #fff}}
+.checkin:disabled{opacity:.6}
+@media (prefers-reduced-motion:reduce){.checkin{animation:none}}
+.dock-btn.dk-ck{position:relative}
+.dk-face{position:absolute;left:50%;top:30.5%;width:calc(var(--w) * .137);aspect-ratio:1;transform:translate(-50%,-50%);border-radius:50%;display:grid;place-items:center;background:radial-gradient(circle at 42% 30%,#34406e,#232a52 62%,#1a2044);box-shadow:inset 0 0 0 1.5px #d9c89a,inset 0 0 0 3px #1a204488}
+.dk-face svg{width:50%;height:50%;fill:none;stroke:#f3dca0;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round;filter:drop-shadow(0 0 3px #ffd98a88)}
+.dk-lab{position:absolute;left:50%;top:68.5%;transform:translate(-50%,-50%);padding:.15em 1.1em;background:radial-gradient(ellipse,#3a3d5e 55%,#3a3d5e00 100%);font:500 calc(var(--w) * .034) var(--f-title);letter-spacing:.12em;color:#f1ead8;white-space:nowrap}
+.dk-dot{position:absolute;left:68%;top:9%;width:11px;height:11px;border-radius:50%;background:#ff5a4a;box-shadow:0 0 0 2px #fff3d0,0 0 8px #ff5a4a;animation:twinkle 1.4s ease-in-out infinite}
+.ck{display:grid;gap:14px;justify-items:center;text-align:center;padding:6px 0 4px}
+.ck-k{margin:0;font:700 11px var(--f-display);letter-spacing:.34em;color:#f3d58a}
+.ck .big-plus{font-size:44px;line-height:1.1}
+.ck-go{width:100%;flex:none;padding:15px;font-size:18px;letter-spacing:.3em;border-radius:999px}
+.ck-done{width:100%;display:grid;gap:5px;padding:14px;border-radius:14px;background:#0b123a99;box-shadow:inset 0 0 0 1.5px #f3d58a99}
+.ck-done b{font:900 20px var(--f-title);color:#ffe9ae;letter-spacing:.1em}
+.ck-done span{font-size:14px;color:#f1f3ff}
+.ck-left{font-size:12.5px!important;color:#cfd6ff!important}.ck-left i{font-style:normal;font-family:var(--f-display);font-variant-numeric:tabular-nums;color:#ffe9ae}
+.sheet .lb{scrollbar-width:thin;scrollbar-color:#f3d58a88 transparent}
+.sheet .lb::-webkit-scrollbar{width:5px}.sheet .lb::-webkit-scrollbar-track{background:transparent}.sheet .lb::-webkit-scrollbar-thumb{background:#f3d58a88;border-radius:99px}
+/* ===== 主畫面：星門圖（941×1672，沒有假介面）。頭像列在螢幕最上方；進入試煉用程式畫；下方四鍵對齊圖上畫的位置 ===== */
+#app{--w:min(100vw,480px);--ih:calc(var(--w) * 1.7768);--sx:calc(50% - var(--w) / 2)}
+.map{background:linear-gradient(#060819,#0d1030 70%)}
+.scene{left:var(--sx);right:auto;width:var(--w);-webkit-mask-image:linear-gradient(transparent 0,#000 7%);mask-image:linear-gradient(transparent 0,#000 7%)}
+.scene::before{display:none}
+.scene-glow{left:49.4%;top:38%}
+.enter,.enter.boss{bottom:calc(var(--ih) * .513);width:calc(var(--w) * .31);height:calc(var(--ih) * .054)}
+.enter.art-txt{background:none!important;box-shadow:none}
+.enter.art-txt span{opacity:0}
+.enter.art-txt::after{inset:2px 0}
+.enter.rest{width:calc(var(--w) * .46)}
+.dock{left:var(--sx);right:auto;width:var(--w);height:calc(var(--ih) * .15)}
+.dk-face,.dk-lab{display:none}
+.dk-dot{left:66%;top:12%}
 </style>
 </head>
 <body>
@@ -840,6 +872,7 @@ button{font:inherit;color:inherit;cursor:pointer}
   <button class="help-btn" id="btnAccount" aria-label="規則說明"><span>?</span></button>
   <div class="ticker" id="ticker" hidden role="status" aria-live="off"><span class="tk-ico" aria-hidden="true">✦</span><div class="tk-win"><span id="tkTxt"></span></div></div>
   <button class="plaque" data-act="battle" id="towerRib">試煉 01</button>
+  <button class="checkin" id="btnCheckin" hidden></button>
   <div class="fill"></div>
   <button class="enter" id="btnBattle" data-act="battle"><span id="battleTxt">進入試煉</span></button>
   <div class="gem" aria-hidden="true"><img id="gemImg" class="gem-img" alt=""><svg viewBox="0 0 60 70"><defs><linearGradient id="gemG" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#f2fbff"/><stop offset=".45" stop-color="#6fc0ff"/><stop offset="1" stop-color="#1f5fd0"/></linearGradient></defs>
@@ -851,7 +884,7 @@ button{font:inherit;color:inherit;cursor:pointer}
   <nav class="dock" aria-label="主選單">
     <button class="dock-btn" data-act="titles"><span class="ico"><span class="laurel" data-n="9" data-r="42"></span><svg viewBox="0 0 24 24"><path d="M3 8l4.5 4L12 5l4.5 7L21 8l-2 11H5z"/></svg></span><em>稱號</em></button>
     <button class="dock-btn" data-act="rank"><span class="ico"><span class="laurel" data-n="9" data-r="42"></span><svg viewBox="0 0 24 24"><path d="M7 4h10v5a5 5 0 0 1-10 0zM7 6H4a3 3 0 0 0 3 4M17 6h3a3 3 0 0 1-3 4M12 14v4M8 21h8M9 18h6"/></svg></span><em>排行榜</em></button>
-    <button class="dock-btn" data-act="account"><span class="ico"><span class="laurel" data-n="9" data-r="42"></span><svg viewBox="0 0 24 24"><path d="M5 20V11M10 20V5M15 20v-7M20 20V9M3 20h18"/></svg></span><em>戰績</em></button>
+    <button class="dock-btn dk-ck" data-act="checkin" aria-label="每日簽到"><span class="dk-face" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="3.5" y="5" width="17" height="15.500" rx="2.5"/><path d="M3.5 9.500h17M8 3v4M16 3v4M8.200 14.600l2.700 2.700 5-5.400"/></svg></span><span class="dk-lab" aria-hidden="true">簽到</span><i class="dk-dot" id="ckDot" hidden></i><span class="ico"><span class="laurel" data-n="9" data-r="42"></span><svg viewBox="0 0 24 24"><path d="M5 20V11M10 20V5M15 20v-7M20 20V9M3 20h18"/></svg></span><em>戰績</em></button>
     <button class="dock-btn" data-act="invite"><span class="ico"><span class="laurel" data-n="9" data-r="42"></span><svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c1-3.5 3.5-5.5 6.5-5.5s5.5 2 6.5 5.5M18 8v6M15 11h6"/></svg></span><em>邀請好友</em></button>
   </nav>
 
@@ -976,7 +1009,7 @@ const DOCK_SRC = {titles:'data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAA
 const ENTER_SRC = { full: 'data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==', blank: 'data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==' };
 const GEM_SRC = 'data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==';
 const NIGHT_SRC = 'img/night.webp';
-const NIGHT_TINY = 'data:image/webp;base64,UklGRowBAABXRUJQVlA4IIABAAAQCgCdASocADIAPtVap0yoJSOiM/ZqqQAaiWYAnTMcAArdWSlnlUtJuz4p8oTwivLw10jZ/yJ45fAAXFtNdYaPyOCEzQLK6LIHxpPKiowLxVyA/vLKH+LIAAD+3iCMhLws+hfWwyxHWAGr4j35Q1VrWmKHjZHqQIuNgbsPSN1f2fRDHb42Xpmg629143SNbVV6qIcSSuK1OtTJe54LrrnUkUwVl/arg5d30tDbyQabCjZO5sGH0CFGzci8LdGq8kWq93Tp7uWH9qUpxpX3tiC/uwpH1FJKRF2zceaYsB46Tgac9gBADsIDMbh8KVLSb5tPx5VpoA0kwqq8PcJlrVPnkFWkOfxZ8AdhDcYHpiNOyn8ltaCIBg3eh3fa2KIEbKoqegJ4XqoE9AjA/NPt+5+7yqmY9j6sKo8Uh1HPpbZiafAe5cPPaYqUY540h9AaV/S0wkScCRcoGGSqCc66pYak1nneBNGKZCp2joCoR31z/f70OwoiaYy5P0BVpEwXAAA=';
+const NIGHT_TINY = 'data:image/webp;base64,UklGRpQBAABXRUJQVlA4IIgBAABwCQCdASocADIAPtlYpkyoJSOiM/ZqqQAbCWgAnTMM8lgkYzc6YoUHanlQf5fywSYSLYt4mp9tNxJuXcysV+y5vWVv96NtIkj0sbvdbRNglUA0KAAA/vWFxFzwp+1glaL+zlhXeddGKfa7ZI0Ks+c8pZ8v5ya8PIekDe1FirY7bXcxDi84Swwl6vj/ZCkOFcdzet8Dh5pVBDIvI3G4HzF5m+q03HJN3OogZiSR9tTOPfNspdQ1RbceY5GhZ/XD57Vr0CpyjaUig7zEXxAQDz4bI/aqWn/0mzgKA02SzB6dQjqgRDKFo5KJdy02byBeLIiqRSpJs7fo/jiVZISXjkhyfM/Bj9ncOqqFgWeFSHsEflY8YOIAQymNBPTdzNrkSAaezE3ZgLRozUHSxz46H5PyPkog7S4kWF76fgJTiOduo2XBoNHvYdVqmLlOGBuQ/D9Julyq7m15hgysHJc2VZjZuJ+YcKucJTOjAeg+X/CXJwoAqlwtGJkLRukjxDNtI0A3pAOtPAAAAA==';
 const OPEN_SRC = 'img/open.webp';
 const OPEN_TINY = 'data:image/webp;base64,UklGRoABAABXRUJQVlA4IHQBAABwCQCdASocADIAPt1cp02opSOiMBQMARAbiWYAgpbaGCU3gUu8pyQEVwzW6QKsNbXLdZMekBJgOahJd8LaTQ9oDtpmgJZv2+B7HadaV0nYLmeLyMAA/vWJuLiyiPjf/wA/d2qMwS9ThNcvjHDd6FXdfzVGG3p2Wpkc8xKP/6vesZDJiyyCsfoKpDPusPbPXOH8wqexfNt8quNzGGaco1SwgAbIQmdazdwDO3X30xXFUj8fwf5aP9WxeAbZDRs6LpPR0SDIamoxpEHg7S9Uheygfrxk6sBZJWXdntD/ZvRTw1A1Mi0OB5QEUTiUwvOS7bccAGC9pKv4uFq7qB7V7L15pQISTgCzVrulK+hcwG5JGMVu31mKSW9hF3keshLxFG/CbSNla9dWSWz/47bRP7bZvYbJqJ7vcTYdcj+wK/eORVL+sEW94qqIfNtpZjQpUS6bx/Xo2AnXkNce7bKPJmBePf7x8vyEG2yLYExtivUAOraAAAA=';
 const ACCT_SRC = 'img/acct.webp';
@@ -1002,9 +1035,10 @@ const CONFIG = {
   // 題目、答案、總層數都由出題引擎（Apps Script）寫進這些集合
   collections: { users: 'tq2_users', emails: 'tq2_emailIndex', floors: 'tq2_floors', answers: 'tq2_answers', meta: 'tq2_meta/tower' },
   start: 10000, invite: 5000,
+  checkin: 1000,   // 每日簽到獎勵，台北時間 00:00 換日（firestore.rules 裡也有同一個數字）
   adminEmail: 'chan37fx@gmail.com',   // 管理員：可跳關、重置自己的紀錄（firestore.rules 裡也有同一個信箱）
   lotFrom: 51,
-  riskFrom: 101, riskMax: 5, riskMin: 30,   // 風控額度：第幾道試煉起、幾次、幾分鐘回 1 次（firestore.rules 裡也有同樣的數字）   // 從第幾道試煉開始可以選 1～3 倍手數（firestore.rules 裡也有同一個數字）
+  riskFrom: 101, riskMax: 5, riskMin: 30,   // 風控護盾：第幾道試煉起、幾次、幾分鐘回 1 次（firestore.rules 裡也有同樣的數字）   // 從第幾道試煉開始可以選 1～3 倍手數（firestore.rules 裡也有同一個數字）
   stake: 300, bossStake: 500,      // 一般關 ±300、魔王關 ±500（正式模式以引擎寫入的金額為準）
   streakEvery: 3, streakBonus: 500, // 每連續答對 3 次額外 +500（要和 firestore.rules 一致）
   minRankGames: 20,
@@ -1137,13 +1171,15 @@ function norm(uid, email, d) {
   return { uid, email, name: d.name || '交易員', balance: d.balance, peak: d.peak || d.balance, wins: d.wins || 0, losses: d.losses || 0,
     total: d.total || 0, floor: d.floor || 0, streak: d.streak || 0, bestStreak: d.bestStreak || 0, invites: d.invites || 0,
     nameAt: d.nameAt ? (d.nameAt.toMillis ? d.nameAt.toMillis() : +d.nameAt) : 0,
-    riskFull: riskFullOf(d), riskTest: !!d.riskTest };
+    riskFull: riskFullOf(d), riskTest: !!d.riskTest, checkDay: +d.checkDay || 0 };
 }
 const RENAME_MS = 14 * 864e5;
-/* 風控額度：存「起算時間 riskBase」和「欠幾次 riskDebt」，回滿的時間 = riskBase + riskDebt × 30 分鐘 */
+/* 風控護盾：存「起算時間 riskBase」和「欠幾次 riskDebt」，回滿的時間 = riskBase + riskDebt × 30 分鐘 */
+const taipeiDay = () => { const t = new Date(Date.now() + 8 * 3600e3); return t.getUTCFullYear() * 10000 + (t.getUTCMonth() + 1) * 100 + t.getUTCDate(); };
+const canCheckin = u => !!u && (u.checkDay || 0) < taipeiDay();
 const RISK_MS = () => CONFIG.riskMin * 60000;
 function riskFullOf(d) { const b = d.riskBase; if (!b || !d.riskDebt) return 0; return (b.toMillis ? b.toMillis() : +b || Date.now()) + d.riskDebt * RISK_MS(); }
-const riskExempt = () => isAdmin() && !S.user.riskTest;   // 管理員預設不受限；在管理員工具打開「套用風控額度」後就和一般玩家一樣
+const riskExempt = () => isAdmin() && !S.user.riskTest;   // 管理員預設不受限；在管理員工具打開「套用風控護盾」後就和一般玩家一樣
 function riskOn(u) { return !!u && !riskExempt() && (u.floor || 0) + 1 >= CONFIG.riskFrom; }
 function riskLeft(u) { const rest = Math.max(0, (u.riskFull || 0) - Date.now()); return Math.max(0, CONFIG.riskMax - Math.ceil(rest / RISK_MS())); }
 function riskNextMs(u) { const rest = (u.riskFull || 0) - Date.now(); return rest > 0 ? (rest % RISK_MS() || RISK_MS()) : 0; }
@@ -1201,6 +1237,7 @@ const LOCAL = {
   async setHero(h) { const d = this.db(); d.users[d.session].hero = h; this.save(); },
   async rename(name) { const d = this.db(), u = d.users[d.session]; if (u.nameAt && Date.now() - u.nameAt < RENAME_MS) throw new Error('RENAME_WAIT'); u.name = name; u.nameAt = Date.now(); this.save(); return this.view(d.session); },
   async histOne() { return null; },
+  async checkin() { const d = this.db(), u = d.users[d.session], day = taipeiDay(); if ((u.checkDay || 0) >= day) throw new Error('CHECKED'); u.balance += CONFIG.checkin; u.peak = Math.max(u.peak || 0, u.balance); u.checkDay = day; this.save(); return this.view(d.session); },
   async adminSet(patch) { const d = this.db(); Object.assign(d.users[d.session], patch); this.save(); return this.view(d.session); },
   async clearVote() {},
   async signOut() { this.db().session = null; this.save(); this.onUser(null); },
@@ -1287,6 +1324,16 @@ const FB = {
   _vote(n) { return this.F.doc(String(n)).collection('votes').doc(this.uid); },
   async adminSet(patch) { await this.U.doc(this.uid).update(patch); return this.refresh(); },
   async clearVote(n) { await this._vote(n).delete(); },
+  async checkin() {
+    const ref = this.U.doc(this.uid), day = taipeiDay();
+    await this.db.runTransaction(async tx => {
+      const d = (await tx.get(ref)).data();
+      if ((d.checkDay || 0) >= day) throw new Error('CHECKED');
+      const balance = d.balance + CONFIG.checkin;
+      tx.update(ref, { balance, peak: Math.max(d.peak || 0, balance), checkDay: day });
+    });
+    return this.refresh();
+  },
   /* 回補某一層的紀錄（商品、對錯），給戰績碑算各商品勝率用 */
   async histOne(n) {
     const [f, v] = await Promise.all([this.F.doc(String(n)).get(), this._vote(n).get()]);
@@ -1598,6 +1645,7 @@ function renderHome() {
   const cleared = u ? Math.min(u.floor, total) : 0;
   refreshTower();
   const bossNext = (cleared + 1) % 10 === 0 && cleared < total, eb = $('#btnBattle');
+  $('#btnCheckin').hidden = true; $('#ckDot').hidden = !canCheckin(u);
   const resting = !!u && cleared < total && riskOn(u) && riskLeft(u) === 0;
   $('#btnBattle').classList.toggle('rest', resting);
   $('#battleTxt').textContent = !total ? '建造中' : cleared >= total ? '明日再戰' : resting ? `休息中 ${mmss(riskNextMs(u))}` : bossNext ? '挑戰魔王' : '進入試煉';
@@ -1771,11 +1819,11 @@ function stageNotice(kind) {
   return new Promise(res => {
     const st = CONFIG.stake, bs = CONFIG.bossStake, el = $('#stageNote');
     $('#stageBody').innerHTML = kind === 'risk' ? `<p class="sn-k">STAGE II CLEAR</p><h2 id="stageT">第二階段試煉・通過</h2>
-      <p class="sn-p">恭喜你，冒險者！前 ${CONFIG.riskFrom - 1} 道試煉已全數通過。</p>
-      <p class="sn-p">從這一關開始啟用<b>「風控額度」</b>：你有 ${CONFIG.riskMax} 次額度，<b>做多或做空答錯</b>一次就扣 1 次。</p>
+      <p class="sn-p">恭喜你，冒險者！前 ${CONFIG.riskFrom - 1} 道試煉已全數通過。但在這深不可測的「多空深淵」裡，能活到最後的從來不是靠運氣，嚴密的風控與冷靜的心態，才是你走得長遠的唯一護甲。</p>
+      <p class="sn-p">從這一關起，正式啟用<b>「風控護盾」</b>：你擁有 ${CONFIG.riskMax} 次額度，<b>做多或做空判斷錯誤</b>將扣除 1 次。</p>
       <div class="sn-sh">${SHIELD(1).repeat(CONFIG.riskMax)}</div>
-      <p class="sn-p">・額度每 ${CONFIG.riskMin} 分鐘恢復 1 次，不滿 ${CONFIG.riskMax} 次就開始倒數。<br>・${CONFIG.riskMax} 次全部用完會強制休息，恢復前不能進入試煉。<br>・選「不進場」答錯只扣本金，不扣額度。</p>
-      <p class="sn-p sn-w">連續虧損時最容易亂出手。額度用完就離開盤面，平復心態再回來。沒把握的盤，不進場也是一種判斷。</p>`
+      <p class="sn-p">・護盾每 ${CONFIG.riskMin} 分鐘修復 1 次，未滿 ${CONFIG.riskMax} 次即啟動倒數。<br>・護盾耗盡將強制鎖定試煉，恢復前無法再次挑戰。<br>・選擇「不進場」若錯判僅扣本金，不扣除護盾。</p>
+      <p class="sn-p sn-w">連續虧損最容易喚醒名為「衝動」的心魔。護盾碎裂時，請果斷離開盤面平復心態。</p>`
       : `<p class="sn-k">STAGE I CLEAR</p><h2 id="stageT">第一階段試煉・通過</h2>
       <p class="sn-p">恭喜你，冒險者！前 ${CONFIG.lotFrom - 1} 道試煉已全數通過。</p>
       <p class="sn-p">從這一關開始解鎖<b>「手數」</b>：每一題出手前，都可以自由選擇 1～3 倍，賺和賠會一起放大。</p>
@@ -1796,12 +1844,22 @@ function riskPaint() {
   const left = riskLeft(u), next = riskNextMs(u);
   $('#riskSh').innerHTML = Array.from({ length: CONFIG.riskMax }, (_, i) => SHIELD(i < left)).join('');
   $('#riskT').textContent = left >= CONFIG.riskMax ? '' : mmss(next);
-  pill.setAttribute('aria-label', `風控額度 ${left}／${CONFIG.riskMax}` + (next ? `，${mmss(next)} 後恢復 1 次` : ''));
+  pill.setAttribute('aria-label', `風控護盾 ${left}／${CONFIG.riskMax}` + (next ? `，${mmss(next)} 後恢復 1 次` : ''));
   const eb = $('#btnBattle'), locked = left === 0;
   if (locked !== eb.classList.contains('rest')) renderHome();
   else if (locked) $('#battleTxt').textContent = `休息中 ${mmss(next)}`;
 }
 setInterval(riskPaint, 1000);
+setInterval(() => { const cb = $('#ckDot'); if (cb && S.user && cb.hidden === canCheckin(S.user)) { renderHome(); if (S.sheet === 'checkin') openSheet('checkin'); } if (S.sheet === 'checkin' && $('#ckLeft')) $('#ckLeft').textContent = ckLeftTxt(); }, 1000);   // 跨過台北 00:00 時讓簽到鈕重新出現
+const ckLeftTxt = () => { const ms = 86400000 - (Date.now() + 8 * 3600e3) % 86400000, h = Math.floor(ms / 3600e3), m = Math.floor(ms % 3600e3 / 60000), x = Math.floor(ms % 60000 / 1000); return `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}:${String(x).padStart(2, '0')}`; };
+async function doCheckin() {
+  const cb = $('#ckGo'); if (!cb || cb.disabled) return; cb.disabled = true; cb.textContent = '簽到中…';
+  try { const nu = await B.checkin(); if (nu) S.user = nu; renderHome(); openSheet('checkin'); toast(`簽到成功！+${fmt(CONFIG.checkin)} U`); }
+  catch (e) {
+    if (e.message === 'CHECKED') { const nu = await B.refresh().catch(() => null); if (nu) S.user = nu; renderHome(); openSheet('checkin'); }
+    else { toast(e.code === 'permission-denied' ? '簽到失敗：請確認 Firestore 規則已更新（或手機時間不正確）。' : '簽到失敗，請檢查網路後再試一次。'); cb.disabled = false; cb.textContent = '簽到'; }
+  }
+}
 async function startFloor() {
   if (needLogin() || S.starting) return;
   S.starting = true;
@@ -1818,7 +1876,7 @@ async function startFloor() {
     if (pending && isAdmin()) { try { await B.clearVote(f); pending = null; } catch (e) { toast('管理員：清除舊紀錄失敗，請確認已更新 Firestore 規則。'); } }
     if (!pending && f === CONFIG.lotFrom && !S.lotSeen) { S.lotSeen = true; await stageNotice('lot'); }
     if (!pending && f === CONFIG.riskFrom && !S.riskSeen) { S.riskSeen = true; await stageNotice('risk'); }
-    if (!pending && riskOn(S.user) && riskLeft(S.user) === 0) { toast(`風控額度已用完，先休息一下。${mmss(riskNextMs(S.user))} 後恢復 1 次。`); return; }
+    if (!pending && riskOn(S.user) && riskLeft(S.user) === 0) { toast(`風控護盾已用完，先休息一下。${mmss(riskNextMs(S.user))} 後恢復 1 次。`); return; }
     if (pending) { enterBattle(ctx, true); toast('上次在這道試煉已經出手，現在幫你結算。'); resolveBattle(pending); }
     else if (q.boss) showWarning(ctx);
     else enterBattle(ctx);
@@ -1993,11 +2051,11 @@ function showResult(b, pick, ok, stake, st) {
       <dt>正確答案</dt><dd class="${ansCls}">${ansTxt}</dd>
       <dt>現價</dt><dd>${now.toFixed(dp)}（做多線 ${(now + P).toFixed(dp)}／做空線 ${(now - P).toFixed(dp)}）</dd>
       <dt>3 根走勢</dt><dd>最高 ${(now + ans.maxUp).toFixed(dp)}（${sg(ans.maxUp)}）・最低 ${(now - ans.maxDown).toFixed(dp)}（${sg(-ans.maxDown)}）・第 3 根收 ${c3.toFixed(dp)}（${sg(c3 - now)}）</dd>
-      ${rOn || b.hit ? `<dt>風控額度</dt><dd>${b.hit ? '<b class="bad-t">−1</b>・' : ''}剩 ${rLeft}／${CONFIG.riskMax}${!b.hit && !ok && pick === 'neutral' ? '（不進場不扣額度）' : ''}</dd>` : ''}
+      ${rOn || b.hit ? `<dt>風控護盾</dt><dd>${b.hit ? '<b class="bad-t">−1</b>・' : ''}剩 ${rLeft}／${CONFIG.riskMax}${!b.hit && !ok && pick === 'neutral' ? '（不進場不扣額度）' : ''}</dd>` : ''}
       ${ans.sourceTime ? `<dt>盤面時間</dt><dd>${esc(ans.sourceTime)}${ev && ev.data ? '・' + esc(ev.name) : ''}</dd>` : ''}
     </dl>
     <div class="row"><button class="btn dim" id="rMap">回地圖</button>${canNext ? `<button class="btn gold" id="rNext">前往${trial(S.user.floor + 1)}</button>` : ''}</div>
-    ${canNext ? '' : more ? `<p class="hint" style="margin:0;position:relative;color:#ffe9ae">風控額度已用完，強制休息。先離開盤面平復心態，${mmss(riskNextMs(S.user))} 後恢復 1 次額度。</p>` : `<p class="hint" style="margin:0;position:relative">已打完目前所有試煉，每天台北時間 00:00 過後會再新增 ${CONFIG.floorsPerDay} 道。</p>`}`;
+    ${canNext ? '' : more ? `<p class="hint" style="margin:0;position:relative;color:#ffe9ae">風控護盾已用完，強制休息。先離開盤面平復心態，${mmss(riskNextMs(S.user))} 後恢復 1 次額度。</p>` : `<p class="hint" style="margin:0;position:relative">已打完目前所有試煉，每天台北時間 00:00 過後會再新增 ${CONFIG.floorsPerDay} 道。</p>`}`;
   $('#actions').hidden = true; $('#result').hidden = false;
   $('#rMap').onclick = exitBattle;
   if (canNext) $('#rNext').onclick = startFloor;
@@ -2009,8 +2067,15 @@ function openSheet(kind) {
   const u = S.user; if (!u) return showGate();
   S.sheet = kind; const body = $('#sheetBody');
   $('#sheet').classList.toggle('art', ['account', 'invite', 'titles'].includes(kind)); $('#sheet').hidden = false;
-  $('#sheetTitle').textContent = { rank: '排行榜', titles: '稱號殿', invite: '邀請好友', account: '戰績碑', rules: '規則說明' }[kind];
-  if (kind === 'rules') {
+  $('#sheetTitle').textContent = { rank: '排行榜', titles: '稱號殿', invite: '邀請好友', account: '戰績碑', rules: '規則說明', checkin: '每日簽到' }[kind];
+  if (kind === 'checkin') {
+    const can = canCheckin(u);
+    body.innerHTML = `<div class="ck"><p class="ck-k">DAILY REWARD</p><div class="big-plus metal-text">+${fmt(CONFIG.checkin)} U</div>
+      ${can ? `<p class="hint" style="margin:0">每天可以簽到一次，領取 ${fmt(CONFIG.checkin)} U。</p><button class="btn gold ck-go" id="ckGo">簽到</button>`
+            : `<div class="ck-done"><b>✓ 今日已簽到</b><span>00:00 後可再次簽到</span><span class="ck-left">還有 <i id="ckLeft">${ckLeftTxt()}</i></span></div>`}
+      <p class="hint" style="margin:0">目前本金 ${fmt(u.balance)} U・台北時間 00:00 換日</p></div>`;
+    if (can) $('#ckGo').onclick = doCheckin;
+  } else if (kind === 'rules') {
     const P = CONFIG.points, N = CONFIG.assetNames;
     body.innerHTML = `<div class="rules">
       <h3>怎麼判定答案</h3>
@@ -2031,7 +2096,8 @@ function openSheet(kind) {
         <li>一般關：答對 +${CONFIG.stake} U，答錯 −${CONFIG.stake} U。</li>
         <li>從${trial(CONFIG.lotFrom)}開始，每一題出手前可以選 1～3 倍手數，賺賠都乘上倍數（連勝獎勵不加倍）。本金不夠賠的倍數不能選。</li>
         <li>魔王關（每 10 道試煉，數據公布前一刻的盤面）：答對 +${CONFIG.bossStake} U，答錯 −${CONFIG.bossStake} U。</li>
-        <li>風控額度：從${trial(CONFIG.riskFrom)}開始，做多或做空答錯一次扣 1 次額度（共 ${CONFIG.riskMax} 次，每 ${CONFIG.riskMin} 分鐘恢復 1 次）。用完會強制休息，恢復前不能進入試煉。不進場答錯只扣本金，不扣額度。</li>
+        <li>風控護盾：從${trial(CONFIG.riskFrom)}開始，做多或做空答錯一次扣 1 次額度（共 ${CONFIG.riskMax} 次，每 ${CONFIG.riskMin} 分鐘恢復 1 次）。用完會強制休息，恢復前不能進入試煉。不進場答錯只扣本金，不扣額度。</li>
+        <li>每日簽到：每天可以在主畫面簽到一次，+${fmt(CONFIG.checkin)} U，台北時間 00:00 換日。</li>
         <li>連勝：每連續答對 ${CONFIG.streakEvery} 次額外 +${CONFIG.streakBonus} U，答錯歸零。</li>
         <li>每道試煉只能出手一次，送出後不能改。答對答錯都會前進到下一道。</li>
         <li>邀請好友註冊並填你的信箱：+${fmt(CONFIG.invite)} U。</li>
@@ -2073,16 +2139,16 @@ function openSheet(kind) {
     if (isAdmin()) {
       body.insertAdjacentHTML('beforeend', `<div class="ac-assets adm"><h3>管理員工具</h3>
         <div class="adm-row"><label for="admN">跳到試煉</label><input id="admN" type="number" inputmode="numeric" min="1" max="${totalFloors()}" value="${Math.min(u.floor + 1, totalFloors())}"><button id="admGo">前往</button></div>
-        <div class="adm-row adm-r2"><button id="admRisk" class="adm-alt" aria-pressed="${u.riskTest}">套用風控額度：${u.riskTest ? '開' : '關'}</button><button id="admFill" class="adm-alt">補滿額度</button></div>
+        <div class="adm-row adm-r2"><button id="admRisk" class="adm-alt" aria-pressed="${u.riskTest}">套用風控護盾：${u.riskTest ? '開' : '關'}</button><button id="admFill" class="adm-alt">補滿額度</button></div>
         <button id="admReset" class="adm-reset">重置我的關卡紀錄</button><p class="adm-msg" id="admMsg">共 ${totalFloors()} 道試煉。跳關只改進度，本金和戰績不變。</p></div>`);
       const msg = t => { const m = $('#admMsg'); if (m) m.textContent = t; };
       const run = async (patch, done) => { try { const nu = await B.adminSet(patch); if (nu) S.user = nu; S.lotSeen = S.riskSeen = false; renderHome(); done(); } catch (e) { msg('失敗：' + (e.code === 'permission-denied' ? '請先更新 Firestore 規則' : e.message)); } };
       $('#admGo').onclick = () => { const n = Math.floor(+$('#admN').value), t = totalFloors(); if (!(n >= 1 && n <= t)) return msg(`請輸入 1～${t}`); run({ floor: n - 1 }, () => { closeSheet(); toast(`已跳到${trial(n)}，按「進入試煉」開始。`); }); };
-      $('#admRisk').onclick = () => run({ riskTest: !u.riskTest }, () => { openSheet('account'); toast(u.riskTest ? '風控額度：管理員不受限。' : '風控額度：已套用，和一般玩家一樣會扣額度、會被鎖。'); });
-      $('#admFill').onclick = () => run({ riskDebt: 0 }, () => { closeSheet(); toast('風控額度已補滿。'); });
+      $('#admRisk').onclick = () => run({ riskTest: !u.riskTest }, () => { openSheet('account'); toast(u.riskTest ? '風控護盾：管理員不受限。' : '風控護盾：已套用，和一般玩家一樣會扣額度、會被鎖。'); });
+      $('#admFill').onclick = () => run({ riskDebt: 0 }, () => { closeSheet(); toast('風控護盾已補滿。'); });
       let armed = false;
       $('#admReset').onclick = () => { if (!armed) { armed = true; $('#admReset').textContent = '再按一次確認重置'; return; }
-        run({ floor: 0, balance: CONFIG.start, peak: CONFIG.start, wins: 0, losses: 0, total: 0, streak: 0, bestStreak: 0, rankBp: -1, riskDebt: 0 }, () => { HIST.put({}); openSheet('account'); toast('已重置：回到試煉 01、本金 10,000 U。'); }); };
+        run({ floor: 0, balance: CONFIG.start, peak: CONFIG.start, wins: 0, losses: 0, total: 0, streak: 0, bestStreak: 0, rankBp: -1, riskDebt: 0, checkDay: 0 }, () => { HIST.put({}); openSheet('account'); toast('已重置：回到試煉 01、本金 10,000 U。'); }); };
     }
     HIST.fill().then(o => { const g = $('#aaGrid'); if (!g || S.sheet !== 'account') return;
       g.innerHTML = ['gold', 'btc', 'nasdaq', 'dow'].map(k => { const [w, t] = o[k]; return `<div class="aa-c"><span>${CONFIG.assetNames[k]}</span><b>${t ? (w / t * 100).toFixed(1) + '%' : '—'}</b><small>${t ? `${w} 勝 ${t - w} 敗` : '尚無紀錄'}</small></div>`; }).join(''); }).catch(() => {});
