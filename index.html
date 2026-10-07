@@ -732,7 +732,7 @@ button{font:inherit;color:inherit;cursor:pointer}
 #battle #chart{position:absolute;left:7.3%;top:28.6%;width:85.6%;height:67%;border-radius:10px;background:#081240d1}
 #battle .chart-foot{background:var(--sp-text) center/100% 100% no-repeat;box-shadow:none;border:0;border-radius:0;margin:-2px 8px 0;padding:5.2% 8% 5.6%;font-size:clamp(11px,3.1vw,12.5px);line-height:1.55;color:#f1f3ff}
 #battle .actions{gap:0;padding:2px 2px 10px;grid-template-columns:repeat(3,1fr)}
-#battle .act,#battle .act.flat,#battle .act.long,#battle .act.short{background:center/100% 100% no-repeat;box-shadow:none;border-radius:0;aspect-ratio:500/330;padding:0;font-size:clamp(17px,5.2vw,22px)}
+#battle .act,#battle .act.flat,#battle .act.long,#battle .act.short{background:center/100% 100% no-repeat;box-shadow:none;border-radius:0;aspect-ratio:520/303;padding:0;font-size:clamp(17px,5.2vw,22px)}
 #battle .act.long{background-image:var(--sp-bl)}#battle .act.flat{background-image:var(--sp-bm)}#battle .act.short{background-image:var(--sp-br)}
 #battle .act small{font-size:clamp(9px,2.7vw,11px)}
 #battle .act.picked{outline:0;filter:drop-shadow(0 0 8px #ffe9ae) brightness(1.15)}
@@ -851,6 +851,20 @@ button{font:inherit;color:inherit;cursor:pointer}
 .sheet .titles .wear{flex:none;border:0;border-radius:999px;padding:7px 14px;font:900 13px var(--f-title);letter-spacing:.08em;color:#3a2400;background:linear-gradient(#fff3c8,#f0c866 55%,#c99232);box-shadow:inset 0 1px 0 #fff8,0 2px 6px #0008;cursor:pointer}
 .sheet .titles .wear:disabled{opacity:.5}
 .sheet h3.tg{margin:14px 4px 7px;font:900 13px var(--f-title);letter-spacing:.14em;color:#ffe9ae}
+.st-skip[hidden]{display:none}
+.st-text.rich{min-height:0;max-height:68vh;overflow:auto;width:100%;max-width:360px;display:block;-webkit-overflow-scrolling:touch}
+.st-card{text-align:left;padding:16px 16px 14px;border-radius:16px;background:#0b123acc;box-shadow:inset 0 0 0 1.5px #f3d58aaa,0 0 18px #070b1f;animation:stIn .5s ease-out both;color:#eef1ff;font:500 14px/1.65 var(--f-body)}
+.st-card h3{margin:0 0 10px;font:900 17px/1.4 var(--f-title);letter-spacing:.06em;color:#ffe9ae}
+.st-text .st-card p{margin:0 0 10px;font:500 14.5px/1.75 var(--f-body);letter-spacing:0;color:#eef1ff;text-shadow:none;animation:none}.st-text .st-card p.fin{font:900 16px var(--f-title);color:#ffe9ae}.st-text .st-card p.lead{color:#c9d6ff}.st-card p.lead{color:#c9d6ff}.st-card p:last-child{margin-bottom:0}
+.st-card ul{margin:0;padding:0;list-style:none;display:grid;gap:10px}
+.st-card li{padding-left:16px;position:relative}.st-card li::before{content:"✦";position:absolute;left:0;top:.35em;font-size:10px;color:#ffe9ae}
+.st-card b{color:#ffe9ae;font-weight:800}
+.st-card .pts{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.st-card .pts div{padding:10px 12px;border-radius:12px;background:#18246ecc;box-shadow:inset 0 0 0 1px #f3d58a88;display:grid;gap:2px}
+.st-card .pts span{font-size:13px;color:#c9d6ff}.st-card .pts b{font:900 20px var(--f-title)}
+.st-card p.fin{margin-top:14px;text-align:center;font:900 16px var(--f-title);color:#ffe9ae;letter-spacing:.06em}
+#battle .act,#battle .act.flat,#battle .act.long,#battle .act.short{font-size:clamp(15px,4.7vw,20px);gap:1px;padding:3% 0 0}
+#battle .act small{font-size:clamp(8.5px,2.45vw,10.5px)}
 </style>
 </head>
 <body>
@@ -920,7 +934,7 @@ button{font:inherit;color:inherit;cursor:pointer}
       <canvas id="chart"></canvas>
     </div>
     <div class="chart-foot" id="cFoot"></div>
-    <div class="lots" id="lots" hidden><span class="lots-k">手數</span><div class="lots-seg" role="radiogroup" aria-label="手數倍數"><button data-m="1" role="radio">1 倍</button><button data-m="2" role="radio">2 倍</button><button data-m="3" role="radio">3 倍</button></div><span class="lots-v" id="lotsV"></span></div>
+    <div class="lots" id="lots" hidden><span class="lots-k">槓桿</span><div class="lots-seg" role="radiogroup" aria-label="槓桿倍數"><button data-m="1" role="radio">1 倍</button><button data-m="2" role="radio">2 倍</button><button data-m="3" role="radio">3 倍</button></div><span class="lots-v" id="lotsV"></span></div>
     <div class="actions" id="actions">
       <button class="act long" data-dir="L">做多<small>▲ 向上斬擊</small></button>
       <button class="act flat" data-dir="N">不進場<small>◆ 識破陷阱</small></button>
@@ -1054,7 +1068,7 @@ const CONFIG = {
   checkin: 1000,   // 每日簽到獎勵，台北時間 00:00 換日（firestore.rules 裡也有同一個數字）
   adminEmail: 'chan37fx@gmail.com',   // 管理員：可跳關、重置自己的紀錄（firestore.rules 裡也有同一個信箱）
   lotFrom: 51,
-  riskFrom: 101, riskMax: 5, riskMin: 30,   // 風控護盾：第幾道試煉起、幾次、幾分鐘回 1 次（firestore.rules 裡也有同樣的數字）   // 從第幾道試煉開始可以選 1～3 倍手數（firestore.rules 裡也有同一個數字）
+  riskFrom: 101, riskMax: 5, riskMin: 30,   // 風控護盾：第幾道試煉起、幾次、幾分鐘回 1 次（firestore.rules 裡也有同樣的數字）   // 從第幾道試煉開始可以選 1-3 倍槓桿（firestore.rules 裡也有同一個數字）
   stake: 300, bossStake: 500,      // 一般關 ±300、魔王關 ±500（正式模式以引擎寫入的金額為準）
   streakEvery: 3, streakBonus: 500, // 每連續答對 3 次額外 +500（要和 firestore.rules 一致）
   minRankGames: 20,
@@ -1619,30 +1633,48 @@ function paintAvatar() {
 }
 /* 開頭故事：註冊後、選角前播一次。點畫面一段一段往下，可以跳過 */
 const STORY = [
-  '當天空裂開，「試煉之門」裡跑出來的不是神話裡的惡龍，而是人類貪婪與恐懼變成的「心魔怪獸」。',
-  '衝動的狂狼誘惑你盲目追高，死不認錯的泥沼怪把凹單的人拖進深淵。這些怪物吞噬了大家的理智，把世界搞得烏煙瘴氣。',
+  '當空間發生扭曲，\n混沌的「試煉之門」矗立於世。\n湧出的不是惡龍，而是人類貪婪與恐懼變成的「心魔怪獸」。',
+  '衝動的狂狼誘惑你盲目追高，泥沼怪將凹單者拖入深淵。牠們吞噬著大眾的理智，讓世界陷入混亂。',
   '直到第一批「破局者」站了出來。',
-  '大家這才發現，怪物其實有弱點。只要關掉情緒，把「理性」當作武器，就能看穿牠們的把戲。',
-  '在這裡，你的每次攻擊都化為赤紅與翠綠的Ｋ線。看懂多空方向，該停損時果斷出手，就是打敗牠們的唯一法則。',
-  '現在，試煉之門已經打開了。',
-  '冒險者，握緊你手上那把名叫「紀律」的武器！用你看懂趨勢的雙眼，打贏這場屬於你的破局之戰！'
+  '大家這才發現，只要捨棄情緒，將「理性」化作武器，就能看穿怪物的虛實。',
+  '在這座試煉場中，熾紅與翠綠的Ｋ線交織成迷宮。你需要看透多空能量的流動，在該出手時精準打擊，這才是擊潰心魔的唯一法則。',
+  '現在，試煉之門已然敞開。',
+  '冒險者，用你看透趨勢的雙眼，打贏這場屬於你的破局之戰！',
+  /* 規則教學（看完故事後接著出現） */
+  { k: 'RULES', h: `<h3>📜 試煉之門的運作法則</h3><p class="lead">要斬殺魔物，你必須熟悉這片戰場的規則：</p><ul>
+    <li><b>時空視野：</b>每道試煉會向你展示 40 根 15 分Ｋ線（可切換為 1 小時Ｋ視野），並將接下來的 3 根Ｋ線隱藏在迷霧中。你必須透過眼前的軌跡，精準預判這 3 根Ｋ線的多空走向，來決定該發動攻擊還是持盾觀望。</li>
+    <li><b>錨定現價：</b>系統將以「題目最後一根Ｋ線的收盤價」作為你當下的立足點（現價）。每個戰場（商品）都有專屬的突破標準（判定點數）。</li></ul>` },
+  { k: 'RULES', h: `<h3>📜 試煉之門的運作法則</h3><ul>
+    <li><b>做多（向上突擊）：</b>隱藏的 3 根Ｋ線裡，最高價必須觸及「現價＋判定點數」，且第 3 根的收盤價沒有低於現價。</li>
+    <li><b>做空（向下突擊）：</b>隱藏的 3 根Ｋ線裡，最低價必須觸及「現價－判定點數」，且第 3 根的收盤價沒有高於現價。</li>
+    <li><b>盤整（不進場 / 迴避陷阱）：</b>如果上下判定點數都沒碰到；或是雖然碰到了，但第 3 根收盤時又縮回現價的另一邊，代表魔物只是在虛張聲勢，此時選擇「不進場」才是正確解答。</li>
+    <li><b>極端雙向波動：</b>若上下判定點數都被觸發，最終勝負將由第 3 根收盤價落在現價的哪一邊來決定。</li></ul>` },
+  { k: 'RULES', h: `<h3>⚔️ 各大戰場的突破點數（判定點數）</h3><div class="pts">
+    <div><span>黃金</span><b>10 點</b></div><div><span>比特幣</span><b>300 點</b></div><div><span>納斯達克</span><b>90 點</b></div><div><span>道瓊</span><b>70 點</b></div></div>` },
+  { k: 'WARNING', h: `<h3>⚠️ 戰場異變警告</h3>
+    <p>試煉之門內部的空間極度不穩定，根據前線情報，當你深入至 <b>第 51 道</b> 與 <b>第 101 道</b> 試煉時，你將面臨機制更加嚴苛的極限考驗。</p>
+    <p>不僅如此，深淵的裂隙仍在持續蔓延——每日都將解鎖 <b>5 道</b>全新的未知關卡。</p>
+    <p>戰鬥永無止境，請隨時保持你手中的利刃鋒利！</p><p class="fin">現在就開始進入試煉吧！</p>` }
 ];
 let STORY_P = null;
-function introStory() {
+function introStory(canSkip) {
   if (STORY_P) return STORY_P;
   return STORY_P = new Promise(res => {
     const el = $('#story'), box = $('#stText'), go = $('#stGo'); let i = 0;
     el.style.backgroundImage = `linear-gradient(#070b1fd9,#0c1236cc 45%,#070b1fe6), url(${OPEN_SRC})`;
     const done = () => { el.hidden = true; res(); };
     const show = () => {
-      box.innerHTML = `<p>${esc(STORY[i]).replace(/「([^」]+)」/g, '「<b>$1</b>」')}</p>`;
+      const pg = STORY[i], rich = typeof pg !== 'string';
+      box.classList.toggle('rich', rich); el.querySelector('.st-k').textContent = rich ? pg.k : 'PROLOGUE';
+      box.innerHTML = rich ? `<div class="st-card">${pg.h}</div>` : `<p>${esc(pg).replace(/「([^」]+)」/g, '「<b>$1</b>」').replace(/\n/g, '<br>')}</p>`; box.scrollTop = 0;
       $('#stDots').innerHTML = STORY.map((_, k) => `<i class="${k === i ? 'on' : ''}"></i>`).join('');
       const last = i === STORY.length - 1; go.textContent = last ? '踏入試煉之門' : '繼續'; go.classList.toggle('last', last);
     };
     const next = () => { if (i < STORY.length - 1) { i++; show(); } else done(); };
     go.onclick = e => { e.stopPropagation(); next(); };
     $('#stSkip').onclick = e => { e.stopPropagation(); done(); };
-    el.onclick = next;
+    el.onclick = () => { if (typeof STORY[i] === 'string') next(); };   // 規則頁字多，只能按按鈕前進，避免誤觸跳過
+    $('#stSkip').hidden = !canSkip;
     show(); el.hidden = false; go.focus();
   });
 }
@@ -1881,8 +1913,8 @@ function stageNotice(kind) {
       <p class="sn-p sn-w">連續虧損最容易喚醒名為「衝動」的心魔。護盾碎裂時，請果斷離開盤面平復心態。</p>`
       : `<p class="sn-k">STAGE I CLEAR</p><h2 id="stageT">第一階段試煉・通過</h2>
       <p class="sn-p">恭喜你，冒險者！前 ${CONFIG.lotFrom - 1} 道試煉已全數通過。</p>
-      <p class="sn-p">從這一關開始解鎖<b>「手數」</b>：每一題出手前，都可以自由選擇 1～3 倍，賺和賠會一起放大。</p>
-      <table class="sn-t"><thead><tr><th>手數</th><th>一般關</th><th>魔王關</th></tr></thead><tbody>${[1, 2, 3].map(m => `<tr><th>${m} 倍</th><td>±${fmt(st * m)} U</td><td>±${fmt(bs * m)} U</td></tr>`).join('')}</tbody></table>
+      <p class="sn-p">從這一關開始解鎖<b>「槓桿」</b>：每一題出手前，都可以自由選擇 1-3 倍，賺和賠會一起放大。</p>
+      <table class="sn-t"><thead><tr><th>槓桿</th><th>一般關</th><th>魔王關</th></tr></thead><tbody>${[1, 2, 3].map(m => `<tr><th>${m} 倍</th><td>±${fmt(st * m)} U</td><td>±${fmt(bs * m)} U</td></tr>`).join('')}</tbody></table>
       <p class="sn-p sn-w">倍數越高，贏得越快，輸得也越快。本金不夠賠的倍數無法選擇。請做好風控，量力而為。</p>`;
     $('#stageNext').textContent = `前往${trial(kind === 'risk' ? CONFIG.riskFrom : CONFIG.lotFrom)}`;
     el.hidden = false; el.scrollTop = 0; $('#stageNext').focus();
@@ -2134,15 +2166,17 @@ function openSheet(kind) {
   } else if (kind === 'rules') {
     const P = CONFIG.points, N = CONFIG.assetNames;
     body.innerHTML = `<div class="rules">
-      <h3>怎麼判定答案</h3>
-      <p>每一題會給你 40 根 15 分 K（可切換 1 小時 K），並隱藏接下來的 3 根。以「題目最後一根 K 的收盤價」當作<b>現價</b>，每個商品有固定的<b>判定點數</b>。</p>
+      <h3>📜 試煉之門的運作法則</h3>
+      <p>要斬殺魔物，你必須熟悉這片戰場的規則：</p>
       <ul>
-        <li><b class="good-t">做多</b>：3 根裡的最高價碰到「現價＋點數」，而且第 3 根收盤<b>沒有低於</b>現價。</li>
-        <li><b class="bad-t">做空</b>：3 根裡的最低價碰到「現價－點數」，而且第 3 根收盤<b>沒有高於</b>現價。</li>
-        <li><b class="flat-t">盤整（不進場）</b>：上下都沒碰到；或是碰到了，但第 3 根收盤又收回現價的另一邊。</li>
-        <li>上下都碰到時，看第 3 根收盤在現價的哪一邊。</li>
+        <li><b>時空視野：</b>每道試煉會向你展示 40 根 15 分Ｋ線（可切換為 1 小時Ｋ視野），並將接下來的 3 根Ｋ線隱藏在迷霧中。你必須透過眼前的軌跡，精準預判這 3 根Ｋ線的多空走向，來決定該發動攻擊還是持盾觀望。</li>
+        <li><b>錨定現價：</b>系統將以「題目最後一根Ｋ線的收盤價」作為你當下的立足點（現價）。每個戰場（商品）都有專屬的突破標準（判定點數）。</li>
+        <li><b class="good-t">做多（向上突擊）：</b>隱藏的 3 根Ｋ線裡，最高價必須觸及「現價＋判定點數」，且第 3 根的收盤價沒有低於現價。</li>
+        <li><b class="bad-t">做空（向下突擊）：</b>隱藏的 3 根Ｋ線裡，最低價必須觸及「現價－判定點數」，且第 3 根的收盤價沒有高於現價。</li>
+        <li><b class="flat-t">盤整（不進場 / 迴避陷阱）：</b>如果上下判定點數都沒碰到；或是雖然碰到了，但第 3 根收盤時又縮回現價的另一邊，代表魔物只是在虛張聲勢，此時選擇「不進場」才是正確解答。</li>
+        <li><b>極端雙向波動：</b>若上下判定點數都被觸發，最終勝負將由第 3 根收盤價落在現價的哪一邊來決定。</li>
       </ul>
-      <h3>各商品的判定點數</h3>
+      <h3>⚔️ 各大戰場的突破點數（判定點數）</h3>
       <ul class="titles">${Object.keys(P).map(k => `<li class="got"><span class="tn">${N[k]}</span><span class="tv">${fmt(P[k])} 點</span></li>`).join('')}</ul>
       <h3>例子</h3>
       <p>黃金現價 4210，判定點數 10：<br>・3 根裡最高到 4220 以上，第 3 根收 4215 → <b class="good-t">做多</b><br>・最高到 4220 以上，但第 3 根收 4208 → <b class="flat-t">盤整</b><br>・最低到 4200 以下，第 3 根收 4204 → <b class="bad-t">做空</b></p>
@@ -2150,7 +2184,7 @@ function openSheet(kind) {
       <h3>本金怎麼算</h3>
       <ul>
         <li>一般關：答對 +${CONFIG.stake} U，答錯 −${CONFIG.stake} U。</li>
-        <li>從${trial(CONFIG.lotFrom)}開始，每一題出手前可以選 1～3 倍手數，賺賠都乘上倍數（連勝獎勵不加倍）。本金不夠賠的倍數不能選。</li>
+        <li>從${trial(CONFIG.lotFrom)}開始，每一題出手前可以選 1-3 倍槓桿，賺賠都乘上倍數（連勝獎勵不加倍）。本金不夠賠的倍數不能選。</li>
         <li>魔王關（每 10 道試煉，數據公布前一刻的盤面）：答對 +${CONFIG.bossStake} U，答錯 −${CONFIG.bossStake} U。</li>
         <li>風控護盾：從${trial(CONFIG.riskFrom)}開始，做多或做空答錯一次扣 1 次額度（共 ${CONFIG.riskMax} 次，每 ${CONFIG.riskMin} 分鐘恢復 1 次）。用完會強制休息，恢復前不能進入試煉。不進場答錯只扣本金，不扣額度。</li>
         <li>每日簽到：每天可以在主畫面簽到一次，+${fmt(CONFIG.checkin)} U，台北時間 00:00 換日。</li>
@@ -2209,7 +2243,7 @@ function openSheet(kind) {
       const run = async (patch, done) => { try { const nu = await B.adminSet(patch); if (nu) S.user = nu; S.lotSeen = S.riskSeen = false; renderHome(); done(); } catch (e) { msg('失敗：' + (e.code === 'permission-denied' ? '請先更新 Firestore 規則' : e.message)); } };
       $('#admGo').onclick = () => { const n = Math.floor(+$('#admN').value), t = totalFloors(); if (!(n >= 1 && n <= t)) return msg(`請輸入 1～${t}`); run({ floor: n - 1 }, () => { closeSheet(); toast(`已跳到${trial(n)}，按「進入試煉」開始。`); }); };
       $('#admRisk').onclick = () => run({ riskTest: !u.riskTest }, () => { openSheet('account'); toast(u.riskTest ? '風控護盾：管理員不受限。' : '風控護盾：已套用，和一般玩家一樣會扣額度、會被鎖。'); });
-      $('#admStory').onclick = () => { closeSheet(); STORY_P = null; introStory(); };
+      $('#admStory').onclick = () => { closeSheet(); STORY_P = null; introStory(true); };
       $('#admFill').onclick = () => run({ riskDebt: 0 }, () => { closeSheet(); toast('風控護盾已補滿。'); });
       let armed = false;
       $('#admReset').onclick = () => { if (!armed) { armed = true; $('#admReset').textContent = '再按一次確認重置'; return; }
