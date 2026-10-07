@@ -844,6 +844,13 @@ button{font:inherit;color:inherit;cursor:pointer}
 .sheet:not(.art) .sheet-head{position:relative;top:auto;display:block;width:calc(100% + 12px);margin:0 -6px 2px;padding:0;aspect-ratio:2137/492;border-radius:0;background:center/100% 100% no-repeat;box-shadow:none;-webkit-backdrop-filter:none;backdrop-filter:none;filter:drop-shadow(0 4px 8px #0008)}
 .sheet:not(.art) .sheet-head h2{position:absolute;left:11%;line-height:1;white-space:nowrap;top:52.5%;transform:translateY(-50%);margin:0;font-size:7cqw;letter-spacing:.12em;text-shadow:none;filter:drop-shadow(0 1px 0 #0b123a) drop-shadow(0 0 6px #0b123a)}
 .sheet:not(.art) .sheet-head .x{position:absolute;left:90.1%;top:52%;transform:translate(-50%,-50%);width:7.96%;height:auto;aspect-ratio:1;background:none;box-shadow:none;display:grid;place-items:center;padding:0;line-height:1;font-size:5cqw;font-weight:700;color:#ffe9a8;text-shadow:0 0 6px #000,0 1px 2px #000;opacity:1}
+.sheet .titles .tn{display:flex;flex-wrap:wrap;align-items:baseline;min-width:0}
+.sheet .titles .tn small{flex-basis:100%;margin:3px 0 0 26px;font:500 11.5px var(--f-body);letter-spacing:0;color:#c9d6ff;opacity:.95}
+.sheet .titles li:not(.got){opacity:.72}
+.sheet .titles .tv{flex:none;font-size:13px}.sheet .titles .tv.lock{font-weight:500;color:#b7c2ea}
+.sheet .titles .wear{flex:none;border:0;border-radius:999px;padding:7px 14px;font:900 13px var(--f-title);letter-spacing:.08em;color:#3a2400;background:linear-gradient(#fff3c8,#f0c866 55%,#c99232);box-shadow:inset 0 1px 0 #fff8,0 2px 6px #0008;cursor:pointer}
+.sheet .titles .wear:disabled{opacity:.5}
+.sheet h3.tg{margin:14px 4px 7px;font:900 13px var(--f-title);letter-spacing:.14em;color:#ffe9ae}
 </style>
 </head>
 <body>
@@ -1070,9 +1077,37 @@ const EVENT_INFO = {   // mon：這種魔王關出場的怪物
   VOL:  { name: '劇烈波動盤面',     boss: '暴波晶龍', mon: 'serpent', data: false }
 };
 const TITLES = [
-  [10000, '韭菜新手'], [11500, '見習交易員'], [13500, 'K線學徒'], [16000, '趨勢獵人'], [19000, '波段騎士'],
-  [23000, '盤面術士'], [28000, '多空將軍'], [34000, '市場霸主'], [41000, '傳奇操盤手'], [50000, '神預測之王']
+  [10000, '新鮮小韭菜'], [12000, '見習破局者'], [15000, '趨勢獵人'], [20000, '波動遊俠'], [25000, '盤面術士'],
+  [30000, '盤感覺醒者'], [35000, '牛熊王者'], [40000, '先知霸主'], [50000, 'K線主宰者']
 ];
+/* 成就稱號：[id, 名稱, 解鎖條件, 取得進度的函式(u, st) → [目前, 目標]] */
+const ACH_GROUPS = [
+  ['勝率', [['r70', '精準狙擊手', '勝率維持 70% 以上', 70], ['r90', '神之手', '勝率維持 90% 以上', 90]]],
+  ['商品專精', [['gold20', '煉金術士', '黃金答對 20 次'], ['gold50', '淘金狂熱者', '黃金答對 50 次'], ['btc20', '鏈上拓荒者', '比特幣答對 20 次'], ['btc50', '區塊鏈巨鯨', '比特幣答對 50 次'],
+    ['nasdaq20', '科技衝浪客', '那斯達克答對 20 次'], ['nasdaq50', '矽谷領航員', '那斯達克答對 50 次'], ['dow20', '藍籌鐵騎', '道瓊答對 20 次'], ['dow50', '工業巨頭', '道瓊答對 50 次']]],
+  ['出手風格', [['bear50', '空軍總司令', '做空答對 50 次'], ['bull50', '多頭鐵騎', '做多答對 50 次'], ['neutral50', '穩健防禦大師', '不進場答對 50 次']]],
+  ['連續紀錄', [['win10', '絕對命中者', '連續答對 10 次'], ['lose10', '燃料供應商', '連續答錯 10 次']]]
+];
+const ACH = {}; ACH_GROUPS.forEach(([, l]) => l.forEach(a => ACH[a[0]] = a));
+/* 回傳 [目前進度, 目標]；勝率類回傳 [勝率%, 門檻]（未滿 minRankGames 戰算 0） */
+function achProg(id, u, st) {
+  if (id[0] === 'r') return [u.total >= CONFIG.minRankGames ? u.wins / u.total * 100 : 0, ACH[id][3]];
+  if (id === 'win10') return [Math.max(u.bestStreak || 0, st.winRun), 10];
+  if (id === 'lose10') return [st.loseRun, 10];
+  const m = id.match(/^([a-z]+)(\d+)$/); return [(st.asset[m[1]] ?? st.dir[m[1]] ?? 0), +m[2]];
+}
+const achGot = (id, u, st) => { const [a, b] = achProg(id, u, st); return a >= b; };
+const wealthId = i => 'w' + i;
+/* 別人（排行榜）的稱號：只看得到對方的本金、勝率，其他成就照對方存的顯示 */
+function shownTitle(r, st) {
+  const id = r.title || '', peak = r.peak || r.balance || 0;
+  if (/^w\d$/.test(id)) { const t = TITLES[+id[1]]; if (t && peak >= t[0]) return t[1]; }
+  else if (ACH[id]) { if (id[0] === 'r' ? ((r.rankBp ?? -1) >= ACH[id][3] * 100) : (st ? achGot(id, r, st) : true)) return ACH[id][1]; }
+  return titleOf(peak);
+}
+/* 自己的稱號：這台裝置的紀錄還沒補齊時（例如換手機），先照雲端存的顯示 */
+const myTitle = () => { if (!S.user) return ''; const h = HIST.get(); return shownTitle(S.user, Object.keys(h).length >= (S.user.floor || 0) ? HIST.stats(h) : null); };
+
 const DIRS = { L: 'bull', S: 'bear', N: 'neutral' };
 const DIR_LABEL = { bull: '做多 ▲', bear: '做空 ▼', neutral: '不進場 ◆' };
 const FAMILIES = [   // 每 10 道試煉換一種
@@ -1180,7 +1215,7 @@ function norm(uid, email, d) {
   return { uid, email, name: d.name || '交易員', balance: d.balance, peak: d.peak || d.balance, wins: d.wins || 0, losses: d.losses || 0,
     total: d.total || 0, floor: d.floor || 0, streak: d.streak || 0, bestStreak: d.bestStreak || 0, invites: d.invites || 0,
     nameAt: d.nameAt ? (d.nameAt.toMillis ? d.nameAt.toMillis() : +d.nameAt) : 0,
-    riskFull: riskFullOf(d), riskTest: !!d.riskTest, checkDay: +d.checkDay || 0 };
+    riskFull: riskFullOf(d), riskTest: !!d.riskTest, checkDay: +d.checkDay || 0, title: d.title || '', rankBp: d.rankBp ?? -1 };
 }
 const RENAME_MS = 14 * 864e5;
 /* 風控護盾：存「起算時間 riskBase」和「欠幾次 riskDebt」，回滿的時間 = riskBase + riskDebt × 30 分鐘 */
@@ -1200,10 +1235,17 @@ const HIST = {
   key() { return 'tq2h:' + (S.user ? S.user.uid : ''); },
   get() { try { return JSON.parse(localStorage.getItem(this.key()) || '{}'); } catch (e) { return this.mem || (this.mem = {}); } },
   put(h) { this.mem = h; try { localStorage.setItem(this.key(), JSON.stringify(h)); } catch (e) {} },
-  add(n, k, ok) { const h = this.get(); h[n] = [k, ok ? 1 : 0]; this.put(h); },
+  add(n, k, ok, c) { const h = this.get(); h[n] = [k, ok ? 1 : 0, c || '']; this.put(h); },
+  stats(h) { h = h || this.get();
+    const o = { asset: { gold: 0, btc: 0, nasdaq: 0, dow: 0 }, dir: { bull: 0, bear: 0, neutral: 0 }, winRun: 0, loseRun: 0 }; let w = 0, l = 0, prev = 0;
+    Object.keys(h).map(Number).sort((a, b) => a - b).forEach(n => { const [k, ok, c] = h[n], a = this.norm(k);
+      if (n !== prev + 1) w = l = 0; prev = n;
+      if (ok) { if (a) o.asset[a]++; if (c in o.dir) o.dir[c]++; w++; l = 0; } else { l++; w = 0; }
+      o.winRun = Math.max(o.winRun, w); o.loseRun = Math.max(o.loseRun, l); });
+    return o; },
   norm(k) { k = String(k || '').toLowerCase(); return /gold|xau/.test(k) ? 'gold' : /btc|bitcoin/.test(k) ? 'btc' : /nas|nq|ndx/.test(k) ? 'nasdaq' : /dow|ym|dji/.test(k) ? 'dow' : ''; },
   async fill() {
-    const h = this.get(), need = []; for (let n = 1; n <= (S.user.floor || 0); n++) if (!h[n]) need.push(n);
+    const h = this.get(), need = []; for (let n = 1; n <= (S.user.floor || 0); n++) if (!h[n] || (B !== LOCAL && h[n].length < 3)) need.push(n);
     for (let i = 0; i < need.length; i += 10) {
       const got = await Promise.all(need.slice(i, i + 10).map(n => B.histOne(n).catch(() => null)));
       got.forEach((r, j) => { if (r) h[need[i + j]] = r; });
@@ -1246,6 +1288,7 @@ const LOCAL = {
   async setHero(h) { const d = this.db(); d.users[d.session].hero = h; this.save(); },
   async rename(name) { const d = this.db(), u = d.users[d.session]; if (u.nameAt && Date.now() - u.nameAt < RENAME_MS) throw new Error('RENAME_WAIT'); u.name = name; u.nameAt = Date.now(); this.save(); return this.view(d.session); },
   async histOne() { return null; },
+  async setTitle(id) { const d = this.db(); d.users[d.session].title = id; this.save(); return this.view(d.session); },
   async checkin() { const d = this.db(), u = d.users[d.session], day = taipeiDay(); if ((u.checkDay || 0) >= day) throw new Error('CHECKED'); u.balance += CONFIG.checkin; u.peak = Math.max(u.peak || 0, u.balance); u.checkDay = day; this.save(); return this.view(d.session); },
   async adminSet(patch) { const d = this.db(); Object.assign(d.users[d.session], patch); this.save(); return this.view(d.session); },
   async clearVote() {},
@@ -1327,6 +1370,7 @@ const FB = {
     this.auth.currentUser.updateProfile({ displayName: name }).catch(() => {});
     return this.refresh();
   },
+  async setTitle(id) { await this.U.doc(this.uid).update({ title: id }); return this.refresh(); },
   async signOut() { await this.auth.signOut(); },
   async resetPw(email) { await this.auth.sendPasswordResetEmail(email); },
   async refresh() { if (!this.uid) return null; const s = await this.U.doc(this.uid).get(); return s.exists ? norm(this.uid, this.email, s.data()) : null; },
@@ -1348,7 +1392,7 @@ const FB = {
     const [f, v] = await Promise.all([this.F.doc(String(n)).get(), this._vote(n).get()]);
     if (!f.exists || !v.exists) return null;
     const a = await this.A.doc(String(n)).get(); if (!a.exists) return null;
-    return [f.data().assetKey || '', v.data().choice === a.data().answer ? 1 : 0];
+    return [f.data().assetKey || '', v.data().choice === a.data().answer ? 1 : 0, v.data().choice];
   },
   /* 已送出選擇但還沒結算（例如中途斷線）的那一層，回傳當時的選擇 */
   async pendingVote(n) { try { const v = await this._vote(n).get(); return v.exists ? v.data().choice : null; } catch (e) { return null; } },
@@ -1647,7 +1691,7 @@ function renderHome() {
   const u = S.user, total = totalFloors();
   paintAvatar(); if (u && !B.hero()) introStory().then(pickHero);
   $('#uName').textContent = u ? u.name : '訪客';
-  $('#uTitle').textContent = u ? titleOf(u.peak) : '尚未登入';
+  $('#uTitle').textContent = u ? myTitle() : '尚未登入';
   const prev = $('#uBal').textContent, now = u ? fmt(u.balance) : fmt(CONFIG.start);
   $('#uBal').textContent = now;
   if (u && prev !== now) { const p = $('#purse'); p.classList.remove('pulse'); void p.offsetWidth; p.classList.add('pulse'); }
@@ -1998,7 +2042,8 @@ async function resolveBattle(choice) {
     toast(e.message === 'MISSING' ? '這道試煉的答案還沒準備好，請稍後再試。' : '連線失敗，請檢查網路後再出手一次。'); return;
   }
   const ans = res.ans, pick = res.choice, ok = pick === ans.answer, stake = ans.stake * (res.mult || 1), st = settle(before, ok, stake);
-  b.ans = ans; S.user = res.user; lockActs(true, pick); HIST.add(b.floor, b.q.assetKey, ok);
+  b.ans = ans; S.user = res.user; lockActs(true, pick); const achBefore = Object.keys(ACH).filter(id => achGot(id, before, HIST.stats())); HIST.add(b.floor, b.q.assetKey, ok, pick);
+  { const stN = HIST.stats(), nu = Object.keys(ACH).filter(id => achGot(id, S.user, stN) && !achBefore.includes(id)); if (nu.length) setTimeout(() => toast(`解鎖稱號「${nu.map(id => ACH[id][1]).join('」「')}」！到稱號殿就能配戴。`), 5200); }
   for (let r = 1; r <= 3; r++) { if (S.battle !== b) return; b.reveal = r; setTf('15m'); drawChart(r); await sleep(380); }
   if (S.battle !== b) return;
   const mon = $('#monster'), stage = $('#stage'), hp = $('#mHp');
@@ -2119,11 +2164,24 @@ function openSheet(kind) {
     $('#lbHint').textContent = S.boardKind === 'rate' ? `累積 ${CONFIG.minRankGames} 戰以上才會上勝率榜，顯示前 50 名。排名為歷史累積。` : S.boardKind === 'net' ? `依成功邀請的好友人數排名，顯示前 50 名。每邀請一位 +${fmt(CONFIG.invite)} U。` : `依目前本金排名，顯示前 50 名。`;
     loadBoard();
   } else if (kind === 'titles') {
-    const peak = u.peak, cur = titleOf(peak), next = TITLES.find(([v]) => v > peak), prevV = [...TITLES].reverse().find(([v]) => v <= peak);
+    const peak = u.peak, next = TITLES.find(([v]) => v > peak), prevV = [...TITLES].reverse().find(([v]) => v <= peak);
     const pct = next && prevV ? Math.min(100, (peak - prevV[0]) / (next[0] - prevV[0]) * 100) : 100;
-    body.innerHTML = `<div class="now-title"><span class="hint" style="margin:0">目前稱號</span><b class="metal-text">${esc(cur)}</b>
-        ${next ? `<div class="meter" role="progressbar" aria-valuenow="${pct.toFixed(0)}" aria-valuemin="0" aria-valuemax="100" aria-label="下一個稱號進度"><i style="width:${pct.toFixed(1)}%"></i></div><span class="hint" style="margin:0">最高本金 ${fmt(peak)} U，再 ${fmt(next[0] - peak)} U 解鎖「${esc(next[1])}」。解鎖後不會因為輸錢而失去。</span>` : '<span class="hint" style="margin:0">所有稱號都已解鎖。</span>'}</div>
-      <ul class="titles">${TITLES.map(([v, n]) => `<li class="${peak >= v ? 'got' : ''} ${n === cur ? 'cur' : ''}"><span class="tn">${n}</span><span class="tv">${peak >= v ? '已解鎖 · ' : ''}${fmt(v)} U</span></li>`).join('')}</ul>`;
+    const paint = () => {
+      if (S.sheet !== 'titles') return;
+      const st = HIST.stats(), cur = myTitle(), auto = titleOf(peak), keep = body.scrollTop;
+      const row = (id, name, cond, got, prog) => `<li class="${got ? 'got' : ''} ${name === cur ? 'cur' : ''}"><span class="tn">${name}<small>${cond}${prog ? ' · ' + prog : ''}</small></span>${name === cur ? '<span class="tv">配戴中</span>' : got ? `<button class="wear" data-id="${id}">配戴</button>` : '<span class="tv lock">未解鎖</span>'}</li>`;
+      body.innerHTML = `<div class="now-title"><span class="hint" style="margin:0">目前配戴</span><b class="metal-text">${esc(cur)}</b>
+        ${next ? `<div class="meter" role="progressbar" aria-valuenow="${pct.toFixed(0)}" aria-valuemin="0" aria-valuemax="100" aria-label="下一個本金稱號進度"><i style="width:${pct.toFixed(1)}%"></i></div><span class="hint" style="margin:0">最高本金 ${fmt(peak)} U，再 ${fmt(next[0] - peak)} U 解鎖「${esc(next[1])}」。</span>` : '<span class="hint" style="margin:0">本金稱號都已解鎖。</span>'}</div>
+        <h3 class="tg">本金稱號</h3><ul class="titles">${TITLES.map(([v, n], i) => row(wealthId(i), n, `最高本金 ${fmt(v)} U`, peak >= v, '')).join('')}</ul>
+        ${ACH_GROUPS.map(([g, l]) => `<h3 class="tg">${g}</h3><ul class="titles">${l.map(a => { const [p, t] = achProg(a[0], u, st), got = p >= t;
+          return row(a[0], a[1], a[2], got, a[0][0] === 'r' ? (u.total >= CONFIG.minRankGames ? `目前 ${p.toFixed(1)}%` : `需累積 ${CONFIG.minRankGames} 戰（${u.total}/${CONFIG.minRankGames}）`) : `${Math.min(p, t)}/${t}`); }).join('')}</ul>`).join('')}
+        <p class="hint">本金稱號解鎖後不會失去；勝率稱號要維持在門檻以上（至少 ${CONFIG.minRankGames} 戰），掉下去就會自動換回本金稱號。</p>`;
+      body.scrollTop = keep;
+      body.querySelectorAll('.wear').forEach(x => x.onclick = async () => { x.disabled = true;
+        try { const nu = await B.setTitle(x.dataset.id); if (nu) S.user = nu; renderHome(); paint(); toast(`已配戴「${myTitle()}」`); }
+        catch (e) { console.warn(e); x.disabled = false; toast('配戴失敗，請稍後再試。'); } });
+    };
+    paint(); HIST.fill().then(paint).catch(() => {});
   } else if (kind === 'invite') {
     body.innerHTML = `<div class="now-title" style="text-align:center"><span class="hint" style="margin:0">每邀請一位好友</span><b class="metal-text" style="font-size:38px;line-height:1.15">+${fmt(CONFIG.invite)} U</b>
         <span class="hint" style="margin:0;text-align:left">朋友註冊時，在「推薦人信箱」填上你的信箱，你就會立刻拿到 ${fmt(CONFIG.invite)} U。</span></div>
@@ -2135,7 +2193,7 @@ function openSheet(kind) {
     const cell = (i, k, v) => `<div class="ac-stat ac-s${i}"><span>${k}</span><b>${v}</b></div>`;
     body.innerHTML = `<div class="acct" style="background-image:url(${ACCT_SRC})">
       <h2 class="ac-title">戰績碑</h2><button class="ac-x" id="acX" aria-label="關閉"></button>
-      <div class="ac-name"><b>${esc(u.name)}</b><span>${esc(u.email || '')} ・ 稱號「${esc(titleOf(u.peak))}」</span><div class="rename" id="renameBox"></div></div>
+      <div class="ac-name"><b>${esc(u.name)}</b><span>${esc(u.email || '')} ・ 稱號「${esc(myTitle())}」</span><div class="rename" id="renameBox"></div></div>
       ${cell(1, '本金', fmt(u.balance) + ' U')}${cell(2, '勝率', rate)}${cell(3, '戰績', `${u.wins} 勝 ${u.losses} 敗`)}${cell(4, '試煉', `${u.floor} / ${totalFloors()}`)}${cell(5, '目前連勝', u.streak + ' 次')}${cell(6, '最高連勝', u.bestStreak + ' 次')}
       <button class="ac-out" id="logout">登出</button></div>
       <div class="ac-assets"><h3>各商品勝率</h3><div class="aa-grid" id="aaGrid">${['gold', 'btc', 'nasdaq', 'dow'].map(k => `<div class="aa-c"><span>${CONFIG.assetNames[k]}</span><b>…</b><small>&nbsp;</small></div>`).join('')}</div></div>`;
@@ -2151,7 +2209,7 @@ function openSheet(kind) {
       $('#admFill').onclick = () => run({ riskDebt: 0 }, () => { closeSheet(); toast('風控護盾已補滿。'); });
       let armed = false;
       $('#admReset').onclick = () => { if (!armed) { armed = true; $('#admReset').textContent = '再按一次確認重置'; return; }
-        run({ floor: 0, balance: CONFIG.start, peak: CONFIG.start, wins: 0, losses: 0, total: 0, streak: 0, bestStreak: 0, rankBp: -1, riskDebt: 0, checkDay: 0 }, () => { HIST.put({}); openSheet('account'); toast('已重置：回到試煉 01、本金 10,000 U。'); }); };
+        run({ floor: 0, balance: CONFIG.start, peak: CONFIG.start, wins: 0, losses: 0, total: 0, streak: 0, bestStreak: 0, rankBp: -1, riskDebt: 0, checkDay: 0, title: '' }, () => { HIST.put({}); openSheet('account'); toast('已重置：回到試煉 01、本金 10,000 U。'); }); };
     }
     HIST.fill().then(o => { const g = $('#aaGrid'); if (!g || S.sheet !== 'account') return;
       g.innerHTML = ['gold', 'btc', 'nasdaq', 'dow'].map(k => { const [w, t] = o[k]; return `<div class="aa-c"><span>${CONFIG.assetNames[k]}</span><b>${t ? (w / t * 100).toFixed(1) + '%' : '—'}</b><small>${t ? `${w} 勝 ${t - w} 敗` : '尚無紀錄'}</small></div>`; }).join(''); }).catch(() => {});
@@ -2223,7 +2281,7 @@ async function loadBoard() {
   $('#lb').innerHTML = show.map(([r, i]) => {
     const me = S.user && r.uid === S.user.uid;
     const v = kind === 'net' ? `${r.invites} 人<small>獎勵 ${fmt(r.invites * CONFIG.invite)} U</small>` : kind === 'rate' ? `${(r.rankBp / 100).toFixed(1)}%<small>${r.wins} 勝 ${r.total - r.wins} 敗</small>` : `${fmt(r.balance)} U<small>${r.wins || 0} 勝 ${r.losses || 0} 敗</small>`;
-    return `<li class="${me ? 'me' : ''} ${i < 3 ? 'top t' + (i + 1) : ''}"><span class="rk ${i < 3 ? 'r' + (i + 1) : ''}"><i>${i + 1}</i></span><span class="nm"><b>${esc(r.name || '交易員')}${me ? '（你）' : ''}</b><span>${esc(titleOf(r.peak || r.balance))}</span></span><span class="val">${v}</span></li>`;
+    return `<li class="${me ? 'me' : ''} ${i < 3 ? 'top t' + (i + 1) : ''}"><span class="rk ${i < 3 ? 'r' + (i + 1) : ''}"><i>${i + 1}</i></span><span class="nm"><b>${esc(r.name || '交易員')}${me ? '（你）' : ''}</b><span>${esc(me ? myTitle() : shownTitle(r))}</span></span><span class="val">${v}</span></li>`;
   }).join('');
 }
 function closeSheet() { $('#sheet').hidden = true; S.sheet = null; }
