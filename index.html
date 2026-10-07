@@ -878,6 +878,9 @@ button{font:inherit;color:inherit;cursor:pointer}
 .nt-tag{padding:2px 8px;border-radius:999px;background:linear-gradient(#fff3c8,#e2b85a);color:#3a2400;font:900 11px var(--f-title);letter-spacing:.08em}
 .nt-list p{margin:0;white-space:pre-wrap;overflow-wrap:anywhere;font:500 15px/1.7 var(--f-body)}
 .nt-act{display:flex;gap:8px;margin-top:10px}.nt-act button{border:0;border-radius:999px;padding:6px 12px;background:#0b123acc;color:#ffe9ae;box-shadow:inset 0 0 0 1px #f3d58a88;font:700 12px var(--f-body);cursor:pointer}.nt-act .del{color:#ffb2a8;box-shadow:inset 0 0 0 1px #ff8a7a88}
+.bgm-btn span{font:600 17px var(--f-display)}
+.bgm-btn.off span{color:#c9d2f5}.bgm-btn.off span::after{content:"";position:absolute;left:22%;right:22%;top:50%;height:1.5px;background:#ffb2a8;transform:rotate(-45deg)}
+.rules .credits{font-size:12.5px;line-height:1.8;opacity:.85;overflow-wrap:anywhere}
 </style>
 </head>
 <body>
@@ -913,6 +916,7 @@ button{font:inherit;color:inherit;cursor:pointer}
   <main class="map" id="map"><canvas id="mapCv"></canvas><div class="scene" id="scene"><i class="scene-glow"></i></div><div class="scene-stars" aria-hidden="true"></div></main>
   <button class="help-btn" id="btnAccount" aria-label="規則說明"><span>?</span></button>
   <button class="help-btn note-btn" id="btnNotice" aria-label="公告"><span><svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 10v4h3l6 4V6L7 10H4z"/><path d="M16.5 9a4 4 0 0 1 0 6M19 6.5a7.5 7.5 0 0 1 0 11"/></svg></span><i class="note-dot" id="noteDot" hidden></i></button>
+  <button class="help-btn note-btn bgm-btn" id="btnBgm" aria-label="音樂開關" aria-pressed="true"><span>♪</span></button>
   <div class="ticker" id="ticker" hidden role="status" aria-live="off"><span class="tk-ico" aria-hidden="true">✦</span><div class="tk-win"><span id="tkTxt"></span></div></div>
   <button class="plaque" data-act="battle" id="towerRib">試煉 01</button>
   <button class="checkin" id="btnCheckin" hidden></button>
@@ -1769,6 +1773,32 @@ function renderHome() {
   $('#demoBar').hidden = !notes.length; $('#demoBar').textContent = notes.join(' ');
   if (S.entered && $('#battle').hidden) startMapLoop();
 }
+/* ================= 背景音樂 =================
+   主畫面音樂放在 audio/main.mp3（和 index.html 同一層的 audio 資料夾）。瀏覽器規定要玩家先點過畫面才能出聲，所以第一次點擊後才開始播。
+   戰鬥畫面先不播（之後放戰鬥音樂）；切到別的分頁會暫停。 */
+const BGM = {
+  src: { main: 'audio/main.mp3', battle: 'audio/battle.mp3' }, vol: { main: .45, battle: .45 }, el: {}, ok: false,
+  off() { try { return localStorage.getItem('tq2bgm') === '0'; } catch (e) { return !!this.m; } },
+  set(off) { this.m = off; try { localStorage.setItem('tq2bgm', off ? '0' : '1'); } catch (e) {} this.sync(); },
+  paint() { const b = $('#btnBgm'); if (!b) return; const off = this.off(); b.setAttribute('aria-pressed', String(!off)); b.classList.toggle('off', off); },
+  get(k) { if (!this.el[k]) { const a = this.el[k] = new Audio(this.src[k]); a.loop = true; a.preload = 'auto'; a.volume = this.vol[k]; a.onerror = () => { a.bad = true; }; } return this.el[k]; },
+  sync() {
+    this.paint(); if (!this.ok) return;
+    const on = !this.off() && !document.hidden, cur = $('#battle').hidden ? 'main' : 'battle';
+    for (const k of ['main', 'battle']) {
+      const want = on && k === cur; if (!want && !this.el[k]) continue;
+      const a = this.get(k); if (a.bad) continue;
+      if (want && a.paused) a.play().catch(() => {}); else if (!want && !a.paused) a.pause();
+    }
+  },
+  init() {
+    const unlock = () => { this.ok = true; this.sync(); };
+    ['pointerdown', 'keydown'].forEach(e => document.addEventListener(e, unlock, { once: true, capture: true }));
+    document.addEventListener('visibilitychange', () => this.sync());
+    $('#btnBgm').onclick = () => { this.set(!this.off()); toast(this.off() ? '音樂已關閉。' : '音樂已開啟。'); };
+    setInterval(() => this.sync(), 600); this.paint();
+  }
+};
 /* ================= 公告 ================= */
 const NOTE = { key: 'tq2n:seen', seen() { try { return +localStorage.getItem(this.key) || 0; } catch (e) { return this.mem || 0; } }, mark(t) { this.mem = t; try { localStorage.setItem(this.key, String(t)); } catch (e) {} } };
 const sortNotes = l => l.sort((a, b) => (b.pinned - a.pinned) || (b.ts - a.ts));   // 置頂在最上面，其餘越新越上面
@@ -2240,7 +2270,9 @@ function openSheet(kind) {
         <li>連勝：每連續答對 ${CONFIG.streakEvery} 次額外 +${CONFIG.streakBonus} U，答錯歸零。</li>
         <li>每道試煉只能出手一次，送出後不能改。答對答錯都會前進到下一道。</li>
         <li>邀請好友註冊並填你的信箱：+${fmt(CONFIG.invite)} U。</li>
-      </ul></div>`;
+      </ul>
+      <h3>音樂出處</h3>
+      <p class="credits">主畫面音樂：“The Epic Hero” by Keys of Moon（CC BY 4.0）<br>戰鬥音樂：“Legionnaire” by Scott Buckley（CC BY 4.0）· www.scottbuckley.com.au</p></div>`;
     $('#sheet').hidden = false; return;
   }
   if (kind === 'rank') {
@@ -2383,6 +2415,7 @@ function bindUI() {
   $('#walletPlus').onclick = () => openSheet('invite');
   $('#btnAccount').onclick = () => openSheet('rules');
   $('#btnNotice').onclick = () => openSheet('notice');
+  BGM.init();
   $('#sheetClose').onclick = closeSheet;
   $('#sheet').onclick = e => { if (e.target.id === 'sheet') closeSheet(); };
   $('#bExit').onclick = exitBattle;
