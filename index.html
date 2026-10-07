@@ -1462,8 +1462,8 @@ const FB = {
     const user = hit ? (await this.refresh()) || norm(this.uid, this.email, out) : norm(this.uid, this.email, out);
     return { user, ans, choice, mult, hit };
   },
-  async leaderboard(kind) {
-    const s = await this.U.orderBy(kind === 'rate' ? 'rankBp' : kind === 'net' ? 'invites' : 'balance', 'desc').limit(kind === 'rate' || kind === 'net' ? 50 : 200).get();
+  async leaderboard(kind, lite) {   // lite：跑馬燈用，只抓前 20 名，省流量
+    const s = await this.U.orderBy(kind === 'rate' ? 'rankBp' : kind === 'net' ? 'invites' : 'balance', 'desc').limit(lite ? 20 : kind === 'rate' || kind === 'net' ? 50 : 200).get();
     return sortBoard(s.docs.map(x => ({ uid: x.id, ...x.data() })), kind);
   }
 };
@@ -1752,7 +1752,7 @@ function renderHome() {
   const u = S.user, total = totalFloors();
   paintAvatar(); if (u && !B.hero()) introStory().then(pickHero);
   $('#uName').textContent = u ? u.name : '訪客';
-  $('#uTitle').textContent = u ? myTitle() : '尚未登入'; if (u) noticeDot();
+  $('#uTitle').textContent = u ? myTitle() : '尚未登入'; if (u) { noticeDot(); const nf = (u.floor || 0) + 1; if (nf <= totalFloors() && !S.floors[nf]) setTimeout(() => getFloorQ(nf).catch(() => {}), 400); }   // 先把下一道試煉的盤面抓好，按進入時不用等
   const prev = $('#uBal').textContent, now = u ? fmt(u.balance) : fmt(CONFIG.start);
   $('#uBal').textContent = now;
   if (u && prev !== now) { const p = $('#purse'); p.classList.remove('pulse'); void p.offsetWidth; p.classList.add('pulse'); }
@@ -1781,7 +1781,7 @@ const BGM = {
   off() { try { return localStorage.getItem('tq2bgm') === '0'; } catch (e) { return !!this.m; } },
   set(off) { this.m = off; try { localStorage.setItem('tq2bgm', off ? '0' : '1'); } catch (e) {} this.sync(); },
   paint() { const b = $('#btnBgm'); if (!b) return; const off = this.off(); b.setAttribute('aria-pressed', String(!off)); b.classList.toggle('off', off); },
-  get(k) { if (!this.el[k]) { const a = this.el[k] = new Audio(this.src[k]); a.loop = true; a.preload = 'auto'; a.volume = this.vol[k]; a.onerror = () => { a.bad = true; }; } return this.el[k]; },
+  get(k) { if (!this.el[k]) { const a = this.el[k] = new Audio(this.src[k]); a.loop = true; a.preload = 'none'; a.volume = this.vol[k]; a.onerror = () => { a.bad = true; }; } return this.el[k]; },
   sync() {
     this.paint(); if (!this.ok) return;
     const on = !this.off() && !document.hidden, cur = $('#battle').hidden ? 'main' : 'battle';
@@ -1803,7 +1803,7 @@ const BGM = {
 const NOTE = { key: 'tq2n:seen', seen() { try { return +localStorage.getItem(this.key) || 0; } catch (e) { return this.mem || 0; } }, mark(t) { this.mem = t; try { localStorage.setItem(this.key, String(t)); } catch (e) {} } };
 const sortNotes = l => l.sort((a, b) => (b.pinned - a.pinned) || (b.ts - a.ts));   // 置頂在最上面，其餘越新越上面
 const noteTime = ms => { const t = new Date(ms + 8 * 36e5), p = n => String(n).padStart(2, '0'); return `${t.getUTCFullYear()}/${p(t.getUTCMonth() + 1)}/${p(t.getUTCDate())} ${p(t.getUTCHours())}:${p(t.getUTCMinutes())}`; };
-async function noticeDot() { try { const l = await B.notices(), top = Math.max(0, ...l.map(x => x.ts)); const d = $('#noteDot'); if (d) d.hidden = !(top > NOTE.seen()); } catch (e) {} }
+async function noticeDot() { if (Date.now() - (NOTE.at || 0) < 3e5) return; NOTE.at = Date.now(); try { const l = await B.notices(), top = Math.max(0, ...l.map(x => x.ts)); const d = $('#noteDot'); if (d) d.hidden = !(top > NOTE.seen()); } catch (e) {} }
 async function noticeSheet() {
   const body = $('#sheetBody'), adm = isAdmin();
   body.innerHTML = `${adm ? `<div class="nt-form"><textarea id="ntText" rows="4" maxlength="1000" placeholder="輸入公告內容（最多 1000 字）" aria-label="公告內容"></textarea>
@@ -2036,7 +2036,7 @@ async function startFloor() {
     if (f > total) { toast(`目前 ${total} 道試煉都打完了！每天台北時間 00:00 過後會再新增 ${CONFIG.floorsPerDay} 道。`); return; }
     let q, pending;
     try { [q, pending] = await Promise.all([getFloorQ(f), B.pendingVote(f)]); }
-    catch (e) { toast('這道試煉的盤面讀取失敗，請稍後再試。'); return; }
+    catch (e) { console.warn(e); toast(`試煉之門擁擠，請稍等（${String(e.code || e.message || '').replace(/^.*\//, '').slice(0, 24)}）`); return; }
     const ctx = { q, floor: f, boss: q.boss, label: trial(f) };
     if (pending && isAdmin()) { try { await B.clearVote(f); pending = null; } catch (e) { toast('管理員：清除舊紀錄失敗，請確認已更新 Firestore 規則。'); } }
     if (!pending && f === CONFIG.lotFrom && !S.lotSeen) { S.lotSeen = true; await stageNotice('lot'); }
@@ -2097,10 +2097,10 @@ function enterBattle(ctx, resume) {
 /* ================= 跑馬燈：從排行榜資料推算，不需要額外寫入 ================= */
 const TK = { prev: null, topW: null, topR: null, queue: [], base: [], i: 0, busy: false, last: 0 };
 async function tickerPoll() {
-  if (!S.user || document.hidden || Date.now() - TK.last < 5000) return;
+  if (!S.user || document.hidden || !$('#battle').hidden || Date.now() - TK.last < 5000) return;   // 戰鬥中不抓排行榜，把網路留給出手結算
   TK.last = Date.now();
   const BOARDS = [['wealth', '財富榜'], ['rate', '勝率榜'], ['net', '人脈榜']];
-  let lists; try { lists = await Promise.all(BOARDS.map(([k]) => B.leaderboard(k))); } catch (e) { return; }
+  let lists; try { lists = await Promise.all(BOARDS.map(([k]) => B.leaderboard(k, true))); } catch (e) { return; }
   const cur = {}; lists.flat().forEach(u => { cur[u.uid] = { name: u.name, floor: u.floor || 0, peak: u.peak || 0, streak: u.streak || 0 }; });
   const top = lists.map(l => l.slice(0, 3).map(u => u.uid));
   if (TK.prev) {   // 第一次只記錄現況，之後有變化才播
@@ -2130,7 +2130,7 @@ function tickerRun() {
   if (reduceMotion() || !el.animate || !W) { el.style.transform = 'none'; setTimeout(done, 5000); return; }
   el.animate([{ transform: `translateX(${W}px)` }, { transform: `translateX(${-w}px)` }], { duration: (W + w) / 60 * 1000, easing: 'linear' }).onfinish = done;
 }
-setInterval(tickerPoll, 60000);
+setInterval(tickerPoll, 120000);
 function exitBattle() { $('#battle').hidden = true; $('#wave').hidden = true; FX.parts = []; S.battle = null; renderHome(); }
 function burst(stage, n) {
   for (let i = 0; i < n; i++) {
@@ -2151,7 +2151,11 @@ async function resolveBattle(choice) {
   catch (e) {
     if (e.message === 'ALREADY') { toast('這道試煉已經結算過了。'); const u = await B.refresh().catch(() => null); if (u) S.user = u; exitBattle(); return; }
     console.warn(e); b.locked = false; lockActs(false); $('#lots').classList.remove('locked');
-    toast(e.message === 'MISSING' ? '這道試煉的答案還沒準備好，請稍後再試。' : '連線失敗，請檢查網路後再出手一次。'); return;
+    const code = e.code || e.message || '';
+    const tag = String(code).replace(/^.*\//, '').slice(0, 24);   // 小字代碼留給管理員查原因
+    toast(`試煉之門擁擠，請稍等${tag ? `（${tag}）` : ''}`);
+    if (/permission/.test(code)) exitBattle();
+    return;
   }
   const ans = res.ans, pick = res.choice, ok = pick === ans.answer, stake = ans.stake * (res.mult || 1), st = settle(before, ok, stake);
   b.ans = ans; S.user = res.user; lockActs(true, pick); const achBefore = Object.keys(ACH).filter(id => achGot(id, before, HIST.stats())); HIST.add(b.floor, b.q.assetKey, ok, pick);
