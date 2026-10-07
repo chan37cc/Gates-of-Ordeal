@@ -865,6 +865,19 @@ button{font:inherit;color:inherit;cursor:pointer}
 .st-card p.fin{margin-top:14px;text-align:center;font:900 16px var(--f-title);color:#ffe9ae;letter-spacing:.06em}
 #battle .act,#battle .act.flat,#battle .act.long,#battle .act.short{font-size:clamp(15px,4.7vw,20px);gap:1px;padding:3% 0 0}
 #battle .act small{font-size:clamp(8.5px,2.45vw,10.5px)}
+.note-btn{margin-top:8px}.note-btn span{display:grid;place-items:center}
+.note-dot{position:absolute;right:-1px;top:-1px;width:10px;height:10px;border-radius:50%;background:#ff5a4d;box-shadow:0 0 0 2px #0c1236,0 0 8px #ff5a4d}.note-dot[hidden]{display:none}
+.nt-form{display:grid;gap:8px;margin-bottom:14px;padding:12px;border-radius:14px;background:#141d5cb3;box-shadow:inset 0 0 0 1.5px #f3d58acc}
+.nt-form textarea{width:100%;box-sizing:border-box;resize:vertical;border:0;border-radius:10px;padding:10px 12px;background:#0b123acc;color:#fff;font:500 15px/1.6 var(--f-body);box-shadow:inset 0 0 0 1px #b9d3ff66}
+.nt-row{display:flex;align-items:center;justify-content:space-between;gap:10px}.nt-pin{display:flex;align-items:center;gap:6px;color:#ffe9ae;font:700 14px var(--f-body)}.nt-pin input{width:18px;height:18px;accent-color:#e2b85a}
+.nt-list{list-style:none;margin:0;padding:0;display:grid;gap:10px}
+.nt-list li{padding:12px 14px;border-radius:14px;background:linear-gradient(100deg,#18246ecc,#22308acc 55%,#3a3a92b3);box-shadow:inset 0 0 0 1.5px #f3d58a88;color:#fff}
+.nt-list li.pin{box-shadow:inset 0 0 0 2px #ffe9ae,0 0 14px #ffd98a77}
+.nt-list li.nt-empty{text-align:center;color:#c9d6ff;font-size:14px}
+.nt-meta{display:flex;align-items:center;gap:8px;margin-bottom:6px;font:600 12px var(--f-body);color:#b7c2ea}
+.nt-tag{padding:2px 8px;border-radius:999px;background:linear-gradient(#fff3c8,#e2b85a);color:#3a2400;font:900 11px var(--f-title);letter-spacing:.08em}
+.nt-list p{margin:0;white-space:pre-wrap;overflow-wrap:anywhere;font:500 15px/1.7 var(--f-body)}
+.nt-act{display:flex;gap:8px;margin-top:10px}.nt-act button{border:0;border-radius:999px;padding:6px 12px;background:#0b123acc;color:#ffe9ae;box-shadow:inset 0 0 0 1px #f3d58a88;font:700 12px var(--f-body);cursor:pointer}.nt-act .del{color:#ffb2a8;box-shadow:inset 0 0 0 1px #ff8a7a88}
 </style>
 </head>
 <body>
@@ -899,6 +912,7 @@ button{font:inherit;color:inherit;cursor:pointer}
 
   <main class="map" id="map"><canvas id="mapCv"></canvas><div class="scene" id="scene"><i class="scene-glow"></i></div><div class="scene-stars" aria-hidden="true"></div></main>
   <button class="help-btn" id="btnAccount" aria-label="規則說明"><span>?</span></button>
+  <button class="help-btn note-btn" id="btnNotice" aria-label="公告"><span><svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 10v4h3l6 4V6L7 10H4z"/><path d="M16.5 9a4 4 0 0 1 0 6M19 6.5a7.5 7.5 0 0 1 0 11"/></svg></span><i class="note-dot" id="noteDot" hidden></i></button>
   <div class="ticker" id="ticker" hidden role="status" aria-live="off"><span class="tk-ico" aria-hidden="true">✦</span><div class="tk-win"><span id="tkTxt"></span></div></div>
   <button class="plaque" data-act="battle" id="towerRib">試煉 01</button>
   <button class="checkin" id="btnCheckin" hidden></button>
@@ -1063,7 +1077,7 @@ const CONFIG = {
     appId: "1:637732244476:web:fdee667878eac2c7794079"
   },
   // 題目、答案、總層數都由出題引擎（Apps Script）寫進這些集合
-  collections: { users: 'tq2_users', emails: 'tq2_emailIndex', floors: 'tq2_floors', answers: 'tq2_answers', meta: 'tq2_meta/tower' },
+  collections: { users: 'tq2_users', emails: 'tq2_emailIndex', floors: 'tq2_floors', answers: 'tq2_answers', meta: 'tq2_meta/tower', notices: 'tq2_notices' },
   start: 10000, invite: 5000,
   checkin: 1000,   // 每日簽到獎勵，台北時間 00:00 換日（firestore.rules 裡也有同一個數字）
   adminEmail: 'chan37fx@gmail.com',   // 管理員：可跳關、重置自己的紀錄（firestore.rules 裡也有同一個信箱）
@@ -1304,6 +1318,10 @@ const LOCAL = {
   async setHero(h) { const d = this.db(); d.users[d.session].hero = h; this.save(); },
   async rename(name) { const d = this.db(), u = d.users[d.session]; if (u.nameAt && Date.now() - u.nameAt < RENAME_MS) throw new Error('RENAME_WAIT'); u.name = name; u.nameAt = Date.now(); this.save(); return this.view(d.session); },
   async histOne() { return null; },
+  async notices() { return (this.db().notices || []).map(x => ({ ...x })); },
+  async noticeAdd(text, pinned) { const d = this.db(); (d.notices = d.notices || []).push({ id: 'n' + Date.now(), text, pinned: !!pinned, ts: Date.now() }); this.save(); },
+  async noticePin(id, pinned) { const d = this.db(), n = (d.notices || []).find(x => x.id === id); if (n) n.pinned = !!pinned; this.save(); },
+  async noticeDel(id) { const d = this.db(); d.notices = (d.notices || []).filter(x => x.id !== id); this.save(); },
   async setTitle(id) { const d = this.db(); d.users[d.session].title = id; this.save(); return this.view(d.session); },
   async checkin() { const d = this.db(), u = d.users[d.session], day = taipeiDay(); if ((u.checkDay || 0) >= day) throw new Error('CHECKED'); u.balance += CONFIG.checkin; u.peak = Math.max(u.peak || 0, netOf(u)); u.checkDay = day; this.save(); return this.view(d.session); },
   async adminSet(patch) { const d = this.db(); Object.assign(d.users[d.session], patch); this.save(); return this.view(d.session); },
@@ -1387,6 +1405,11 @@ const FB = {
     return this.refresh();
   },
   async setTitle(id) { await this.U.doc(this.uid).update({ title: id }); return this.refresh(); },
+  async notices() { const s = await this.db.collection(CONFIG.collections.notices).orderBy('ts', 'desc').limit(60).get();
+    return s.docs.map(x => { const d = x.data(); return { id: x.id, text: d.text || '', pinned: !!d.pinned, ts: d.ts && d.ts.toMillis ? d.ts.toMillis() : Date.now() }; }); },
+  async noticeAdd(text, pinned) { await this.db.collection(CONFIG.collections.notices).add({ text, pinned: !!pinned, ts: firebase.firestore.FieldValue.serverTimestamp() }); },
+  async noticePin(id, pinned) { await this.db.collection(CONFIG.collections.notices).doc(id).update({ pinned: !!pinned }); },
+  async noticeDel(id) { await this.db.collection(CONFIG.collections.notices).doc(id).delete(); },
   async signOut() { await this.auth.signOut(); },
   async resetPw(email) { await this.auth.sendPasswordResetEmail(email); },
   async refresh() { if (!this.uid) return null; const s = await this.U.doc(this.uid).get(); return s.exists ? norm(this.uid, this.email, s.data()) : null; },
@@ -1725,7 +1748,7 @@ function renderHome() {
   const u = S.user, total = totalFloors();
   paintAvatar(); if (u && !B.hero()) introStory().then(pickHero);
   $('#uName').textContent = u ? u.name : '訪客';
-  $('#uTitle').textContent = u ? myTitle() : '尚未登入';
+  $('#uTitle').textContent = u ? myTitle() : '尚未登入'; if (u) noticeDot();
   const prev = $('#uBal').textContent, now = u ? fmt(u.balance) : fmt(CONFIG.start);
   $('#uBal').textContent = now;
   if (u && prev !== now) { const p = $('#purse'); p.classList.remove('pulse'); void p.offsetWidth; p.classList.add('pulse'); }
@@ -1745,6 +1768,31 @@ function renderHome() {
   else if (!total) notes.push('塔還在建造中：題庫建立完成後就能開始挑戰。');
   $('#demoBar').hidden = !notes.length; $('#demoBar').textContent = notes.join(' ');
   if (S.entered && $('#battle').hidden) startMapLoop();
+}
+/* ================= 公告 ================= */
+const NOTE = { key: 'tq2n:seen', seen() { try { return +localStorage.getItem(this.key) || 0; } catch (e) { return this.mem || 0; } }, mark(t) { this.mem = t; try { localStorage.setItem(this.key, String(t)); } catch (e) {} } };
+const sortNotes = l => l.sort((a, b) => (b.pinned - a.pinned) || (b.ts - a.ts));   // 置頂在最上面，其餘越新越上面
+const noteTime = ms => { const t = new Date(ms + 8 * 36e5), p = n => String(n).padStart(2, '0'); return `${t.getUTCFullYear()}/${p(t.getUTCMonth() + 1)}/${p(t.getUTCDate())} ${p(t.getUTCHours())}:${p(t.getUTCMinutes())}`; };
+async function noticeDot() { try { const l = await B.notices(), top = Math.max(0, ...l.map(x => x.ts)); const d = $('#noteDot'); if (d) d.hidden = !(top > NOTE.seen()); } catch (e) {} }
+async function noticeSheet() {
+  const body = $('#sheetBody'), adm = isAdmin();
+  body.innerHTML = `${adm ? `<div class="nt-form"><textarea id="ntText" rows="4" maxlength="1000" placeholder="輸入公告內容（最多 1000 字）" aria-label="公告內容"></textarea>
+    <div class="nt-row"><label class="nt-pin"><input type="checkbox" id="ntPin"> 置頂</label><button class="btn gold" id="ntGo">發佈公告</button></div></div>` : ''}<ul class="nt-list" id="ntList"><li class="nt-empty">讀取中…</li></ul>`;
+  const load = async () => {
+    let l; try { l = sortNotes(await B.notices()); } catch (e) { console.warn(e); if ($('#ntList')) $('#ntList').innerHTML = '<li class="nt-empty">公告讀取失敗，請稍後再試。</li>'; return; }
+    if (S.sheet !== 'notice' || !$('#ntList')) return;
+    if (l.length) { NOTE.mark(Math.max(...l.map(x => x.ts))); $('#noteDot').hidden = true; }
+    $('#ntList').innerHTML = l.length ? l.map(n => `<li class="${n.pinned ? 'pin' : ''}"><div class="nt-meta">${n.pinned ? '<b class="nt-tag">置頂</b>' : ''}<time>${noteTime(n.ts)}</time></div><p>${esc(n.text)}</p>
+      ${adm ? `<div class="nt-act"><button data-pin="${n.id}" data-v="${n.pinned ? 0 : 1}">${n.pinned ? '取消置頂' : '置頂'}</button><button data-del="${n.id}" class="del">刪除</button></div>` : ''}</li>`).join('') : '<li class="nt-empty">目前沒有公告。</li>';
+    if (!adm) return;
+    const run = async (f, okMsg) => { try { await f(); toast(okMsg); await load(); } catch (e) { console.warn(e); toast('操作失敗，請稍後再試。'); } };
+    body.querySelectorAll('[data-pin]').forEach(x => x.onclick = () => run(() => B.noticePin(x.dataset.pin, x.dataset.v === '1'), x.dataset.v === '1' ? '已置頂。' : '已取消置頂。'));
+    body.querySelectorAll('[data-del]').forEach(x => x.onclick = () => { if (x.dataset.sure) run(() => B.noticeDel(x.dataset.del), '已刪除公告。'); else { x.dataset.sure = 1; x.textContent = '再按一次確認刪除'; } });
+  };
+  if (adm) $('#ntGo').onclick = async () => { const t = $('#ntText').value.trim(); if (!t) return toast('請先輸入公告內容。'); $('#ntGo').disabled = true;
+    try { await B.noticeAdd(t, $('#ntPin').checked); $('#ntText').value = ''; $('#ntPin').checked = false; toast('公告已發佈。'); await load(); } catch (e) { console.warn(e); toast('發佈失敗，請稍後再試。'); }
+    $('#ntGo').disabled = false; };
+  load();
 }
 function act(a) { if (a === 'battle') return startFloor(); openSheet(a); }
 
@@ -2155,7 +2203,8 @@ function openSheet(kind) {
   const u = S.user; if (!u) return showGate();
   S.sheet = kind; const body = $('#sheetBody');
   $('#sheet').classList.toggle('art', ['account'].includes(kind)); $('#sheet').hidden = false;
-  $('#sheetTitle').textContent = { rank: '排行榜', titles: '稱號殿', invite: '邀請好友', account: '戰績碑', rules: '規則說明', checkin: '每日簽到' }[kind];
+  $('#sheetTitle').textContent = { rank: '排行榜', titles: '稱號殿', invite: '邀請好友', account: '戰績碑', rules: '規則說明', checkin: '每日簽到', notice: '公告' }[kind];
+  if (kind === 'notice') { noticeSheet(); return; }
   if (kind === 'checkin') {
     const can = canCheckin(u);
     body.innerHTML = `<div class="ck"><p class="ck-k">DAILY REWARD</p><div class="big-plus metal-text">+${fmt(CONFIG.checkin)} U</div>
@@ -2333,6 +2382,7 @@ function bindUI() {
   $('#avatar').onclick = () => openSheet('account');
   $('#walletPlus').onclick = () => openSheet('invite');
   $('#btnAccount').onclick = () => openSheet('rules');
+  $('#btnNotice').onclick = () => openSheet('notice');
   $('#sheetClose').onclick = closeSheet;
   $('#sheet').onclick = e => { if (e.target.id === 'sheet') closeSheet(); };
   $('#bExit').onclick = exitBattle;
