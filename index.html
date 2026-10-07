@@ -881,6 +881,8 @@ button{font:inherit;color:inherit;cursor:pointer}
 .bgm-btn span{font:600 17px var(--f-display)}
 .bgm-btn.off span{color:#c9d2f5}.bgm-btn.off span::after{content:"";position:absolute;left:22%;right:22%;top:50%;height:1.5px;background:#ffb2a8;transform:rotate(-45deg)}
 .rules .credits{font-size:12.5px;line-height:1.8;opacity:.85;overflow-wrap:anywhere}
+/* 手機上關掉毛玻璃（背景模糊）：這是手機畫面一頓一頓最常見的來源，面板本身有底色，看起來差異很小 */
+@media (pointer:coarse){*,*::before,*::after{-webkit-backdrop-filter:none!important;backdrop-filter:none!important}}
 </style>
 </head>
 <body>
@@ -1511,9 +1513,11 @@ function makeGrain() {
     document.documentElement.style.setProperty('--grain', `url(${c.toDataURL()})`);
   } catch (e) {}
 }
+/* 效能：記憶體或核心數少的裝置算低階機，動態背景畫少一點 */
+const LOW_END = (navigator.deviceMemory && navigator.deviceMemory <= 4) || (navigator.hardwareConcurrency && navigator.hardwareConcurrency <= 4);
 function prepCanvas(cv) {
   const W = cv.clientWidth, H = cv.clientHeight; if (!W || !H) return null;
-  const dpr = Math.min(2, window.devicePixelRatio || 1);
+  const dpr = Math.min(LOW_END ? 1 : 1.5, window.devicePixelRatio || 1);   // 畫布解析度上限：手機 3 倍屏全解析度重畫太吃效能
   if (cv.width !== Math.round(W * dpr) || cv.height !== Math.round(H * dpr)) { cv.width = Math.round(W * dpr); cv.height = Math.round(H * dpr); }
   const g = cv.getContext('2d'); g.setTransform(1, 0, 0, 1, 0, 0); g.clearRect(0, 0, cv.width, cv.height);
   return { g, dpr, W, H };
@@ -1607,7 +1611,9 @@ function mapFrame(now) {
 function mapLoop(now) {
   MAP.raf = 0;
   if (!S.entered || !$('#battle').hidden) return;
-  mapFrame(now);
+  /* 主畫面雲霧：一般手機每秒 30 格、低階機 12 格；開著面板、看故事或切到別的分頁時不重畫 */
+  const busy = document.hidden || !$('#sheet').hidden || !$('#story').hidden || !$('#heroPick').hidden;
+  if (!busy && now - (MAP.drawn || 0) >= (LOW_END ? 80 : 32)) { MAP.drawn = now; mapFrame(now); }
   if (!reduceMotion()) MAP.raf = requestAnimationFrame(mapLoop);
 }
 function startMapLoop() { if (!MAP.raf) MAP.raf = requestAnimationFrame(mapLoop); }
@@ -2332,7 +2338,7 @@ function openSheet(kind) {
       $('#admFill').onclick = () => run({ riskDebt: 0 }, () => { closeSheet(); toast('風控護盾已補滿。'); });
       let armed = false;
       $('#admReset').onclick = () => { if (!armed) { armed = true; $('#admReset').textContent = '再按一次確認重置'; return; }
-        run({ floor: 0, balance: CONFIG.start, peak: CONFIG.start, wins: 0, losses: 0, total: 0, streak: 0, bestStreak: 0, rankBp: -1, riskDebt: 0, checkDay: 0, title: '' }, () => { HIST.put({}); openSheet('account'); toast('已重置：回到試煉 01、本金 10,000 U。'); }); };
+        run({ floor: 0, balance: CONFIG.start + (u.invites || 0) * CONFIG.invite, peak: CONFIG.start, wins: 0, losses: 0, total: 0, streak: 0, bestStreak: 0, rankBp: -1, riskDebt: 0, checkDay: 0, title: '' }, () => { HIST.put({}); openSheet('account'); toast(`已重置：回到試煉 01、本金 ${fmt(CONFIG.start + (u.invites || 0) * CONFIG.invite)} U${u.invites ? '（含邀請獎勵）' : ''}。`); }); };
     }
     HIST.fill().then(o => { const g = $('#aaGrid'); if (!g || S.sheet !== 'account') return;
       g.innerHTML = ['gold', 'btc', 'nasdaq', 'dow'].map(k => { const [w, t] = o[k]; return `<div class="aa-c"><span>${CONFIG.assetNames[k]}</span><b>${t ? (w / t * 100).toFixed(1) + '%' : '—'}</b><small>${t ? `${w} 勝 ${t - w} 敗` : '尚無紀錄'}</small></div>`; }).join(''); }).catch(() => {});
