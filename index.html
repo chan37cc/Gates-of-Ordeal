@@ -2203,11 +2203,13 @@ function openSheet(kind) {
       body.insertAdjacentHTML('beforeend', `<div class="ac-assets adm"><h3>管理員工具</h3>
         <div class="adm-row"><label for="admN">跳到試煉</label><input id="admN" type="number" inputmode="numeric" min="1" max="${totalFloors()}" value="${Math.min(u.floor + 1, totalFloors())}"><button id="admGo">前往</button></div>
         <div class="adm-row adm-r2"><button id="admRisk" class="adm-alt" aria-pressed="${u.riskTest}">套用風控護盾：${u.riskTest ? '開' : '關'}</button><button id="admFill" class="adm-alt">補滿額度</button></div>
+        <div class="adm-row adm-r2"><button id="admStory" class="adm-alt" style="grid-column:1/-1">重看開頭故事</button></div>
         <button id="admReset" class="adm-reset">重置我的關卡紀錄</button><p class="adm-msg" id="admMsg">共 ${totalFloors()} 道試煉。跳關只改進度，本金和戰績不變。</p></div>`);
       const msg = t => { const m = $('#admMsg'); if (m) m.textContent = t; };
       const run = async (patch, done) => { try { const nu = await B.adminSet(patch); if (nu) S.user = nu; S.lotSeen = S.riskSeen = false; renderHome(); done(); } catch (e) { msg('失敗：' + (e.code === 'permission-denied' ? '請先更新 Firestore 規則' : e.message)); } };
       $('#admGo').onclick = () => { const n = Math.floor(+$('#admN').value), t = totalFloors(); if (!(n >= 1 && n <= t)) return msg(`請輸入 1～${t}`); run({ floor: n - 1 }, () => { closeSheet(); toast(`已跳到${trial(n)}，按「進入試煉」開始。`); }); };
       $('#admRisk').onclick = () => run({ riskTest: !u.riskTest }, () => { openSheet('account'); toast(u.riskTest ? '風控護盾：管理員不受限。' : '風控護盾：已套用，和一般玩家一樣會扣額度、會被鎖。'); });
+      $('#admStory').onclick = () => { closeSheet(); STORY_P = null; introStory(); };
       $('#admFill').onclick = () => run({ riskDebt: 0 }, () => { closeSheet(); toast('風控護盾已補滿。'); });
       let armed = false;
       $('#admReset').onclick = () => { if (!armed) { armed = true; $('#admReset').textContent = '再按一次確認重置'; return; }
