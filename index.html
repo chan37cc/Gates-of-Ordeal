@@ -883,6 +883,7 @@ button{font:inherit;color:inherit;cursor:pointer}
 .rules .credits{font-size:12.5px;line-height:1.8;opacity:.85;overflow-wrap:anywhere}
 /* 手機上關掉毛玻璃（背景模糊）：這是手機畫面一頓一頓最常見的來源，面板本身有底色，看起來差異很小 */
 @media (pointer:coarse){*,*::before,*::after{-webkit-backdrop-filter:none!important;backdrop-filter:none!important}}
+.mail-fix{border:0;background:none;padding:0;color:#ffe9ae;font:inherit;font-weight:800;text-decoration:underline;cursor:pointer}
 </style>
 </head>
 <body>
@@ -1830,6 +1831,25 @@ async function noticeSheet() {
     $('#ntGo').disabled = false; };
   load();
 }
+/* ================= 信箱防呆：抓常見的打錯字（gmali.com、yahoo.con…） ================= */
+const MAIL_OK = ['gmail.com', 'yahoo.com', 'yahoo.com.tw', 'hotmail.com', 'hotmail.com.tw', 'outlook.com', 'icloud.com', 'live.com', 'msn.com', 'me.com', 'mac.com', 'mail.com', 'ymail.com', 'aol.com',
+  'proton.me', 'protonmail.com', 'pm.me', 'gmx.com', 'qq.com', '163.com', '126.com', 'naver.com', 'yahoo.co.jp', 'pchome.com.tw', 'seed.net.tw', 'hinet.net', 'ms1.hinet.net', 'kimo.com', 'googlemail.com', 'outlook.jp', 'live.cn', 'live.jp', 'hotmail.co.uk', 'yahoo.co.uk', 'yahoo.com.hk', 'email.com', 'gmail.com.tw', 'yahoo.cn', 'yahoo.com.cn', 'hotmail.fr', 'outlook.com.tw', 'icloud.com.cn', 'yahoo.fr', 'yahoo.de', 'hotmail.it'];
+const MAIL_POP = ['gmail.com', 'yahoo.com', 'yahoo.com.tw', 'hotmail.com', 'outlook.com', 'icloud.com'];   // 拿來比對打錯字的熱門網域
+const BAD_TLD = { con: 'com', cmo: 'com', ocm: 'com', comm: 'com', coom: 'com', vom: 'com', xom: 'com', cpm: 'com', clm: 'com', 'c0m': 'com',  comn: 'com', 'com,': 'com', ney: 'net', nte: 'net', met: 'net', tww: 'tw', te: 'tw' };
+function editDist(a, b) { const d = Array.from({ length: a.length + 1 }, (_, i) => [i]); for (let j = 1; j <= b.length; j++) d[0][j] = j;
+  for (let i = 1; i <= a.length; i++) for (let j = 1; j <= b.length; j++) d[i][j] = Math.min(d[i - 1][j] + 1, d[i][j - 1] + 1, d[i - 1][j - 1] + (a[i - 1] === b[j - 1] ? 0 : 1), i > 1 && j > 1 && a[i - 1] === b[j - 2] && a[i - 2] === b[j - 1] ? d[i - 2][j - 2] + 1 : 99);
+  return d[a.length][b.length]; }
+/* 回傳 { to: 建議的信箱, hard: 一定是錯的（例如 .con） }，沒問題就回傳 null */
+function mailTypo(email) {
+  const at = email.lastIndexOf('@'), user = email.slice(0, at); let dom = email.slice(at + 1).toLowerCase(), hard = false;
+  if (MAIL_OK.includes(dom)) return null;
+  const parts = dom.split('.'), tld = parts[parts.length - 1];
+  if (BAD_TLD[tld]) { parts[parts.length - 1] = BAD_TLD[tld]; dom = parts.join('.'); hard = true; if (MAIL_OK.includes(dom)) return { to: user + '@' + dom, hard }; }
+  let best = null, bd = 9;
+  for (const k of MAIL_POP) { const x = editDist(dom, k); if (x < bd) { bd = x; best = k; } }
+  if (best && bd > 0 && bd <= 2) return { to: user + '@' + best, hard };
+  return hard ? { to: user + '@' + dom, hard } : null;
+}
 function act(a) { if (a === 'battle') return startFloor(); openSheet(a); }
 
 /* ================= 戰鬥場景與怪物 ================= */
@@ -2385,6 +2405,7 @@ function renderAuth(body) {
     const email = $('#fEmail').value.trim(), pw = $('#fPw').value, name = reg ? $('#fName').value.trim() : '', refEmail = reg ? $('#fRef').value.trim() : '';
     const okMail = s => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(s);
     if (!okMail(email)) return err('請輸入正確的信箱。');
+    if (reg && mailTypo(email)) return err('信箱格式有誤');
     if (reg && !name) return err('請輸入暱稱。');
     if (pw.length < 6) return err('密碼至少要 6 個字元。');
     if (refEmail && !okMail(refEmail)) return err('推薦人信箱格式不正確。');
