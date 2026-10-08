@@ -884,6 +884,14 @@ button{font:inherit;color:inherit;cursor:pointer}
 /* 手機上關掉毛玻璃（背景模糊）：這是手機畫面一頓一頓最常見的來源，面板本身有底色，看起來差異很小 */
 @media (pointer:coarse){*,*::before,*::after{-webkit-backdrop-filter:none!important;backdrop-filter:none!important}}
 .mail-fix{border:0;background:none;padding:0;color:#ffe9ae;font:inherit;font-weight:800;text-decoration:underline;cursor:pointer}
+.ticker{border:0;width:auto;text-align:left;cursor:pointer;font:inherit;color:inherit}
+.tk-win{-webkit-mask-image:none;mask-image:none;text-overflow:ellipsis}#tkTxt{display:block;overflow:hidden;text-overflow:ellipsis;transform:none!important}
+.tk-go{flex:none;font:700 12px var(--f-title);color:#ffe9ae;letter-spacing:.04em}
+.fd-list li{display:flex;align-items:center;gap:10px;padding:11px 14px}
+.fd-list li p{flex:1;min-width:0;font-size:14.5px;line-height:1.5}.fd-list li b{color:#ffe9ae;font-weight:800}
+.fd-list time{flex:none;font:600 11.5px var(--f-body);color:#b7c2ea}
+.fd-ico{flex:none;width:26px;height:26px;border-radius:50%;display:grid;place-items:center;font-size:13px;color:#ffe9ae;background:#0b123acc;box-shadow:inset 0 0 0 1px #f3d58a88}
+.fd-list li.fd-rank{box-shadow:inset 0 0 0 2px #ffe9ae,0 0 12px #ffd98a66}
 </style>
 </head>
 <body>
@@ -920,7 +928,7 @@ button{font:inherit;color:inherit;cursor:pointer}
   <button class="help-btn" id="btnAccount" aria-label="規則說明"><span>?</span></button>
   <button class="help-btn note-btn" id="btnNotice" aria-label="公告"><span><svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 10v4h3l6 4V6L7 10H4z"/><path d="M16.5 9a4 4 0 0 1 0 6M19 6.5a7.5 7.5 0 0 1 0 11"/></svg></span><i class="note-dot" id="noteDot" hidden></i></button>
   <button class="help-btn note-btn bgm-btn" id="btnBgm" aria-label="音樂開關" aria-pressed="true"><span>♪</span></button>
-  <div class="ticker" id="ticker" hidden role="status" aria-live="off"><span class="tk-ico" aria-hidden="true">✦</span><div class="tk-win"><span id="tkTxt"></span></div></div>
+  <button class="ticker" id="ticker" hidden aria-label="試煉戰報"><span class="tk-ico" aria-hidden="true">✦</span><div class="tk-win"><span id="tkTxt"></span></div><span class="tk-go" aria-hidden="true">戰報 ›</span></button>
   <button class="plaque" data-act="battle" id="towerRib">試煉 01</button>
   <button class="checkin" id="btnCheckin" hidden></button>
   <div class="fill"></div>
@@ -1084,7 +1092,7 @@ const CONFIG = {
     appId: "1:637732244476:web:fdee667878eac2c7794079"
   },
   // 題目、答案、總層數都由出題引擎（Apps Script）寫進這些集合
-  collections: { users: 'tq2_users', emails: 'tq2_emailIndex', floors: 'tq2_floors', answers: 'tq2_answers', meta: 'tq2_meta/tower', notices: 'tq2_notices' },
+  collections: { users: 'tq2_users', emails: 'tq2_emailIndex', floors: 'tq2_floors', answers: 'tq2_answers', meta: 'tq2_meta/tower', notices: 'tq2_notices', feed: 'tq2_feed' },
   start: 10000, invite: 5000,
   checkin: 1000,   // 每日簽到獎勵，台北時間 00:00 換日（firestore.rules 裡也有同一個數字）
   adminEmail: 'chan37fx@gmail.com',   // 管理員：可跳關、重置自己的紀錄（firestore.rules 裡也有同一個信箱）
@@ -1325,6 +1333,8 @@ const LOCAL = {
   async setHero(h) { const d = this.db(); d.users[d.session].hero = h; this.save(); },
   async rename(name) { const d = this.db(), u = d.users[d.session]; if (u.nameAt && Date.now() - u.nameAt < RENAME_MS) throw new Error('RENAME_WAIT'); u.name = name; u.nameAt = Date.now(); this.save(); return this.view(d.session); },
   async histOne() { return null; },
+  async feed(n) { return (this.db().feed || []).slice().sort((a, b) => b.ts - a.ts).slice(0, n); },
+  async feedAdd(e) { const d = this.db(); (d.feed = d.feed || []).push({ ...e, uid: d.session, ts: Date.now() }); d.feed = d.feed.slice(-80); this.save(); },
   async notices() { return (this.db().notices || []).map(x => ({ ...x })); },
   async noticeAdd(text, pinned) { const d = this.db(); (d.notices = d.notices || []).push({ id: 'n' + Date.now(), text, pinned: !!pinned, ts: Date.now() }); this.save(); },
   async noticePin(id, pinned) { const d = this.db(), n = (d.notices || []).find(x => x.id === id); if (n) n.pinned = !!pinned; this.save(); },
@@ -1412,6 +1422,9 @@ const FB = {
     return this.refresh();
   },
   async setTitle(id) { await this.U.doc(this.uid).update({ title: id }); return this.refresh(); },
+  async feed(n) { const s = await this.db.collection(CONFIG.collections.feed).orderBy('ts', 'desc').limit(n).get();
+    return s.docs.map(x => { const d = x.data(); return { t: d.t, n: d.n || 0, s: d.s || '', name: d.name || '交易員', ts: d.ts && d.ts.toMillis ? d.ts.toMillis() : Date.now() }; }); },
+  async feedAdd(e) { await this.db.collection(CONFIG.collections.feed).add({ uid: this.uid, name: e.name, t: e.t, n: e.n, s: e.s, ts: firebase.firestore.FieldValue.serverTimestamp() }); },
   async notices() { const s = await this.db.collection(CONFIG.collections.notices).orderBy('ts', 'desc').limit(60).get();
     return s.docs.map(x => { const d = x.data(); return { id: x.id, text: d.text || '', pinned: !!d.pinned, ts: d.ts && d.ts.toMillis ? d.ts.toMillis() : Date.now() }; }); },
   async noticeAdd(text, pinned) { await this.db.collection(CONFIG.collections.notices).add({ text, pinned: !!pinned, ts: firebase.firestore.FieldValue.serverTimestamp() }); },
@@ -1466,7 +1479,7 @@ const FB = {
     return { user, ans, choice, mult, hit };
   },
   async leaderboard(kind, lite) {   // lite：跑馬燈用，只抓前 20 名，省流量
-    const s = await this.U.orderBy(kind === 'rate' ? 'rankBp' : kind === 'net' ? 'invites' : 'balance', 'desc').limit(lite ? 20 : kind === 'rate' || kind === 'net' ? 50 : 200).get();
+    const s = await this.U.orderBy(kind === 'rate' ? 'rankBp' : kind === 'net' ? 'invites' : 'balance', 'desc').limit(lite ? 10 : kind === 'rate' || kind === 'net' ? 50 : 100).get();
     return sortBoard(s.docs.map(x => ({ uid: x.id, ...x.data() })), kind);
   }
 };
@@ -1621,7 +1634,7 @@ function startMapLoop() { if (!MAP.raf) MAP.raf = requestAnimationFrame(mapLoop)
 function refreshTower() {
   const total = totalFloors(), cleared = S.user ? Math.min(S.user.floor, total) : 0;
   $('#towerRib').textContent = !total ? '塔正在建造中' : cleared >= total ? `已通過全部 ${total} 道試煉` : `${trial(cleared + 1)} ／ 共 ${total}`;
-  tickerPoll();
+  feedStrip();
 }
 
 /* ================= 開場（同一座神殿，鏡頭從殿門拉遠到全景） ================= */
@@ -1840,15 +1853,18 @@ function editDist(a, b) { const d = Array.from({ length: a.length + 1 }, (_, i) 
   for (let i = 1; i <= a.length; i++) for (let j = 1; j <= b.length; j++) d[i][j] = Math.min(d[i - 1][j] + 1, d[i][j - 1] + 1, d[i - 1][j - 1] + (a[i - 1] === b[j - 1] ? 0 : 1), i > 1 && j > 1 && a[i - 1] === b[j - 2] && a[i - 2] === b[j - 1] ? d[i - 2][j - 2] + 1 : 99);
   return d[a.length][b.length]; }
 /* 回傳 { to: 建議的信箱, hard: 一定是錯的（例如 .con） }，沒問題就回傳 null */
+const TLD_OK = 'com net org edu gov mil int tw hk mo cn jp kr sg my th vn ph id in au nz us ca uk de fr it es nl be ch at se no dk fi ie pt pl ru br mx ar tr ae sa il za eu asia me io co cc tv ai app dev xyz info biz pro top site online tech club shop store live email cloud blog name mobi page one work life world today'.split(' ');
+const MAIL_BRAND = ['gmail', 'yahoo', 'hotmail', 'outlook', 'icloud'];
 function mailTypo(email) {
-  const at = email.lastIndexOf('@'), user = email.slice(0, at); let dom = email.slice(at + 1).toLowerCase(), hard = false;
+  const at = email.lastIndexOf('@'), user = email.slice(0, at), dom = email.slice(at + 1).toLowerCase();
   if (MAIL_OK.includes(dom)) return null;
-  const parts = dom.split('.'), tld = parts[parts.length - 1];
-  if (BAD_TLD[tld]) { parts[parts.length - 1] = BAD_TLD[tld]; dom = parts.join('.'); hard = true; if (MAIL_OK.includes(dom)) return { to: user + '@' + dom, hard }; }
-  let best = null, bd = 9;
-  for (const k of MAIL_POP) { const x = editDist(dom, k); if (x < bd) { bd = x; best = k; } }
-  if (best && bd > 0 && bd <= 2) return { to: user + '@' + best, hard };
-  return hard ? { to: user + '@' + dom, hard } : null;
+  const parts = dom.split('.'), tld = parts[parts.length - 1], hit = { to: user + '@' + dom, hard: true };
+  if (parts.some(p => !p) || !/^[a-z0-9.-]+$/.test(dom)) return hit;          // 連續的點、全形或奇怪符號
+  if (BAD_TLD[tld] || !TLD_OK.includes(tld)) return hit;                       // 結尾不是認得的網域（.con、.cmo、.comm…）
+  if (parts.slice(1).some(p => BAD_TLD[p])) return hit;                        // 中間段打錯（yahoo.con.tw）
+  if (MAIL_BRAND.some(b => parts.some(p => p === b || (p.length >= 5 && editDist(p, b) <= (b.length > 5 ? 2 : 1))))) return hit;   // 是熱門信箱（或只差一兩個字），但整個網域不在名單裡
+  for (const k of MAIL_POP) if (editDist(dom, k) <= 2) return hit;
+  return null;
 }
 function act(a) { if (a === 'battle') return startFloor(); openSheet(a); }
 
@@ -2120,43 +2136,44 @@ function enterBattle(ctx, resume) {
   requestAnimationFrame(() => drawChart(0));
   if (!resume) introBattle(ctx);
 }
-/* ================= 跑馬燈：從排行榜資料推算，不需要額外寫入 ================= */
-const TK = { prev: null, topW: null, topR: null, queue: [], base: [], i: 0, busy: false, last: 0 };
-async function tickerPoll() {
-  if (!S.user || document.hidden || !$('#battle').hidden || Date.now() - TK.last < 5000) return;   // 戰鬥中不抓排行榜，把網路留給出手結算
-  TK.last = Date.now();
-  const BOARDS = [['wealth', '財富榜'], ['rate', '勝率榜'], ['net', '人脈榜']];
-  let lists; try { lists = await Promise.all(BOARDS.map(([k]) => B.leaderboard(k, true))); } catch (e) { return; }
-  const cur = {}; lists.flat().forEach(u => { cur[u.uid] = { name: u.name, floor: u.floor || 0, peak: u.peak || 0, streak: u.streak || 0 }; });
-  const top = lists.map(l => l.slice(0, 3).map(u => u.uid));
-  if (TK.prev) {   // 第一次只記錄現況，之後有變化才播
-    for (const [id, u] of Object.entries(cur)) {
-      const p = TK.prev[id]; if (!p) continue;
-      const k = Math.floor(u.floor / 10);
-      if (k > Math.floor(p.floor / 10)) TK.queue.push(`${u.name} 通過了${trial(k * 10)}！`);
-      if (titleOf(u.peak) !== titleOf(p.peak) && u.peak > p.peak) TK.queue.push(`${u.name} 獲得稱號「${titleOf(u.peak)}」！`);
-      const sk = Math.floor(u.streak / 5);
-      if (sk > Math.floor(p.streak / 5)) TK.queue.push(`${u.name} 達成 ${sk * 5} 連勝！`);
-    }
-    top.forEach((ids, bi) => ids.forEach((id, rank) => {
-      const was = TK.top[bi].indexOf(id);
-      if (cur[id] && (was < 0 || was > rank)) TK.queue.push(`${cur[id].name} 登上${BOARDS[bi][1]}第 ${rank + 1} 名！`);
-    }));
+/* ================= 試煉戰報（榮譽公佈欄）=================
+   玩家達成里程碑時，自己寫一筆紀錄到 tq2_feed；大家打開戰報時讀最新的幾十筆。不再定時抓排行榜，讀取量小很多。 */
+const FEED_BOARD = { wealth: '財富榜', rate: '勝率榜' };
+const feedText = e => e.t === 'floor' ? `突破${trial(e.n)}` : e.t === 'streak' ? `達成 ${e.n} 連勝` : e.t === 'title' ? `獲得稱號「${e.s}」` : e.t === 'rank' ? `登上${FEED_BOARD[e.s] || '排行榜'}第 ${e.n} 名` : '';
+const FEED = { top: null, at: 0, list: null, listAt: 0, rankAt: 0 };
+function feedPost(t, n, s) { if (!S.user) return; B.feedAdd({ t, n: n | 0, s: String(s || '').slice(0, 20), name: S.user.name }).then(() => { FEED.at = 0; FEED.listAt = 0; }).catch(e => console.warn('feed', e)); }
+/* 打完一題後檢查有沒有值得上戰報的事 */
+function feedAfter(before, u, newAch, ok) {
+  if (Math.floor(u.floor / 10) > Math.floor(before.floor / 10)) feedPost('floor', Math.floor(u.floor / 10) * 10);
+  if (ok && u.streak > 0 && u.streak % 5 === 0) feedPost('streak', u.streak);
+  if (titleOf(u.peak) !== titleOf(before.peak)) feedPost('title', 0, titleOf(u.peak));
+  newAch.forEach(id => feedPost('title', 0, ACH[id][1]));
+  if (ok && Date.now() - FEED.rankAt > 3e5) { FEED.rankAt = Date.now(); feedRank().catch(() => {}); }   // 名次最多 5 分鐘查一次
+}
+async function feedRank() {
+  const key = 'tq2rk:' + S.user.uid; let last = {}; try { last = JSON.parse(localStorage.getItem(key) || '{}'); } catch (e) {}
+  for (const k of ['wealth', 'rate']) {
+    const l = await B.leaderboard(k, true), r = l.findIndex(x => x.uid === S.user.uid) + 1;   // 0 = 不在前 10 名
+    if (r && (!last[k] || r < last[k])) feedPost('rank', r, k);
+    last[k] = r || 0;
   }
-  TK.prev = Object.assign(TK.prev || {}, cur); TK.top = top; TK.base = [];
-  tickerRun();
+  try { localStorage.setItem(key, JSON.stringify(last)); } catch (e) {}
 }
-function tickerRun() {
-  if (TK.busy) return;
-  const msg = TK.queue.shift() || (TK.base.length ? TK.base[TK.i++ % TK.base.length] : null);
-  const box = $('#ticker'); if (!msg) { box.hidden = true; return; }
-  box.hidden = false; const el = $('#tkTxt'); el.textContent = msg; TK.busy = true;
-  const done = () => { TK.busy = false; tickerRun(); };
-  const W = el.parentElement.clientWidth, w = el.offsetWidth;
-  if (reduceMotion() || !el.animate || !W) { el.style.transform = 'none'; setTimeout(done, 5000); return; }
-  el.animate([{ transform: `translateX(${W}px)` }, { transform: `translateX(${-w}px)` }], { duration: (W + w) / 60 * 1000, easing: 'linear' }).onfinish = done;
+/* 主畫面上那一條：顯示最新一則，點了打開整個戰報。3 分鐘內不重抓 */
+async function feedStrip() {
+  if (!S.user || document.hidden) return;
+  if (Date.now() - FEED.at > 18e4) { FEED.at = Date.now(); try { FEED.top = (await B.feed(1))[0] || null; } catch (e) {} }
+  const box = $('#ticker'), e = FEED.top; if (!box) return;
+  box.hidden = !e; if (e) $('#tkTxt').textContent = `${e.name} ${feedText(e)}`;
 }
-setInterval(tickerPoll, 120000);
+async function feedSheet() {
+  const body = $('#sheetBody'); body.innerHTML = '<ul class="nt-list fd-list" id="fdList"><li class="nt-empty">讀取中…</li></ul><p class="hint">突破每 10 道試煉、每 5 連勝、獲得新稱號、登上財富榜或勝率榜前 10 名，都會記在這裡。</p>';
+  try { if (!FEED.list || Date.now() - FEED.listAt > 6e4) { FEED.list = await B.feed(40); FEED.listAt = Date.now(); } }
+  catch (e) { console.warn(e); if ($('#fdList')) $('#fdList').innerHTML = '<li class="nt-empty">戰報讀取失敗，請稍後再試。</li>'; return; }
+  if (S.sheet !== 'feed' || !$('#fdList')) return;
+  const ago = ms => { const m = Math.max(0, Math.floor((Date.now() - ms) / 6e4)); return m < 1 ? '剛剛' : m < 60 ? `${m} 分鐘前` : m < 1440 ? `${Math.floor(m / 60)} 小時前` : noteTime(ms).slice(5, 10); };
+  $('#fdList').innerHTML = FEED.list.length ? FEED.list.map(e => `<li class="fd-${e.t}"><span class="fd-ico" aria-hidden="true">${{ floor: '⚔', streak: '🔥', title: '✦', rank: '♛' }[e.t] || '✦'}</span><p><b>${esc(e.name)}</b> ${esc(feedText(e))}</p><time>${ago(e.ts)}</time></li>`).join('') : '<li class="nt-empty">還沒有戰報，成為第一個上榜的人吧。</li>';
+}
 function exitBattle() { $('#battle').hidden = true; $('#wave').hidden = true; FX.parts = []; S.battle = null; renderHome(); }
 function burst(stage, n) {
   for (let i = 0; i < n; i++) {
@@ -2185,7 +2202,7 @@ async function resolveBattle(choice) {
   }
   const ans = res.ans, pick = res.choice, ok = pick === ans.answer, stake = ans.stake * (res.mult || 1), st = settle(before, ok, stake);
   b.ans = ans; S.user = res.user; lockActs(true, pick); const achBefore = Object.keys(ACH).filter(id => achGot(id, before, HIST.stats())); HIST.add(b.floor, b.q.assetKey, ok, pick);
-  { const stN = HIST.stats(), nu = Object.keys(ACH).filter(id => achGot(id, S.user, stN) && !achBefore.includes(id)); if (nu.length) setTimeout(() => toast(`解鎖稱號「${nu.map(id => ACH[id][1]).join('」「')}」！到稱號殿就能配戴。`), 5200); }
+  { const stN = HIST.stats(), nu = Object.keys(ACH).filter(id => achGot(id, S.user, stN) && !achBefore.includes(id)); try { feedAfter(before, S.user, nu, ok); } catch (e) { console.warn(e); } if (nu.length) setTimeout(() => toast(`解鎖稱號「${nu.map(id => ACH[id][1]).join('」「')}」！到稱號殿就能配戴。`), 5200); }
   for (let r = 1; r <= 3; r++) { if (S.battle !== b) return; b.reveal = r; setTf('15m'); drawChart(r); await sleep(380); }
   if (S.battle !== b) return;
   const mon = $('#monster'), stage = $('#stage'), hp = $('#mHp');
@@ -2263,8 +2280,9 @@ function openSheet(kind) {
   const u = S.user; if (!u) return showGate();
   S.sheet = kind; const body = $('#sheetBody');
   $('#sheet').classList.toggle('art', ['account'].includes(kind)); $('#sheet').hidden = false;
-  $('#sheetTitle').textContent = { rank: '排行榜', titles: '稱號殿', invite: '邀請好友', account: '戰績碑', rules: '規則說明', checkin: '每日簽到', notice: '公告' }[kind];
+  $('#sheetTitle').textContent = { rank: '排行榜', titles: '稱號殿', invite: '邀請好友', account: '戰績碑', rules: '規則說明', checkin: '每日簽到', notice: '公告', feed: '試煉戰報' }[kind];
   if (kind === 'notice') { noticeSheet(); return; }
+  if (kind === 'feed') { feedSheet(); return; }
   if (kind === 'checkin') {
     const can = canCheckin(u);
     body.innerHTML = `<div class="ck"><p class="ck-k">DAILY REWARD</p><div class="big-plus metal-text">+${fmt(CONFIG.checkin)} U</div>
@@ -2423,7 +2441,9 @@ function renderAuth(body) {
 }
 async function loadBoard() {
   const kind = S.boardKind, list = $('#lb');
-  let rows; try { rows = await B.leaderboard(kind); } catch (e) { if (list) list.innerHTML = `<li><span></span><span class="nm"><b>排行榜讀取失敗</b><span>${esc(e.message)}</span></span></li>`; return; }
+  /* 同一個榜 60 秒內重開不重抓，省讀取量 */
+  const LB = loadBoard.cache || (loadBoard.cache = {}), hit = LB[kind];
+  let rows; try { rows = hit && Date.now() - hit.at < 6e4 ? hit.rows : (LB[kind] = { at: Date.now(), rows: await B.leaderboard(kind) }).rows; } catch (e) { if (list) list.innerHTML = `<li><span></span><span class="nm"><b>排行榜讀取失敗</b><span>${esc(e.message)}</span></span></li>`; return; }
   if (S.sheet !== 'rank' || S.boardKind !== kind || !$('#lb')) return;
   if (!rows.length) { $('#lb').innerHTML = `<li><span></span><span class="nm"><b>還沒有人上榜</b><span>${kind === 'rate' ? `打滿 ${CONFIG.minRankGames} 戰就能上榜` : kind === 'net' ? '邀請第一位好友就能上榜' : '成為第一位挑戰者'}</span></span></li>`; return; }
   const ranked = rows.map((r, i) => [r, i]), mi = S.user ? rows.findIndex(r => r.uid === S.user.uid) : -1;
@@ -2446,6 +2466,7 @@ function bindUI() {
   $('#walletPlus').onclick = () => openSheet('invite');
   $('#btnAccount').onclick = () => openSheet('rules');
   $('#btnNotice').onclick = () => openSheet('notice');
+  $('#ticker').onclick = () => openSheet('feed');
   BGM.init();
   $('#sheetClose').onclick = closeSheet;
   $('#sheet').onclick = e => { if (e.target.id === 'sheet') closeSheet(); };
