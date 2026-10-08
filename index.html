@@ -1936,7 +1936,7 @@ function drawChart(reveal) {
   if (is15) {
     const xb = step * vis.length;
     g.setLineDash([4, 4]); g.strokeStyle = V('--gold'); g.beginPath(); g.moveTo(xb, top); g.lineTo(xb, bot); g.stroke(); g.setLineDash([]);
-    g.fillStyle = V('--gold-hi'); g.textAlign = 'center'; g.fillText('現在', xb, bot + 9);
+    g.fillStyle = V('--gold-hi'); g.textAlign = 'center'; { const lb = q.sourceHour ? `現在 ${q.sourceHour}` : '現在', hw = g.measureText(lb).width / 2 + 2; g.fillText(lb, Math.min(Math.max(xb, hw), plotW - hw), bot + 9); }   // 「現在」旁邊標上這根 K 棒的時間（台北）
     for (let k = fut.length; k < 3; k++) {
       const x = step * (vis.length + k + 0.5), yh = (top + bot) / 2, hw = Math.max(bw + 2, 10);
       g.strokeStyle = V('--gold'); g.setLineDash([3, 3]); g.strokeRect(x - hw / 2, yh - 26, hw, 52); g.setLineDash([]);
@@ -2141,7 +2141,7 @@ function enterBattle(ctx, resume) {
     L.querySelectorAll('button').forEach(x => { const m = +x.dataset.m; x.disabled = m > 1 && S.user.balance < ctx.q.stake * m; x.title = x.disabled ? '本金不足，無法選這個倍數' : ''; });
     L.querySelectorAll('button').forEach(x => x.onclick = () => { if (!L.classList.contains('locked')) setM(+x.dataset.m); }); }
   const q = ctx.q, ev = ctx.boss && (EVENT_INFO[ctx.boss.type] || EVENT_INFO.VOL), dp = dpOf(q), a = q.vis[q.vis.length - 1][3];
-  const when = q.sourceHour ? `台北 ${q.sourceHour}${q.sessionLabel ? ' · ' + q.sessionLabel : ''} · ` : '';
+  const when = q.sessionLabel ? `${q.sessionLabel} · ` : '';   // 時間改標在圖上「現在」那根 K 棒旁邊
   $('#cSym').innerHTML = `${esc(q.name)}<small>${ev ? '⚠ ' + esc(ev.data ? ev.name + '公布前一刻' : ev.name) + ' · ' : ''}${esc(when)}${q.demo ? '模擬盤面' : '真實歷史行情'}</small>`;
   $('#cFoot').textContent = `現價 ${a.toFixed(dp)}，判定點數 ${q.pts} 點。之後 3 根裡碰到 ${(a + q.pts).toFixed(dp)} 且第 3 根收盤不低於現價＝做多；碰到 ${(a - q.pts).toFixed(dp)} 且第 3 根收盤不高於現價＝做空；其餘＝盤整，不進場勝。答對 +${q.stake} U、答錯 −${q.stake} U。`;
   renderStreak(S.user.streak);
