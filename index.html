@@ -1219,7 +1219,7 @@ function judgeQ(vis, rev, pts) {
 }
 const cvCandles = a => (a || []).map(x => [+x.open, +x.high, +x.low, +x.close]);
 function floorFromDoc(d) {
-  return { floor: +d.floor, name: d.name || '', assetKey: d.assetKey || '', vis: cvCandles(d.candles15m), h1: cvCandles(d.candles1h), pts: +d.points,
+  return { floor: +d.floor, name: d.name || '', assetKey: d.assetKey || '', vis: cvCandles(d.candles15m), h1: cvCandles(d.candles1h), t15: (d.t15 || []).map(Number), t1h: (d.t1h || []).map(Number), pts: +d.points,
     sourceHour: d.sourceHour || '', sessionLabel: d.sessionLabel || '', boss: d.boss ? { type: EVENT_INFO[d.boss] ? d.boss : 'VOL' } : null, stake: +d.stake || CONFIG.stake };
 }
 function ansFromDoc(a) { return { answer: a.answer, pts: +a.points, finalMove: +a.finalMove, maxUp: +a.maxUp, maxDown: +a.maxDown, rev: cvCandles(a.reveal15m), sourceTime: a.sourceTime || '', stake: Math.trunc(+a.stake) || CONFIG.stake }; }
@@ -1958,6 +1958,16 @@ function monsterFor(ctx) {
 /* ================= K 線圖 ================= */
 let CSSV = null;
 function cssv() { if (!CSSV) { const cs = getComputedStyle(document.getElementById('battle')); CSSV = n => cs.getPropertyValue(n).trim(); } return CSSV; }
+/* 每根 K 棒的台北時間（分鐘數，0～1439）。有存真實時間就用真實時間；
+   沒存時間的舊題目，只有比特幣（24 小時不休市）或示範盤面才往回推算，其他商品因為有休市，不標，避免標錯 */
+function candleMins(q, is15, n) {
+  const real = is15 ? q.t15 : q.t1h, all = is15 ? q.vis : q.h1;
+  if (real && real.length === all.length) return real.slice(-n).map(t => Math.floor(((t + 8 * 36e5) % 864e5) / 6e4));
+  if (!q.sourceHour || !(q.demo || /btc/i.test(q.assetKey || ''))) return null;
+  const [hh, mm] = q.sourceHour.split(':').map(Number), a = hh * 60 + mm, step = is15 ? 15 : 60;
+  const first = is15 ? a - 15 : Math.floor((a - 1) / 60) * 60;   // 最後一根的開盤時間
+  return Array.from({ length: n }, (_, i) => (((first - (n - 1 - i) * step) % 1440) + 1440) % 1440);
+}
 function drawChart(reveal, o) {   // o：回憶之廊用 { cv, q, ans }，沒給就是畫戰鬥中的盤面
   const b = o || S.battle; if (!b) return;
   const q = b.q, cv = (o && o.cv) || $('#chart'), V = cssv(), dpr = window.devicePixelRatio || 1;
@@ -2005,7 +2015,14 @@ function drawChart(reveal, o) {   // o：回憶之廊用 { cv, q, ans }，沒給
       g.strokeStyle = V('--gold'); g.setLineDash([3, 3]); g.strokeRect(x - hw / 2, yh - 26, hw, 52); g.setLineDash([]);
       g.fillStyle = V('--gold-hi'); g.fillText('?', x, yh);
     }
-  } else { g.fillStyle = V('--muted'); g.textAlign = 'right'; g.fillText('1H 輔助視角（只到現在這一刻）', plotW, bot + 9); }
+  } else { g.fillStyle = V('--muted'); g.textAlign = 'right'; g.fillText('1H 輔助視角（只到現在這一刻）', plotW, candleMins(q, false, 1) ? top + 8 : bot + 9); }
+  /* 時間刻度：15 分圖每到整點標一次（每 4 根），1 小時圖每 4 小時標一次 */
+  { const mins = candleMins(q, is15, vis.length), xNow = step * vis.length;
+    if (mins) { g.save(); g.font = '9px "Noto Sans TC", sans-serif'; g.fillStyle = V('--muted'); g.textAlign = 'center'; let lastX = -99;
+      mins.forEach((m, i) => { if (m % (is15 ? 60 : 240)) return; const x = step * (i + 0.5), half = g.measureText('00:00').width / 2;
+        if ((is15 && Math.abs(x - xNow) < 50) || x < half || x - lastX < half * 2 + 3) return; lastX = x;   // 太擠就跳過，不讓字疊在一起
+        g.strokeStyle = '#ffffff10'; g.beginPath(); g.moveTo(x, top); g.lineTo(x, bot); g.stroke();
+        g.fillText(String(Math.floor(m / 60)).padStart(2, '0') + ':' + String(m % 60).padStart(2, '0'), x, bot + 9); }); g.restore(); } }
   const yl = Y(last);
   g.setLineDash([2, 3]); g.strokeStyle = V('--gold-hi'); g.beginPath(); g.moveTo(0, yl); g.lineTo(plotW, yl); g.stroke(); g.setLineDash([]);
   g.fillStyle = V('--gold'); g.fillRect(plotW + 2, yl - 8, axisW, 16);
