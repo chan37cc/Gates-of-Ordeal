@@ -1624,6 +1624,7 @@ function mapFrame(now) {
 }
 function mapLoop(now) {
   MAP.raf = 0;
+  if (!$('#mapCv').clientWidth) return;   // 畫布被 CSS 隱藏（現在主畫面用的是圖片）：直接停，不再空轉
   if (!S.entered || !$('#battle').hidden) return;
   /* 主畫面雲霧：一般手機每秒 30 格、低階機 12 格；開著面板、看故事或切到別的分頁時不重畫 */
   const busy = document.hidden || !$('#sheet').hidden || !$('#story').hidden || !$('#heroPick').hidden;
@@ -1641,7 +1642,7 @@ function refreshTower() {
 const TITLE = { raf: 0, motes: [], glints: [], t0: 0, last: 0 };
 function titleLoop(now) {
   TITLE.raf = 0; if ($('#title').hidden) return;
-  const f = prepCanvas($('#titleCv')); if (!f) { TITLE.raf = requestAnimationFrame(titleLoop); return; }
+  const f = prepCanvas($('#titleCv')); if (!f) return;   // 畫布被 CSS 隱藏（現在開場用的是圖片）：直接停，不再空轉
   const { g, dpr, W, H } = f, D = HOME, s = W / D.W, oy = H - D.H * s, t = now / 1000, dt = Math.min(.05, (now - (TITLE.last || now)) / 1000); TITLE.last = now;
   if (!TITLE.t0) TITLE.t0 = now;
   // 鏡頭：一開始貼近發光的殿門，緩緩拉遠到整座神殿，之後輕微呼吸
