@@ -892,6 +892,8 @@ button{font:inherit;color:inherit;cursor:pointer}
 .fd-list time{flex:none;font:600 11.5px var(--f-body);color:#b7c2ea}
 .fd-ico{flex:none;width:26px;height:26px;border-radius:50%;display:grid;place-items:center;font-size:13px;color:#ffe9ae;background:#0b123acc;box-shadow:inset 0 0 0 1px #f3d58a88}
 .fd-list li.fd-rank{box-shadow:inset 0 0 0 2px #ffe9ae,0 0 12px #ffd98a66}
+#ticker.ticker{position:absolute;left:14px;margin:0;z-index:3}
+#ticker.ticker[hidden]{display:none}
 </style>
 </head>
 <body>
@@ -2161,11 +2163,15 @@ async function feedRank() {
   try { localStorage.setItem(key, JSON.stringify(last)); } catch (e) {}
 }
 /* 主畫面上那一條：顯示最新一則，點了打開整個戰報。3 分鐘內不重抓 */
+/* 戰報條和右上角「？」放在同一排：跟著「？」的位置和高度走 */
+function feedPlace() { const q = $('#btnAccount'), t = $('#ticker'); if (!q || !t || !q.offsetParent) return;
+  t.style.top = q.offsetTop + 'px'; t.style.height = q.offsetHeight + 'px'; t.style.right = (q.offsetParent.clientWidth - q.offsetLeft + 10) + 'px'; }
+window.addEventListener('resize', () => feedPlace());
 async function feedStrip() {
   if (!S.user || document.hidden) return;
   if (Date.now() - FEED.at > 18e4) { FEED.at = Date.now(); try { FEED.top = (await B.feed(1))[0] || null; } catch (e) {} }
   const box = $('#ticker'), e = FEED.top; if (!box) return;
-  box.hidden = !e; if (e) $('#tkTxt').textContent = `${e.name} ${feedText(e)}`;
+  box.hidden = !e; feedPlace(); if (e) $('#tkTxt').textContent = `${e.name} ${feedText(e)}`;
 }
 async function feedSheet() {
   const body = $('#sheetBody'); body.innerHTML = '<ul class="nt-list fd-list" id="fdList"><li class="nt-empty">讀取中…</li></ul><p class="hint">突破每 10 道試煉、每 5 連勝、獲得新稱號、登上財富榜或勝率榜前 10 名，都會記在這裡。</p>';
