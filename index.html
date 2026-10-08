@@ -1094,7 +1094,7 @@ const CONFIG = {
     appId: "1:637732244476:web:fdee667878eac2c7794079"
   },
   // 題目、答案、總層數都由出題引擎（Apps Script）寫進這些集合
-  collections: { users: 'tq2_users', emails: 'tq2_emailIndex', floors: 'tq2_floors', answers: 'tq2_answers', meta: 'tq2_meta/tower', notices: 'tq2_notices', feed: 'tq2_feed' },
+  collections: { users: 'tq2_users', emails: 'tq2_emailIndex', floors: 'tq2_floors', answers: 'tq2_answers', meta: 'tq2_meta/tower', notices: 'tq2_notices', feed: 'tq2_feed', hist: 'tq2_hist' },
   start: 10000, invite: 5000,
   checkin: 1000,   // 每日簽到獎勵，台北時間 00:00 換日（firestore.rules 裡也有同一個數字）
   adminEmail: 'chan37fx@gmail.com',   // 管理員：可跳關、重置自己的紀錄（firestore.rules 裡也有同一個信箱）
@@ -1282,24 +1282,35 @@ const HIST = {
   key() { return 'tq2h:' + (S.user ? S.user.uid : ''); },
   get() { try { return JSON.parse(localStorage.getItem(this.key()) || '{}'); } catch (e) { return this.mem || (this.mem = {}); } },
   put(h) { this.mem = h; try { localStorage.setItem(this.key(), JSON.stringify(h)); } catch (e) {} },
-  add(n, k, ok, c) { const h = this.get(); h[n] = [k, ok ? 1 : 0, c || '']; this.put(h); },
+  add(n, k, ok, c) { const h = this.get(); h[n] = [k, ok ? 1 : 0, c || '']; this.put(h); B.histSave && B.histSave({ [n]: h[n] }).catch(() => {}); },   // 同步存一份到雲端，換手機也不用重抓
   stats(h) { h = h || this.get();
     const o = { asset: { gold: 0, btc: 0, nasdaq: 0, dow: 0 }, dir: { bull: 0, bear: 0, neutral: 0 }, winRun: 0, loseRun: 0 }; let w = 0, l = 0, prev = 0;
-    Object.keys(h).map(Number).sort((a, b) => a - b).forEach(n => { const [k, ok, c] = h[n], a = this.norm(k);
+    Object.keys(h).map(Number).sort((a, b) => a - b).forEach(n => { if (!Array.isArray(h[n])) return; const [k, ok, c] = h[n], a = this.norm(k);
       if (n !== prev + 1) w = l = 0; prev = n;
       if (ok) { if (a) o.asset[a]++; if (c in o.dir) o.dir[c]++; w++; l = 0; } else { l++; w = 0; }
       o.winRun = Math.max(o.winRun, w); o.loseRun = Math.max(o.loseRun, l); });
     return o; },
   norm(k) { k = String(k || '').toLowerCase(); return /gold|xau/.test(k) ? 'gold' : /btc|bitcoin/.test(k) ? 'btc' : /nas|nq|ndx/.test(k) ? 'nasdaq' : /dow|ym|dji/.test(k) ? 'dow' : ''; },
+  /* 補齊紀錄：1. 先讀雲端那份（1 次讀取） 2. 還缺的層才一層一層補抓，抓不到的記成 0 不再重抓 3. 補到的存回雲端，下次任何裝置都不用再抓 */
   async fill() {
-    const h = this.get(), need = []; for (let n = 1; n <= (S.user.floor || 0); n++) if (!h[n] || (B !== LOCAL && h[n].length < 3)) need.push(n);
-    for (let i = 0; i < need.length; i += 10) {
-      const got = await Promise.all(need.slice(i, i + 10).map(n => B.histOne(n).catch(() => null)));
-      got.forEach((r, j) => { if (r) h[need[i + j]] = r; });
-    }
-    if (need.length) this.put(h);
+    if (this.busy) return this.busy;
+    return (this.busy = (async () => {
+      const h = this.get(), F = S.user.floor || 0, has = n => n in h && (h[n] === 0 || B === LOCAL || h[n].length >= 3);
+      let miss = []; for (let n = 1; n <= F; n++) if (!has(n)) miss.push(n);
+      if (miss.length && B.histLoad) { try { const cloud = await B.histLoad(); for (const n of miss) if (cloud[n] !== undefined) h[n] = cloud[n]; } catch (e) {} miss = miss.filter(n => !has(n)); }
+      const got = {};
+      for (let i = 0; i < miss.length; i += 20) {
+        const res = await Promise.all(miss.slice(i, i + 20).map(n => B.histOne(n).catch(() => undefined)));
+        res.forEach((r, j) => { if (r === undefined) return; h[miss[i + j]] = got[miss[i + j]] = r || 0; });   // null（題目或紀錄不存在）記成 0，之後不再抓；連線失敗的下次再試
+      }
+      this.put(h);
+      if (Object.keys(got).length && B.histSave) B.histSave(got).catch(() => {});
+      return this.sum(h);
+    })().finally(() => { this.busy = null; }));
+  },
+  sum(h) {
     const out = { gold: [0, 0], btc: [0, 0], nasdaq: [0, 0], dow: [0, 0] };
-    Object.values(h).forEach(([k, ok]) => { const a = out[this.norm(k)]; if (a) { a[0] += ok; a[1]++; } });
+    Object.values(h).forEach(v => { if (!Array.isArray(v)) return; const a = out[this.norm(v[0])]; if (a) { a[0] += v[1]; a[1]++; } });
     return out;
   }
 };
@@ -1449,6 +1460,8 @@ const FB = {
     return this.refresh();
   },
   /* 回補某一層的紀錄（商品、對錯），給戰績碑算各商品勝率用 */
+  async histLoad() { const d = await this.db.collection(CONFIG.collections.hist).doc(this.uid).get(); return d.exists ? (d.data().h || {}) : {}; },
+  async histSave(part) { await this.db.collection(CONFIG.collections.hist).doc(this.uid).set({ h: part }, { merge: true }); },
   async histOne(n) {
     const [f, v] = await Promise.all([this.F.doc(String(n)).get(), this._vote(n).get()]);
     if (!f.exists || !v.exists) return null;
