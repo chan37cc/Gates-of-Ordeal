@@ -881,8 +881,8 @@ button{font:inherit;color:inherit;cursor:pointer}
 .bgm-btn span{font:600 17px var(--f-display)}
 .bgm-btn.off span{color:#c9d2f5}.bgm-btn.off span::after{content:"";position:absolute;left:22%;right:22%;top:50%;height:1.5px;background:#ffb2a8;transform:rotate(-45deg)}
 .rules .credits{font-size:12.5px;line-height:1.8;opacity:.85;overflow-wrap:anywhere}
-/* 手機上關掉毛玻璃（背景模糊）：這是手機畫面一頓一頓最常見的來源，面板本身有底色，看起來差異很小 */
-@media (pointer:coarse){*,*::before,*::after{-webkit-backdrop-filter:none!important;backdrop-filter:none!important}}
+/* 全部關掉毛玻璃（背景模糊）：手機和內顯筆電開面板時最常卡在這裡，面板本身有底色，看起來差異很小 */
+*,*::before,*::after{-webkit-backdrop-filter:none!important;backdrop-filter:none!important}
 .mail-fix{border:0;background:none;padding:0;color:#ffe9ae;font:inherit;font-weight:800;text-decoration:underline;cursor:pointer}
 .ticker{border:0;width:auto;text-align:left;cursor:pointer;font:inherit;color:inherit}
 .tk-win{-webkit-mask-image:none;mask-image:none;text-overflow:ellipsis}#tkTxt{display:block;overflow:hidden;text-overflow:ellipsis;transform:none!important}
