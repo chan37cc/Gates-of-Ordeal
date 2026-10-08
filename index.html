@@ -909,6 +909,10 @@ button{font:inherit;color:inherit;cursor:pointer}
 #btnReview .rv-lab{display:flex;align-items:center;gap:4px;margin-top:-8%;padding:1px 7px;border-radius:5px;white-space:nowrap;font:700 clamp(9px,2.4vw,11.5px) var(--f-title);letter-spacing:.1em;color:#ffe9ae;background:linear-gradient(#141a3fe6,#0b1030e6);box-shadow:inset 0 0 0 1px #c99a4a,0 2px 6px #0008;text-shadow:0 1px 2px #000}
 #btnReview .rv-lab em{font-style:normal;font-size:.75em;color:#f3d58a}
 #btnReview:active .rv-emb{filter:brightness(1.25)}
+.rv-head{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:4px 0 2px}.rv-head h3.tg{margin:0;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.rv-tabs{flex:none;display:inline-flex;gap:4px;padding:3px;margin:0;border-radius:999px;background:#0b123acc;box-shadow:inset 0 0 0 1px #f3d58a88}
+.rv-tabs button{border:0;border-radius:999px;padding:5px 13px;letter-spacing:.04em;background:none;color:#e6e9ff;font:700 13px var(--f-title);cursor:pointer}
+.rv-tabs button.on{background:linear-gradient(#fff3c8,#f0c866 55%,#c99232);color:#3a2400}
 </style>
 </head>
 <body>
@@ -1887,7 +1891,8 @@ async function reviewOne(n) {
   const dp = dpOf(q), now = q.vis[q.vis.length - 1][3], P = ans.pts, c3 = ans.rev[ans.rev.length - 1][3];
   const sg = v => (v > 0 ? '+' : v < 0 ? '−' : '') + Math.abs(v).toFixed(dp), L = { bull: '做多', bear: '做空', neutral: '盤整' };
   const cls = a => a === 'neutral' ? 'flat-t' : a === 'bull' ? 'good-t' : 'bad-t';
-  $('#rvBox').innerHTML = `<h3 class="tg" style="margin-top:4px">${trial(n)}・${esc(q.name)}</h3>
+  $('#rvBox').innerHTML = `<div class="rv-head"><h3 class="tg">${trial(n)}・${esc(q.name)}</h3>
+    ${q.h1.length ? '<div class="rv-tabs" role="tablist"><button data-tf="15m" class="on">15M</button><button data-tf="1h">1H</button></div>' : ''}</div>
     <div class="rv-chart"><canvas id="rvCv"></canvas></div>
     <dl class="facts rv-facts">
       <dt>你的判斷</dt><dd class="bad-t">${DIR_LABEL[choice] || choice}</dd>
@@ -1896,7 +1901,9 @@ async function reviewOne(n) {
       <dt>3 根走勢</dt><dd>最高 ${(now + ans.maxUp).toFixed(dp)}（${sg(ans.maxUp)}）・最低 ${(now - ans.maxDown).toFixed(dp)}（${sg(-ans.maxDown)}）・第 3 根收 ${c3.toFixed(dp)}（${sg(c3 - now)}）</dd>
       ${ans.sourceTime ? `<dt>盤面時間</dt><dd>${esc(ans.sourceTime)}</dd>` : ''}
     </dl>`;
-  requestAnimationFrame(() => drawChart(3, { cv: $('#rvCv'), q, ans }));
+  const paint = tf => drawChart(3, { cv: $('#rvCv'), q, ans, tf });
+  $('#rvBox').querySelectorAll('.rv-tabs button').forEach(x => x.onclick = () => { $('#rvBox').querySelectorAll('.rv-tabs button').forEach(y => y.classList.toggle('on', y === x)); paint(x.dataset.tf); });
+  requestAnimationFrame(() => paint('15m'));
 }
 /* ================= 公告 ================= */
 const NOTE = { key: 'tq2n:seen', seen() { try { return +localStorage.getItem(this.key) || 0; } catch (e) { return this.mem || 0; } }, mark(t) { this.mem = t; try { localStorage.setItem(this.key, String(t)); } catch (e) {} } };
@@ -1974,7 +1981,7 @@ function drawChart(reveal, o) {   // o：回憶之廊用 { cv, q, ans }，沒給
   const W = cv.clientWidth, H = cv.clientHeight; if (!W || !H) return;
   cv.width = W * dpr; cv.height = H * dpr;
   const g = cv.getContext('2d'); g.setTransform(dpr, 0, 0, dpr, 0, 0); g.clearRect(0, 0, W, H);
-  const is15 = (o ? '15m' : S.tf) === '15m' || !q.h1.length;
+  const is15 = (o ? (o.tf || '15m') : S.tf) === '15m' || !q.h1.length;
   const vis = is15 ? q.vis.slice(-44) : q.h1.slice(-40);
   const fut = is15 && b.ans ? b.ans.rev.slice(0, reveal) : [];
   const slots = vis.length + (is15 ? 3 : 0), shown = vis.concat(fut);
