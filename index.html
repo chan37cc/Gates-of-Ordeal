@@ -894,6 +894,21 @@ button{font:inherit;color:inherit;cursor:pointer}
 .fd-list li.fd-rank{box-shadow:inset 0 0 0 2px #ffe9ae,0 0 12px #ffd98a66}
 #ticker.ticker{position:absolute;left:14px;margin:0;z-index:3}
 #ticker.ticker[hidden]{display:none}
+.rv-list li{padding:0;overflow:hidden}
+.rv-item{width:100%;display:flex;align-items:center;gap:12px;padding:13px 14px;border:0;background:none;color:#fff;text-align:left;cursor:pointer;font:inherit}
+.rv-item b{flex:none;font:900 16px var(--f-title);color:#ffe9ae;letter-spacing:.04em}
+.rv-item span{flex:1;min-width:0;font-size:13.5px;color:#c9d6ff}.rv-item i{font-style:normal;color:#ffe9ae;font-size:18px}
+.rv-back{display:inline-flex;align-items:center;gap:6px;margin:0 0 10px;padding:8px 16px 8px 12px;border:0;border-radius:999px;cursor:pointer;font:900 14px var(--f-title);letter-spacing:.06em;color:#3a2400;background:linear-gradient(#fff3c8,#f0c866 55%,#c99232);box-shadow:inset 0 1px 0 #fff8,0 2px 8px #0009}
+.rv-back:active{filter:brightness(1.1)}
+.rv-chart{height:230px;border-radius:12px;background:#0b123acc;box-shadow:inset 0 0 0 1px #f3d58a66;margin:6px 0 12px;padding:4px}
+.rv-chart canvas{width:100%;height:100%;display:block}
+.rv-facts{color:#fff}
+/* 回憶之廊入口：放在主畫面右側雲海上（位置照設計稿）；星環圖示＋文字牌 */
+#btnReview.rv-art{position:absolute;z-index:3;left:calc(var(--sx) + var(--w) * 0.8905);bottom:calc(var(--ih) * 0.3947);transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:0;margin:0;padding:0;border:0;background:none;cursor:pointer;-webkit-tap-highlight-color:transparent}
+#btnReview .rv-emb{display:block;width:calc(var(--w) * 0.1275);height:calc(var(--ih) * 0.0754);background:center/100% 100% no-repeat}
+#btnReview .rv-lab{display:flex;align-items:center;gap:4px;margin-top:-8%;padding:1px 7px;border-radius:5px;white-space:nowrap;font:700 clamp(9px,2.4vw,11.5px) var(--f-title);letter-spacing:.1em;color:#ffe9ae;background:linear-gradient(#141a3fe6,#0b1030e6);box-shadow:inset 0 0 0 1px #c99a4a,0 2px 6px #0008;text-shadow:0 1px 2px #000}
+#btnReview .rv-lab em{font-style:normal;font-size:.75em;color:#f3d58a}
+#btnReview:active .rv-emb{filter:brightness(1.25)}
 </style>
 </head>
 <body>
@@ -929,6 +944,7 @@ button{font:inherit;color:inherit;cursor:pointer}
   <main class="map" id="map"><canvas id="mapCv"></canvas><div class="scene" id="scene"><i class="scene-glow"></i></div><div class="scene-stars" aria-hidden="true"></div></main>
   <button class="help-btn" id="btnAccount" aria-label="規則說明"><span>?</span></button>
   <button class="help-btn note-btn" id="btnNotice" aria-label="公告"><span><svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 10v4h3l6 4V6L7 10H4z"/><path d="M16.5 9a4 4 0 0 1 0 6M19 6.5a7.5 7.5 0 0 1 0 11"/></svg></span><i class="note-dot" id="noteDot" hidden></i></button>
+  <button class="rv-art" id="btnReview" aria-label="回憶之廊"><i class="rv-emb" aria-hidden="true"></i><b class="rv-lab"><em aria-hidden="true">✦</em>回憶之廊<em aria-hidden="true">✦</em></b></button>
   <button class="help-btn note-btn bgm-btn" id="btnBgm" aria-label="音樂開關" aria-pressed="true"><span>♪</span></button>
   <button class="ticker" id="ticker" hidden aria-label="試煉戰報"><span class="tk-ico" aria-hidden="true">✦</span><div class="tk-win"><span id="tkTxt"></span></div><span class="tk-go" aria-hidden="true">戰報 ›</span></button>
   <button class="plaque" data-act="battle" id="towerRib">試煉 01</button>
@@ -1076,6 +1092,7 @@ const ACCT_SRC = 'img/acct.webp';
 const INV_SRC = '';
 const TITLES_SRC = '';
 const SP = {back:'img/sp.webp',title:'img/sp2.webp',bal:'img/sp3.webp',hp:'img/sp4.webp',streak:'img/sp5.webp',chart:'img/sp6.webp',text:'img/sp7.webp',bl:'img/sp8.webp',bm:'img/sp9.webp',br:'img/sp10.webp'};
+const RVI_SRC = 'img/rvi.webp';
 const HEAD_SRC = 'img/head.webp';
 const INSIDE_SRC = 'img/inside.webp';
 
@@ -1346,6 +1363,7 @@ const LOCAL = {
   async setHero(h) { const d = this.db(); d.users[d.session].hero = h; this.save(); },
   async rename(name) { const d = this.db(), u = d.users[d.session]; if (u.nameAt && Date.now() - u.nameAt < RENAME_MS) throw new Error('RENAME_WAIT'); u.name = name; u.nameAt = Date.now(); this.save(); return this.view(d.session); },
   async histOne() { return null; },
+  async reviewOne(n) { const q = demoFloor(n), h = HIST.get()[n]; if (!Array.isArray(h) || !h[2]) throw new Error('NOVOTE'); return { q, ans: q._ans, choice: h[2] }; },
   async feed(n) { return (this.db().feed || []).slice().sort((a, b) => b.ts - a.ts).slice(0, n); },
   async feedAdd(e) { const d = this.db(); (d.feed = d.feed || []).push({ ...e, uid: d.session, ts: Date.now() }); d.feed = d.feed.slice(-80); this.save(); },
   async notices() { return (this.db().notices || []).map(x => ({ ...x })); },
@@ -1460,6 +1478,12 @@ const FB = {
     return this.refresh();
   },
   /* 回補某一層的紀錄（商品、對錯），給戰績碑算各商品勝率用 */
+  /* 回憶之廊：重看一題。必須真的送出過選擇（雲端規則也規定送出後才讀得到答案），而且選擇和答案不同 */
+  async reviewOne(n) {
+    const v = await this._vote(n).get(); if (!v.exists) throw new Error('NOVOTE');
+    const [q, a] = await Promise.all([getFloorQ(n), this.A.doc(String(n)).get()]); if (!a.exists) throw new Error('MISSING');
+    return { q, ans: ansFromDoc(a.data()), choice: v.data().choice };
+  },
   async histLoad() { const d = await this.db.collection(CONFIG.collections.hist).doc(this.uid).get(); return d.exists ? (d.data().h || {}) : {}; },
   async histSave(part) { await this.db.collection(CONFIG.collections.hist).doc(this.uid).set({ h: part }, { merge: true }); },
   async histOne(n) {
@@ -1835,6 +1859,45 @@ const BGM = {
     setInterval(() => this.sync(), 600); this.paint();
   }
 };
+/* ================= 回憶之廊：重看自己答錯的試煉 =================
+   清單來自作答紀錄（只列「答過而且答錯」的關卡）；點進去時再向雲端確認：真的送出過選擇、而且選擇和答案不同，才會顯示答案 */
+const RV = { cache: {} };
+async function reviewSheet() {
+  const body = $('#sheetBody'); body.innerHTML = '<ul class="nt-list rv-list" id="rvList"><li class="nt-empty">讀取中…</li></ul>';
+  try { await HIST.fill(); } catch (e) {}
+  if (S.sheet !== 'review' || !$('#rvList')) return;
+  const h = HIST.get(), F = S.user.floor || 0, N = CONFIG.assetNames;
+  const wrong = Object.keys(h).map(Number).filter(n => n >= 1 && n <= F && Array.isArray(h[n]) && h[n][1] === 0).sort((a, b) => b - a);
+  $('#rvList').innerHTML = wrong.length ? wrong.map(n => { const [k, , c] = h[n], a = HIST.norm(k);
+    return `<li><button class="rv-item" data-n="${n}"><b>${trial(n)}</b><span>${a ? N[a] : '試煉'}${c ? ' · 你選了' + ({ bull: '做多', bear: '做空', neutral: '不進場' }[c] || '') : ''}</span><i aria-hidden="true">›</i></button></li>`; }).join('')
+    : '<li class="nt-empty">目前沒有答錯的試煉。答錯的關卡會收進這裡，方便你回來覆盤。</li>';
+  body.querySelectorAll('.rv-item').forEach(x => x.onclick = () => reviewOne(+x.dataset.n));
+}
+async function reviewOne(n) {
+  const body = $('#sheetBody'); body.innerHTML = `<button class="rv-back" id="rvBack">‹ 返回列表</button><div id="rvBox"><p class="hint">讀取中…</p></div>`;
+  $('#rvBack').onclick = reviewSheet; body.scrollTop = 0;
+  let r; try { r = RV.cache[n] || (RV.cache[n] = await B.reviewOne(n)); }
+  catch (e) { console.warn(e); delete RV.cache[n]; if ($('#rvBox')) $('#rvBox').innerHTML = '<p class="hint">這一題目前無法重看（沒有找到你的作答紀錄）。</p>'; return; }
+  if (S.sheet !== 'review' || !$('#rvBox')) return;
+  const { q, ans, choice } = r;
+  if (choice === ans.answer) {   // 雲端顯示這題其實答對：從清單移除，不顯示答案
+    const h = HIST.get(); if (Array.isArray(h[n])) { h[n][1] = 1; HIST.put(h); }
+    $('#rvBox').innerHTML = '<p class="hint">這一題你答對了，不在回憶之廊裡。</p>'; return;
+  }
+  const dp = dpOf(q), now = q.vis[q.vis.length - 1][3], P = ans.pts, c3 = ans.rev[ans.rev.length - 1][3];
+  const sg = v => (v > 0 ? '+' : v < 0 ? '−' : '') + Math.abs(v).toFixed(dp), L = { bull: '做多', bear: '做空', neutral: '盤整' };
+  const cls = a => a === 'neutral' ? 'flat-t' : a === 'bull' ? 'good-t' : 'bad-t';
+  $('#rvBox').innerHTML = `<h3 class="tg" style="margin-top:4px">${trial(n)}・${esc(q.name)}</h3>
+    <div class="rv-chart"><canvas id="rvCv"></canvas></div>
+    <dl class="facts rv-facts">
+      <dt>你的判斷</dt><dd class="bad-t">${DIR_LABEL[choice] || choice}</dd>
+      <dt>正確答案</dt><dd class="${cls(ans.answer)}">${L[ans.answer]}（${whyOf(q, ans)}）</dd>
+      <dt>現價</dt><dd>${now.toFixed(dp)}（做多線 ${(now + P).toFixed(dp)}／做空線 ${(now - P).toFixed(dp)}）</dd>
+      <dt>3 根走勢</dt><dd>最高 ${(now + ans.maxUp).toFixed(dp)}（${sg(ans.maxUp)}）・最低 ${(now - ans.maxDown).toFixed(dp)}（${sg(-ans.maxDown)}）・第 3 根收 ${c3.toFixed(dp)}（${sg(c3 - now)}）</dd>
+      ${ans.sourceTime ? `<dt>盤面時間</dt><dd>${esc(ans.sourceTime)}</dd>` : ''}
+    </dl>`;
+  requestAnimationFrame(() => drawChart(3, { cv: $('#rvCv'), q, ans }));
+}
 /* ================= 公告 ================= */
 const NOTE = { key: 'tq2n:seen', seen() { try { return +localStorage.getItem(this.key) || 0; } catch (e) { return this.mem || 0; } }, mark(t) { this.mem = t; try { localStorage.setItem(this.key, String(t)); } catch (e) {} } };
 const sortNotes = l => l.sort((a, b) => (b.pinned - a.pinned) || (b.ts - a.ts));   // 置頂在最上面，其餘越新越上面
@@ -1895,13 +1958,13 @@ function monsterFor(ctx) {
 /* ================= K 線圖 ================= */
 let CSSV = null;
 function cssv() { if (!CSSV) { const cs = getComputedStyle(document.getElementById('battle')); CSSV = n => cs.getPropertyValue(n).trim(); } return CSSV; }
-function drawChart(reveal) {
-  const b = S.battle; if (!b) return;
-  const q = b.q, cv = $('#chart'), V = cssv(), dpr = window.devicePixelRatio || 1;
+function drawChart(reveal, o) {   // o：回憶之廊用 { cv, q, ans }，沒給就是畫戰鬥中的盤面
+  const b = o || S.battle; if (!b) return;
+  const q = b.q, cv = (o && o.cv) || $('#chart'), V = cssv(), dpr = window.devicePixelRatio || 1;
   const W = cv.clientWidth, H = cv.clientHeight; if (!W || !H) return;
   cv.width = W * dpr; cv.height = H * dpr;
   const g = cv.getContext('2d'); g.setTransform(dpr, 0, 0, dpr, 0, 0); g.clearRect(0, 0, W, H);
-  const is15 = S.tf === '15m' || !q.h1.length;
+  const is15 = (o ? '15m' : S.tf) === '15m' || !q.h1.length;
   const vis = is15 ? q.vis.slice(-44) : q.h1.slice(-40);
   const fut = is15 && b.ans ? b.ans.rev.slice(0, reveal) : [];
   const slots = vis.length + (is15 ? 3 : 0), shown = vis.concat(fut);
@@ -2255,17 +2318,20 @@ async function resolveBattle(choice) {
   b.hit = !!res.hit;
   if (S.battle === b) showResult(b, pick, ok, stake, st);
 }
+/* 判定說明：為什麼答案是做多／做空／盤整（結算畫面和回憶之廊共用） */
+function whyOf(q, ans) {
+  const P = ans.pts, now = q.vis[q.vis.length - 1][3], c3 = ans.rev[ans.rev.length - 1][3], upHit = ans.maxUp >= P, dnHit = ans.maxDown >= P;
+  if (upHit && dnHit) return `上下都碰到 ±${P} 點，第 3 根收在現價${c3 > now ? '之上' : c3 < now ? '之下' : ''}`;
+  if (upHit) return c3 >= now ? `碰到 +${P} 點，第 3 根收盤沒有跌回現價之下` : `碰到 +${P} 點，但第 3 根收盤跌回現價之下`;
+  if (dnHit) return c3 <= now ? `碰到 −${P} 點，第 3 根收盤沒有漲回現價之上` : `碰到 −${P} 點，但第 3 根收盤漲回現價之上`;
+  return `上下都沒碰到 ±${P} 點`;
+}
 function showResult(b, pick, ok, stake, st) {
   const q = b.q, ans = b.ans, dp = dpOf(q), total = totalFloors(), more = S.user.floor < total, rOn = riskOn(S.user), rLeft = rOn ? riskLeft(S.user) : CONFIG.riskMax, canNext = more && rLeft > 0, P = ans.pts;
   const ev = b.boss && (EVENT_INFO[b.boss.type] || EVENT_INFO.VOL), who = b.monName;
   const now = q.vis[q.vis.length - 1][3], c3 = ans.rev[ans.rev.length - 1][3];
   const sg = v => (v > 0 ? '+' : v < 0 ? '−' : '') + Math.abs(v).toFixed(dp);
-  const upHit = ans.maxUp >= P, dnHit = ans.maxDown >= P;
-  let why;
-  if (upHit && dnHit) why = `上下都碰到 ±${P} 點，第 3 根收在現價${c3 > now ? '之上' : c3 < now ? '之下' : ''}`;
-  else if (upHit) why = c3 >= now ? `碰到 +${P} 點，第 3 根收盤沒有跌回現價之下` : `碰到 +${P} 點，但第 3 根收盤跌回現價之下`;
-  else if (dnHit) why = c3 <= now ? `碰到 −${P} 點，第 3 根收盤沒有漲回現價之上` : `碰到 −${P} 點，但第 3 根收盤漲回現價之上`;
-  else why = `上下都沒碰到 ±${P} 點`;
+  const why = whyOf(q, ans);
   let head, line;
   if (ok && pick === 'neutral') { head = '逃過陷阱！'; line = `你逃過了「${esc(who)}」設下的盤整陷阱，沒進場就是最好的進場。`; }
   else if (ok) { head = b.boss ? '魔王討伐成功！' : '擊敗！'; line = `一刀斬下「${esc(who)}」。`; }
@@ -2300,9 +2366,10 @@ function openSheet(kind) {
   const u = S.user; if (!u) return showGate();
   S.sheet = kind; const body = $('#sheetBody');
   $('#sheet').classList.toggle('art', ['account'].includes(kind)); $('#sheet').hidden = false;
-  $('#sheetTitle').textContent = { rank: '排行榜', titles: '稱號殿', invite: '邀請好友', account: '戰績碑', rules: '規則說明', checkin: '每日簽到', notice: '公告', feed: '試煉戰報' }[kind];
+  $('#sheetTitle').textContent = { rank: '排行榜', titles: '稱號殿', invite: '邀請好友', account: '戰績碑', rules: '規則說明', checkin: '每日簽到', notice: '公告', feed: '試煉戰報', review: '回憶之廊' }[kind];
   if (kind === 'notice') { noticeSheet(); return; }
   if (kind === 'feed') { feedSheet(); return; }
+  if (kind === 'review') { reviewSheet(); return; }
   if (kind === 'checkin') {
     const can = canCheckin(u);
     body.innerHTML = `<div class="ck"><p class="ck-k">DAILY REWARD</p><div class="big-plus metal-text">+${fmt(CONFIG.checkin)} U</div>
@@ -2487,6 +2554,7 @@ function bindUI() {
   $('#btnAccount').onclick = () => openSheet('rules');
   $('#btnNotice').onclick = () => openSheet('notice');
   $('#ticker').onclick = () => openSheet('feed');
+  $('#btnReview').onclick = () => openSheet('review'); $('#btnReview .rv-emb').style.backgroundImage = `url(${RVI_SRC})`;
   BGM.init();
   $('#sheetClose').onclick = closeSheet;
   $('#sheet').onclick = e => { if (e.target.id === 'sheet') closeSheet(); };
@@ -2539,6 +2607,6 @@ function boot() {
 }
 boot();
 </script>
-<script>addEventListener("load",()=>setTimeout(()=>{const q=["heroes.webp", "heroes2.webp", "night.webp", "acct.webp", "head.webp", "inside.webp", "mon.webp", "mon10.webp", "mon11.webp", "mon12.webp", "mon13.webp", "mon14.webp", "mon2.webp", "mon3.webp", "mon4.webp", "mon5.webp", "mon6.webp", "mon7.webp", "mon8.webp", "mon9.webp", "sp.webp", "sp10.webp", "sp2.webp", "sp3.webp", "sp4.webp", "sp5.webp", "sp6.webp", "sp7.webp", "sp8.webp", "sp9.webp"];(function n(){const f=q.shift();if(!f)return;const i=new Image();i.onload=i.onerror=n;i.src="img/"+f})()},1200));</script>
+<script>addEventListener("load",()=>setTimeout(()=>{const q=["heroes.webp", "heroes2.webp", "night.webp", "acct.webp", "head.webp", "inside.webp", "mon.webp", "mon10.webp", "mon11.webp", "mon12.webp", "mon13.webp", "mon14.webp", "mon2.webp", "mon3.webp", "mon4.webp", "mon5.webp", "mon6.webp", "mon7.webp", "mon8.webp", "mon9.webp", "rvi.webp", "sp.webp", "sp10.webp", "sp2.webp", "sp3.webp", "sp4.webp", "sp5.webp", "sp6.webp", "sp7.webp", "sp8.webp", "sp9.webp"];(function n(){const f=q.shift();if(!f)return;const i=new Image();i.onload=i.onerror=n;i.src="img/"+f})()},1200));</script>
 </body>
 </html>
