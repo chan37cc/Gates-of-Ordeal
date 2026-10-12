@@ -942,6 +942,16 @@ button{font:inherit;color:inherit;cursor:pointer}
 .story{padding-left:58px;padding-right:58px}
 .st-text.rich{max-width:min(360px,calc(100vw - 112px))}
 .story .st-text > p{font-size:clamp(15.5px,4.3vw,19px);letter-spacing:.03em}   /* 只調故事段落，不影響規則教學卡片 */
+#tour{position:absolute;inset:0;z-index:60;overflow:hidden}
+#tour[hidden]{display:none}
+.tr-hole{position:absolute;box-shadow:0 0 0 2000px #050819d9,0 0 0 2px #ffe9ae,0 0 22px 4px #ffd98a88;transition:all .35s cubic-bezier(.3,.7,.2,1);pointer-events:none}
+.tr-box{position:absolute;left:14px;right:14px;padding:14px 16px 12px;border-radius:16px;background:linear-gradient(#141d5cf2,#0b123af2);box-shadow:inset 0 0 0 1.5px #f3d58a,0 8px 24px #000a;color:#fff;transition:top .35s,bottom .35s}
+.tr-box.mid{top:50%;bottom:auto;transform:translateY(-50%)}
+.tr-k{margin:0 0 4px;font:700 11px var(--f-title);letter-spacing:.2em;color:#f3d58a}
+.tr-box h3{margin:0 0 6px;font:900 19px var(--f-title);letter-spacing:.06em;color:#ffe9ae}
+.tr-box p#trD{margin:0;font:500 14.5px/1.7 var(--f-body);color:#eef1ff}
+.tr-nav{display:flex;justify-content:flex-end;gap:12px;margin-top:10px}
+.tr-nav .st-arrow{width:44px;height:44px;padding:0 0 3px;font-size:30px;line-height:1;margin:0}
 </style>
 </head>
 <body>
@@ -1809,6 +1819,49 @@ function introStory(canSkip) {
     show(); el.hidden = false; stNavPlace(); requestAnimationFrame(stNavPlace); go.focus();   // 畫面顯示出來之後才量得到位置
   });
 }
+/* ================= 新手教學：主畫面版面導覽 =================
+   選完角色後第一次進到主畫面時自動播放；畫面變暗，只把正在介紹的地方亮出來，旁邊放說明 */
+const TOUR = [
+  { t: '歡迎來到試煉之門！', d: '嗨！歡迎加入破局者的行列！第一次來嗎？花 30 秒認識一下這裡，等一下就能開始你的第一道試煉。' },
+  { el: ['#avatar'], t: '戰績碑', d: '點左上角的頭像，可以看到你的勝率、戰績，還有在黃金、比特幣等各個戰場的表現。' },
+  { el: ['#purse'], t: '本金', d: '右上角是你的本金（U）。每道試煉答對會增加、答錯會減少，排行榜也是看這個數字。' },
+  { el: ['.dock-btn[data-act="checkin"]', '.dock-btn[data-act="invite"]'], t: '獲得更多本金', d: '每天簽到 +1,000 U；邀請好友註冊，再 +5,000 U。本金不夠時記得來這裡補充。' },
+  { el: ['.dock-btn[data-act="titles"]', '.dock-btn[data-act="rank"]'], t: '稱號與排行榜', d: '達成目標就能解鎖稱號、配戴在名字上；排行榜可以和其他破局者比勝率、財富和人脈。' },
+  { el: ['#btnBattle'], t: '試煉之門', d: '點這裡踏入 K 線交織的迷宮：看穿多空走向、抓準時機精準出手，一舉擊退心魔怪獸。' },
+  { el: ['#btnReview'], t: '回憶之廊', d: '沒有成功擊敗的關卡會收進這裡。隨時回來覆盤、變得更強大。' },
+  { t: '準備好了！', d: '有問題隨時點右上角的「？」看規則說明。現在就踏進第一道試煉吧！' }
+];
+function startTour(force) {
+  const key = 'tq2tour:' + (S.user ? S.user.uid : '');
+  if (!force) { try { if (localStorage.getItem(key)) return; } catch (e) {} }
+  closeSheet && $('#sheet') && !$('#sheet').hidden && closeSheet();
+  let ov = $('#tour'); if (!ov) { ov = document.createElement('div'); ov.id = 'tour'; ov.setAttribute('role', 'dialog'); ov.setAttribute('aria-label', '新手教學');
+    ov.innerHTML = '<div class="tr-hole" id="trHole"></div><div class="tr-box" id="trBox"><p class="tr-k">新手教學 <span id="trN"></span></p><h3 id="trT"></h3><p id="trD"></p><div class="tr-nav"><button class="st-arrow" id="trPrev" aria-label="上一步">‹</button><button class="st-arrow st-go" id="trNext" aria-label="下一步">›</button></div></div>';
+    $('#app').appendChild(ov); }
+  let i = 0;
+  const box = $('#trBox'), hole = $('#trHole');
+  const rectOf = sels => { const a = $('#app').getBoundingClientRect(); let r = null;
+    sels.forEach(q => { const e = document.querySelector(q); if (!e || !e.offsetParent) return; const b = e.getBoundingClientRect(); if (!b.width) return;
+      r = r ? { l: Math.min(r.l, b.left), t: Math.min(r.t, b.top), r: Math.max(r.r, b.right), b: Math.max(r.b, b.bottom) } : { l: b.left, t: b.top, r: b.right, b: b.bottom }; });
+    return r && { x: r.l - a.left, y: r.t - a.top, w: r.r - r.l, h: r.b - r.t, H: a.height, W: a.width }; };
+  const show = () => {
+    const st = TOUR[i], last = i === TOUR.length - 1;
+    $('#trN').textContent = `${i + 1} / ${TOUR.length}`; $('#trT').textContent = st.t; $('#trD').textContent = st.d;
+    $('#trPrev').disabled = i === 0; $('#trNext').classList.toggle('last', last); $('#trNext').setAttribute('aria-label', last ? '開始試煉' : '下一步');
+    const r = st.el && rectOf(st.el), pad = 8;
+    if (r) {
+      Object.assign(hole.style, { left: r.x - pad + 'px', top: r.y - pad + 'px', width: r.w + pad * 2 + 'px', height: r.h + pad * 2 + 'px', borderRadius: Math.min(r.w, r.h) > 80 ? '18px' : '999px', opacity: 1 });
+      const below = r.y + r.h / 2 < r.H / 2;   // 亮處在上半部就把說明放下面，反之放上面
+      box.style.top = below ? (r.y + r.h + pad + 14) + 'px' : ''; box.style.bottom = below ? '' : (r.H - r.y + pad + 14) + 'px';
+      box.classList.remove('mid');
+    } else { Object.assign(hole.style, { left: '50%', top: '50%', width: '0px', height: '0px', opacity: 1 }); box.style.top = ''; box.style.bottom = ''; box.classList.add('mid'); }
+  };
+  const end = () => { ov.hidden = true; try { localStorage.setItem(key, '1'); } catch (e) {} };
+  $('#trNext').onclick = () => { if (i < TOUR.length - 1) { i++; show(); } else end(); };
+  $('#trPrev').onclick = () => { if (i > 0) { i--; show(); } };
+  ov.hidden = false; requestAnimationFrame(show);
+  window.addEventListener('resize', () => { if (!ov.hidden) show(); });
+}
 function pickHero() {
   const el = $('#heroPick'); if (!el.hidden) return;
   let sel = null; const go = $('#hpGo');
@@ -1820,7 +1873,7 @@ function pickHero() {
   });
   go.onclick = async () => {
     if (!sel) return; go.disabled = true; go.textContent = '處理中…';
-    try { await B.setHero(sel); el.hidden = true; paintAvatar(); }
+    try { await B.setHero(sel); el.hidden = true; paintAvatar(); setTimeout(() => startTour(), 700); }   // 選完角色 → 新手教學
     catch (e) { toast('儲存失敗：' + e.message); go.disabled = false; go.textContent = '再試一次'; }
   };
   el.hidden = false;
@@ -2560,13 +2613,14 @@ function openSheet(kind) {
       body.insertAdjacentHTML('beforeend', `<div class="ac-assets adm"><h3>管理員工具</h3>
         <div class="adm-row"><label for="admN">跳到試煉</label><input id="admN" type="number" inputmode="numeric" min="1" max="${totalFloors()}" value="${Math.min(u.floor + 1, totalFloors())}"><button id="admGo">前往</button></div>
         <div class="adm-row adm-r2"><button id="admRisk" class="adm-alt" aria-pressed="${u.riskTest}">套用風控護盾：${u.riskTest ? '開' : '關'}</button><button id="admFill" class="adm-alt">補滿額度</button></div>
-        <div class="adm-row adm-r2"><button id="admStory" class="adm-alt" style="grid-column:1/-1">重看開頭故事</button></div>
+        <div class="adm-row adm-r2"><button id="admStory" class="adm-alt">重看開頭故事</button><button id="admTour" class="adm-alt">重看新手教學</button></div>
         <button id="admReset" class="adm-reset">重置我的關卡紀錄</button><p class="adm-msg" id="admMsg">共 ${totalFloors()} 道試煉。跳關只改進度，本金和戰績不變。</p></div>`);
       const msg = t => { const m = $('#admMsg'); if (m) m.textContent = t; };
       const run = async (patch, done) => { try { const nu = await B.adminSet(patch); if (nu) S.user = nu; S.lotSeen = S.riskSeen = false; renderHome(); done(); } catch (e) { msg('失敗：' + (e.code === 'permission-denied' ? '請先更新 Firestore 規則' : e.message)); } };
       $('#admGo').onclick = () => { const n = Math.floor(+$('#admN').value), t = totalFloors(); if (!(n >= 1 && n <= t)) return msg(`請輸入 1～${t}`); run({ floor: n - 1 }, () => { closeSheet(); toast(`已跳到${trial(n)}，按「進入試煉」開始。`); }); };
       $('#admRisk').onclick = () => run({ riskTest: !u.riskTest }, () => { openSheet('account'); toast(u.riskTest ? '風控護盾：管理員不受限。' : '風控護盾：已套用，和一般玩家一樣會扣額度、會被鎖。'); });
       $('#admStory').onclick = () => { closeSheet(); STORY_P = null; introStory(true); };
+      $('#admTour').onclick = () => { closeSheet(); setTimeout(() => startTour(true), 300); };
       $('#admFill').onclick = () => run({ riskDebt: 0 }, () => { closeSheet(); toast('風控護盾已補滿。'); });
       let armed = false;
       $('#admReset').onclick = () => { if (!armed) { armed = true; $('#admReset').textContent = '再按一次確認重置'; return; }
