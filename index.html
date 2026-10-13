@@ -1031,7 +1031,7 @@ button{font:inherit;color:inherit;cursor:pointer}
 
   <section class="doors" id="doorsScr" hidden aria-label="選擇試煉之門">
     <div class="dr-scene" id="drScene"></div>
-    <div class="dr-top"><button class="dr-back" id="drBack" aria-label="返回主畫面">‹</button><div class="dr-h"><b>選擇試煉之門</b><small>四道門各自闖關・每道門每 10 關一隻魔王</small></div></div>
+    <div class="dr-top"><button class="dr-back" id="drBack" aria-label="返回主畫面">‹</button><div class="dr-h"><b>選擇試煉之門</b></div></div>
   </section>
   <section class="screen" id="battle" hidden aria-label="戰鬥">
     <div class="b-top"><button class="ghost" id="bExit">← 返回</button><div class="b-floor metal-text" id="bFloor">試煉 01</div><div class="b-bal"><span class="coin">U</span><span id="bBal">10,000</span></div></div>
@@ -1284,7 +1284,7 @@ const DOORS = {
 };
 const baseOf = lv => lv % 10 === 0 ? CONFIG.bossStake : CONFIG.stake;
 const doorDone = (u, a) => (u && u.doors && u.doors[a]) || 0;          // 這道門已通過幾關
-const doorLabel = (a, lv) => `${DOORS[a] ? DOORS[a].name : ''} 第 ${lv} 關`;
+const doorLabel = (a, lv) => `${DOORS[a] ? DOORS[a].name : ''} ${String(lv).padStart(2, '0')}`;   // 例：噬金魔窟 01
 function setDoors(d) {
   S.doors = d; S.doorPos = {};
   if (d) DOOR_KEYS.forEach(a => (d[a] || []).forEach((n, i) => { S.doorPos[n] = { a, lv: i + 1 }; }));
