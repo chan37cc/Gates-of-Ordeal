@@ -1204,10 +1204,10 @@ const DEMO_ASSETS = {
   dow:    { name: '道瓊工業指數',          base: 47000, vol: .0009, dp: 2 }
 };
 const EVENT_INFO = {   // mon：這種魔王關出場的怪物
-  NFP:  { name: '美國非農就業報告', boss: '非農獅鷲', mon: 'griffin', data: true },
-  CPI:  { name: '美國 CPI 通膨數據', boss: '通膨翼龍', mon: 'wyvern',  data: true },
-  FOMC: { name: '聯準會利率決議',   boss: '利率蒼龍', mon: 'dragon',  data: true },
-  VOL:  { name: '劇烈波動盤面',     boss: '暴波晶龍', mon: 'serpent', data: false }
+  NFP:  { name: '美國非農就業報告', boss: '狂妄獅鷲', mon: 'griffin', data: true },
+  CPI:  { name: '美國 CPI 通膨數據', boss: '貪婪翼龍', mon: 'wyvern',  data: true },
+  FOMC: { name: '聯準會利率決議',   boss: '驚惶蒼龍', mon: 'dragon',  data: true },
+  VOL:  { name: '劇烈波動盤面',     boss: '失控晶龍', mon: 'serpent', data: false }
 };
 const TITLES = [
   [10000, '新鮮小韭菜'], [12000, '見習破局者'], [15000, '趨勢獵人'], [20000, '波動遊俠'], [25000, '盤面術士'],
@@ -1244,8 +1244,8 @@ const myTitle = () => { if (!S.user) return ''; const h = HIST.get(); return sho
 const DIRS = { L: 'bull', S: 'bear', N: 'neutral' };
 const DIR_LABEL = { bull: '做多 ▲', bear: '做空 ▼', neutral: '不進場 ◆' };
 const FAMILIES = [   // 每 10 道試煉換一種
-  { k: 'deer', n: '盤整靈鹿' }, { k: 'fox', n: '假突破妖狐' }, { k: 'wolf', n: '洗盤星狼' }, { k: 'panther', n: '插針影豹' }, { k: 'bull', n: '多頭晶牛' },
-  { k: 'bear', n: '空頭晶熊' }, { k: 'raptor', n: '獵價鷹隼' }, { k: 'hound', n: '停損甲犬' }, { k: 'horse', n: '趨勢天馬' }, { k: 'goat', n: '回檔晶羊' }
+  { k: 'deer', n: '猶豫靈鹿' }, { k: 'fox', n: '貪欲妖狐' }, { k: 'wolf', n: '恐懼星狼' }, { k: 'panther', n: '衝動影豹' }, { k: 'bull', n: '傲慢晶牛' },
+  { k: 'bear', n: '執念晶熊' }, { k: 'raptor', n: '急躁鷹隼' }, { k: 'hound', n: '僥倖甲犬' }, { k: 'horse', n: '盲從天馬' }, { k: 'goat', n: '懊悔晶羊' }
 ];
 const DEMO_BOTS = [
   ['夜盤遊俠', 15400, 61, 33], ['黃金獵手', 13800, 52, 33], ['布林之眼', 12600, 40, 27], ['均線修士', 12200, 47, 36],
