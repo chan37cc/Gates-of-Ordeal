@@ -968,9 +968,9 @@ button{font:inherit;color:inherit;cursor:pointer}
 .dr-h{display:flex;flex-direction:column;gap:2px;min-width:0}
 .dr-h b{font:700 clamp(17px,calc(var(--w) * .05),22px)/1.2 var(--f-display);letter-spacing:.08em;color:#ffe9ae;text-shadow:0 0 12px #ffd98a66}
 .dr-h small{font-size:12px;color:#c9d6ff;letter-spacing:.04em}
-.rv-cats{display:flex;gap:6px;overflow-x:auto;margin:0 0 10px;padding:2px 1px 4px;scrollbar-width:none}
+.rv-cats{display:flex;gap:4px;overflow-x:auto;margin:0 0 10px;padding:2px 1px 4px;scrollbar-width:none}
 .rv-cats::-webkit-scrollbar{display:none}
-.rv-cats button{flex:none;display:flex;align-items:center;gap:5px;padding:6px 12px;border:0;border-radius:999px;background:#0c1236b3;box-shadow:inset 0 0 0 1px #f3d58a66;color:#cfd6ff;font:700 13px/1.2 inherit;letter-spacing:.04em;cursor:pointer}
+.rv-cats button{flex:1 1 auto;justify-content:center;display:flex;align-items:center;gap:3px;padding:6px 7px;border:0;border-radius:999px;background:#0c1236b3;box-shadow:inset 0 0 0 1px #f3d58a66;color:#cfd6ff;font-weight:700;font-size:clamp(11.5px,3.2vw,13px);line-height:1.2;letter-spacing:0;white-space:nowrap;cursor:pointer}
 .rv-cats button.on{background:linear-gradient(#f6dc93,#c99a3d);color:#2a1a05;box-shadow:0 0 10px #ffd98a55}
 .rv-cats button i{font-style:normal;font-size:11px;min-width:16px;padding:0 4px;border-radius:99px;background:#b8233a;color:#fff;text-align:center}
 .rv-cats button i:empty{display:none}
@@ -1216,8 +1216,8 @@ const TITLES = [
 /* 成就稱號：[id, 名稱, 解鎖條件, 取得進度的函式(u, st) → [目前, 目標]] */
 const ACH_GROUPS = [
   ['勝率', [['r70', '精準狙擊手', '勝率維持 70% 以上', 70], ['r90', '神之手', '勝率維持 90% 以上', 90]]],
-  ['商品專精', [['gold20', '煉金術士', '黃金答對 20 次'], ['gold50', '淘金狂熱者', '黃金答對 50 次'], ['btc20', '鏈上拓荒者', '比特幣答對 20 次'], ['btc50', '區塊鏈巨鯨', '比特幣答對 50 次'],
-    ['nasdaq20', '科技衝浪客', '那斯達克答對 20 次'], ['nasdaq50', '矽谷領航員', '那斯達克答對 50 次'], ['dow20', '藍籌鐵騎', '道瓊答對 20 次'], ['dow50', '工業巨頭', '道瓊答對 50 次']]],
+  ['試煉之門專精', [['gold20', '煉金術士', '噬金魔窟答對 20 次'], ['gold50', '淘金狂熱者', '噬金魔窟答對 50 次'], ['btc20', '鏈上拓荒者', '虛空深淵答對 20 次'], ['btc50', '區塊鏈巨鯨', '虛空深淵答對 50 次'],
+    ['nasdaq20', '科技衝浪客', '造夢峽谷答對 20 次'], ['nasdaq50', '矽谷領航員', '造夢峽谷答對 50 次'], ['dow20', '藍籌鐵騎', '鏽蝕要塞答對 20 次'], ['dow50', '工業巨頭', '鏽蝕要塞答對 50 次']]],
   ['出手風格', [['bear50', '空軍總司令', '做空答對 50 次'], ['bull50', '多頭鐵騎', '做多答對 50 次'], ['neutral50', '穩健防禦大師', '不進場答對 50 次']]],
   ['連續紀錄', [['win10', '絕對命中者', '連續答對 10 次'], ['lose10', '燃料供應商', '連續答錯 10 次']]]
 ];
@@ -2037,7 +2037,7 @@ const BGM = {
 const RV = { cache: {} };
 async function reviewSheet() {
   const body = $('#sheetBody'), tab = RV.tab || 'all';
-  body.innerHTML = `<div class="rv-cats" role="tablist" aria-label="依試煉之門分類">${['all', ...DOOR_KEYS].map(a => `<button role="tab" data-cat="${a}" class="${a === tab ? 'on' : ''}" aria-selected="${a === tab}">${a === 'all' ? '全部' : CONFIG.assetNames[a]}<i></i></button>`).join('')}</div><ul class="nt-list rv-list" id="rvList"><li class="nt-empty">讀取中…</li></ul>`;
+  body.innerHTML = `<div class="rv-cats" role="tablist" aria-label="依試煉之門分類">${['all', ...DOOR_KEYS].map(a => `<button role="tab" data-cat="${a}" class="${a === tab ? 'on' : ''}" aria-selected="${a === tab}">${a === 'all' ? '全部' : DOORS[a].name}<i></i></button>`).join('')}</div><ul class="nt-list rv-list" id="rvList"><li class="nt-empty">讀取中…</li></ul>`;
   body.querySelectorAll('[data-cat]').forEach(x => x.onclick = () => { RV.tab = x.dataset.cat; reviewSheet(); });
   try { await HIST.fill(); } catch (e) {}
   if (S.sheet !== 'review' || !$('#rvList')) return;
@@ -2046,7 +2046,7 @@ async function reviewSheet() {
   body.querySelectorAll('[data-cat]').forEach(x => { const c = x.dataset.cat === 'all' ? all.length : all.filter(n => pos(n).a === x.dataset.cat).length; x.querySelector('i').textContent = c ? c : ''; });
   const wrong = tab === 'all' ? all : all.filter(n => pos(n).a === tab);
   $('#rvList').innerHTML = wrong.length ? wrong.map(n => { const c = h[n][2], p = pos(n);
-    return `<li><button class="rv-item" data-n="${n}"><b>${doorLabel(p.a, p.lv)}</b><span>${p.lv % 10 === 0 ? '魔王關' : CONFIG.assetNames[p.a]}${c ? ' · 你選了' + ({ bull: '做多', bear: '做空', neutral: '不進場' }[c] || '') : ''}</span><i aria-hidden="true">›</i></button></li>`; }).join('')
+    return `<li><button class="rv-item" data-n="${n}"><b>${doorLabel(p.a, p.lv)}</b><span>${p.lv % 10 === 0 ? '魔王關' : '一般關'}${c ? ' · 你選了' + ({ bull: '做多', bear: '做空', neutral: '不進場' }[c] || '') : ''}</span><i aria-hidden="true">›</i></button></li>`; }).join('')
     : `<li class="nt-empty">${tab === 'all' ? '目前沒有答錯的試煉。' : `${DOORS[tab].name}目前沒有答錯的關卡。`}答錯的關卡會收進這裡，方便你回來覆盤。</li>`;
   body.querySelectorAll('.rv-item').forEach(x => x.onclick = () => reviewOne(+x.dataset.n));
 }
@@ -2148,7 +2148,7 @@ function doorsPaint() {
   DOOR_KEYS.forEach(a => {
     const c = document.querySelector(`[data-chip="${a}"]`), b = document.querySelector(`[data-door="${a}"]`); if (!c || !b) return;
     const D = DOORS[a], tot = (d[a] || []).length, k = doorDone(u, a), lv = k + 1, done = k >= tot, boss = !done && lv % 10 === 0, lock = !done && rest && lv >= CONFIG.riskFrom;
-    const txt = !tot ? '建造中' : done ? `已全破 ${tot} 關` : lock ? `休息中 ${mmss(riskNextMs(u))}` : `第 ${lv} 關`;
+    const txt = !tot ? '建造中' : done ? `已全破 ${tot} 關` : lock ? `休息中 ${mmss(riskNextMs(u))}` : `第 ${lv}／${tot} 關`;
     c.className = 'dr-chip' + (boss && !lock ? ' boss' : '') + (done || lock ? ' off' : '');
     c.innerHTML = (boss && !lock ? '<i>魔王</i>' : '') + txt;
     b.setAttribute('aria-label', `${D.tag}・${D.name}：${boss && !lock ? '魔王關，' : ''}${txt}`);
