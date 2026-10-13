@@ -1282,7 +1282,7 @@ const DOORS = {
   nasdaq: { tag: 'NAS',  name: '造夢峽谷', x: 316, y: 1140, w: 360, h: 560, cy: 1424 },
   dow:    { tag: 'DOW',  name: '鏽蝕要塞', x: 712, y: 880, w: 320, h: 470, cy: 1134 }
 };
-const baseOf = lv => lv % 10 === 0 ? CONFIG.bossStake : CONFIG.stake;
+const isDataBoss = q => !!(q && q.boss && EVENT_INFO[q.boss.type] && EVENT_INFO[q.boss.type].data);   // 只有真的數據題（非農／CPI／利率決議）才是魔王關
 const doorDone = (u, a) => (u && u.doors && u.doors[a]) || 0;          // 這道門已通過幾關
 const doorLabel = (a, lv) => `${DOORS[a] ? DOORS[a].name : ''} ${String(lv).padStart(2, '0')}`;   // 例：噬金魔窟 01
 function setDoors(d) {
@@ -1303,10 +1303,12 @@ function doorsFromFloor(f) {
 }
 /* 已經打過的題號（給戰績碑、回憶之廊用） */
 function doneFloors(u) { const d = doorsList(), out = []; if (!d || !u) return out; DOOR_KEYS.forEach(a => (d[a] || []).slice(0, doorDone(u, a)).forEach(n => out.push(n))); return out; }
-/* 依題目在門裡的位置決定魔王關與本金（每道門逢 10 關是魔王） */
+/* 魔王關只看題目本身：數據公布那一刻的盤面才是魔王（±500），其他都是一般關（±300） */
 async function doorQ(n) {
   const q = await getFloorQ(n), p = S.doorPos && S.doorPos[n];
-  if (p) { const boss = p.lv % 10 === 0; q.boss = boss ? (q.boss || { type: 'VOL' }) : null; q.stake = baseOf(p.lv); q.door = p.a; q.lv = p.lv; }
+  if (!isDataBoss(q)) q.boss = null;
+  q.stake = q.boss ? CONFIG.bossStake : CONFIG.stake;
+  if (p) { q.door = p.a; q.lv = p.lv; }
   return q;
 }
 function dpOf(q) { const p = Math.abs(q.vis[q.vis.length - 1][3]); return p >= 10000 ? 1 : p >= 10 ? 2 : 4; }
@@ -1351,7 +1353,7 @@ function demoFloor(n) {
   }
   const h1 = [];
   for (let i = 0; i < 160; i += 4) { const g = all.slice(i, i + 4); h1.push([g[0][0], Math.max(...g.map(c => c[1])), Math.min(...g.map(c => c[2])), g[3][3]]); }
-  const type = ['NFP', 'CPI', 'FOMC', 'VOL'][Math.floor(lv / 10) % 4], m = Math.floor(r() * 96) * 15, stake = boss ? CONFIG.bossStake : CONFIG.stake;
+  const type = ['NFP', 'CPI', 'FOMC'][Math.floor(lv / 10) % 3], m = Math.floor(r() * 96) * 15, stake = boss ? CONFIG.bossStake : CONFIG.stake;
   return (S.floors[n] = { floor: n, name: A.name, assetKey: key, vis: all.slice(120, 160), h1, pts, demo: true, stake,
     sourceHour: boss ? (type === 'FOMC' ? '02:00' : '20:30') : String(Math.floor(m / 60)).padStart(2, '0') + ':' + String(m % 60).padStart(2, '0'),
     sessionLabel: boss ? '美洲盤' : '', boss: boss ? { type } : null,
@@ -1492,7 +1494,7 @@ const LOCAL = {
   async pendingVote() { return null; },
   async play(n, choice, mult = 1) {
     const d = this.db(), u = d.users[d.session], p = (doorsList(), S.doorPos[n]); if (!p) throw new Error('MISSING');
-    const doors = this.view(d.session).doors, base = baseOf(p.lv);
+    const doors = this.view(d.session).doors, base = isDataBoss(demoFloor(n)) ? CONFIG.bossStake : CONFIG.stake;
     mult = p.lv >= CONFIG.lotFrom && [2, 3].includes(mult) && u.balance >= base * mult ? mult : 1;
     if (doorDone({ doors }, p.a) !== p.lv - 1) throw new Error('ALREADY');
     const ans = { ...demoFloor(n)._ans, stake: base };
@@ -1865,7 +1867,7 @@ const STORY = [
       ${rzCard('both', '雙向都碰到', '看第 3 根收在現價哪一邊（例：收在下方＝做空）', [[0, 1.2, -.1, .8], [.8, .9, -1.2, -.9], [-.9, -.2, -1, -.4]], [0, 1.2, 1, -1.2], true)}
     </div>` },
   { k: 'WARNING', h: `<h3>⚠️ 戰場異變警告</h3>
-    <p>星海中矗立著四道試煉之門——<b>噬金魔窟</b>（黃金）、<b>虛空深淵</b>（比特幣）、<b>造夢峽谷</b>（納斯達克）、<b>鏽蝕要塞</b>（道瓊）。每道門各自闖關，每 10 關都有魔王鎮守。</p>
+    <p>星海中矗立著四道試煉之門——<b>噬金魔窟</b>（黃金）、<b>虛空深淵</b>（比特幣）、<b>造夢峽谷</b>（納斯達克）、<b>鏽蝕要塞</b>（道瓊）。每道門各自闖關，數據公布的時刻會有魔王現身。</p>
     <p>根據前線情報，當你在任何一道門深入至 <b>第 31 關</b> 與 <b>第 51 關</b> 時，將面臨機制更加嚴苛的極限考驗。</p>
     <p>不僅如此，深淵的裂隙仍在持續蔓延——每日都將解鎖 <b>5 道</b>全新的未知關卡。</p>
     <p>戰鬥永無止境，請隨時保持你手中的利刃鋒利！</p><p class="fin">現在就開始進入試煉吧！</p>` }
@@ -2046,7 +2048,7 @@ async function reviewSheet() {
   body.querySelectorAll('[data-cat]').forEach(x => { const c = x.dataset.cat === 'all' ? all.length : all.filter(n => pos(n).a === x.dataset.cat).length; x.querySelector('i').textContent = c ? c : ''; });
   const wrong = tab === 'all' ? all : all.filter(n => pos(n).a === tab);
   $('#rvList').innerHTML = wrong.length ? wrong.map(n => { const c = h[n][2], p = pos(n);
-    return `<li><button class="rv-item" data-n="${n}"><b>${doorLabel(p.a, p.lv)}</b><span>${p.lv % 10 === 0 ? '魔王關' : '一般關'}${c ? ' · 你選了' + ({ bull: '做多', bear: '做空', neutral: '不進場' }[c] || '') : ''}</span><i aria-hidden="true">›</i></button></li>`; }).join('')
+    return `<li><button class="rv-item" data-n="${n}"><b>${doorLabel(p.a, p.lv)}</b><span>${c ? '你選了' + ({ bull: '做多', bear: '做空', neutral: '不進場' }[c] || '') : ''}</span><i aria-hidden="true">›</i></button></li>`; }).join('')
     : `<li class="nt-empty">${tab === 'all' ? '目前沒有答錯的試煉。' : `${DOORS[tab].name}目前沒有答錯的關卡。`}答錯的關卡會收進這裡，方便你回來覆盤。</li>`;
   body.querySelectorAll('.rv-item').forEach(x => x.onclick = () => reviewOne(+x.dataset.n));
 }
@@ -2140,6 +2142,7 @@ async function openDoors() {
   el.querySelectorAll('.dr-door').forEach(b => b.onclick = () => startFloor(b.dataset.door));
   $('#doorsScr').hidden = false; doorsPaint();
 }
+const DOORS_PF = {};
 function closeDoors() { $('#doorsScr').hidden = true; renderHome(); }
 /* 每道門的進度標籤：第幾關／魔王關／休息中／已全破 */
 function doorsPaint() {
@@ -2147,11 +2150,12 @@ function doorsPaint() {
   const d = doorsList() || {}, u = S.user, rest = !!u && riskOn(u) && riskLeft(u) === 0;
   DOOR_KEYS.forEach(a => {
     const c = document.querySelector(`[data-chip="${a}"]`), b = document.querySelector(`[data-door="${a}"]`); if (!c || !b) return;
-    const D = DOORS[a], tot = (d[a] || []).length, k = doorDone(u, a), lv = k + 1, done = k >= tot, boss = !done && lv % 10 === 0, lock = !done && rest && lv >= CONFIG.riskFrom;
+    const D = DOORS[a], tot = (d[a] || []).length, k = doorDone(u, a), lv = k + 1, done = k >= tot, nq = !done && S.floors[d[a][k]], boss = !done && isDataBoss(nq), lock = !done && rest && lv >= CONFIG.riskFrom;
     const txt = !tot ? '建造中' : done ? `已全破 ${tot} 關` : lock ? `休息中 ${mmss(riskNextMs(u))}` : `第 ${lv}／${tot} 關`;
     c.className = 'dr-chip' + (boss && !lock ? ' boss' : '') + (done || lock ? ' off' : '');
     c.innerHTML = (boss && !lock ? '<i>魔王</i>' : '') + txt;
     b.setAttribute('aria-label', `${D.tag}・${D.name}：${boss && !lock ? '魔王關，' : ''}${txt}`);
+    if (!done && !nq && !DOORS_PF[d[a][k]]) { DOORS_PF[d[a][k]] = 1; doorQ(d[a][k]).then(doorsPaint).catch(() => {}); }   // 先抓下一關，才知道是不是魔王
   });
 }
 
@@ -2668,7 +2672,7 @@ function openSheet(kind) {
       <ul>
         <li>一般關：答對 +${CONFIG.stake} U；做多、做空答錯 −${CONFIG.stake} U，選不進場答錯只扣 −${CONFIG.neutralLoss} U。</li>
         <li>四道試煉之門（黃金、比特幣、納斯達克、道瓊）各自計算關卡。每道門從第 ${CONFIG.lotFrom} 關開始，每一題出手前可以選 1-3 倍槓桿，賺賠都乘上倍數（包含不進場答錯的扣款；連勝獎勵不加倍）。本金不夠賠的倍數不能選。</li>
-        <li>魔王關（每道門的第 10、20、30… 關，常是數據公布前一刻的盤面）：答對 +${CONFIG.bossStake} U；做多、做空答錯 −${CONFIG.bossStake} U，選不進場答錯只扣 −${CONFIG.bossNeutralLoss} U。</li>
+        <li>魔王關（非農、CPI、利率決議等數據公布前一刻的盤面）：答對 +${CONFIG.bossStake} U；做多、做空答錯 −${CONFIG.bossStake} U，選不進場答錯只扣 −${CONFIG.bossNeutralLoss} U。</li>
         <li>風控護盾：每道門從第 ${CONFIG.riskFrom} 關開始，做多或做空答錯一次扣 1 次額度（四道門共用 ${CONFIG.riskMax} 次，每 ${CONFIG.riskMin} 分鐘恢復 1 次）。用完會強制休息，恢復前不能挑戰第 ${CONFIG.riskFrom} 關以後的關卡。不進場答錯只扣本金，不扣額度。</li>
         <li>每日簽到：每天可以在主畫面簽到一次，+${fmt(CONFIG.checkin)} U，台北時間 00:00 換日。</li>
         <li>連勝：每連續答對 ${CONFIG.streakEvery} 次額外 +${CONFIG.streakBonus} U，答錯歸零。</li>
