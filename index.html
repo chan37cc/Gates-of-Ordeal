@@ -777,6 +777,7 @@ button{font:inherit;color:inherit;cursor:pointer}
 .adm h3{color:#ffb3a8}
 .adm-row{display:flex;align-items:center;gap:2cqw}
 .adm-row label{font-size:3.2cqw;color:#f1f3ff;white-space:nowrap}
+.adm-sel{flex:none;width:36%;padding:2cqw;border:0;border-radius:2.4cqw;background:#0b123acc;box-shadow:inset 0 0 0 1px #f3d58a99;color:#fff;font:700 max(14px,3.3cqw) var(--f-body,inherit)}
 .adm-row input{flex:1;min-width:0;padding:2cqw;border:0;border-radius:2.4cqw;background:#0b123acc;box-shadow:inset 0 0 0 1px #f3d58a99;color:#fff;font:700 max(16px,3.6cqw) var(--f-display);text-align:center}
 .adm button{border:0;border-radius:999px;padding:2.2cqw 4cqw;font:900 3.4cqw var(--f-title);cursor:pointer;background:linear-gradient(#fff3c4,#f0c877 50%,#d9a24e);color:#141d5c}
 .adm .adm-reset{width:100%;margin-top:2cqw;background:#0b123acc;color:#ffb3a8;box-shadow:inset 0 0 0 1.5px #ff9d8a}
@@ -952,6 +953,27 @@ button{font:inherit;color:inherit;cursor:pointer}
 .tr-box p#trD{margin:0;font:500 14.5px/1.7 var(--f-body);color:#eef1ff}
 .tr-nav{display:flex;justify-content:flex-end;gap:12px;margin-top:10px}
 .tr-nav .st-arrow{width:44px;height:44px;padding:0 0 3px;font-size:30px;line-height:1;margin:0}
+/* ===== 四道試煉之門（941×1672，和主畫面同比例、貼齊底部） ===== */
+.doors{position:absolute;inset:0;z-index:9;overflow:hidden;background:linear-gradient(#070a24,#0b0f33)}
+.dr-scene{position:absolute;left:50%;bottom:0;height:max(var(--ih),100%);aspect-ratio:941/1672;transform:translateX(-50%);background:center/100% 100% no-repeat}
+.dr-door{position:absolute;transform:translate(-50%,-50%);padding:0;border:0;border-radius:40% 40% 14% 14%;background:radial-gradient(closest-side,#ffd98a00,#ffd98a00);cursor:pointer;-webkit-tap-highlight-color:transparent;transition:background .2s,filter .2s}
+.dr-door:hover,.dr-door:focus-visible{background:radial-gradient(closest-side,#ffe7a838,#ffd98a00);outline:0}
+.dr-door:active{background:radial-gradient(closest-side,#fff2c855,#ffd98a00)}
+.dr-chip{position:absolute;transform:translate(-50%,-50%);pointer-events:none;white-space:nowrap;display:flex;align-items:center;gap:5px;padding:3px 11px 4px;border-radius:999px;font:700 clamp(11px,calc(var(--w) * .031),14px)/1.2 var(--f-body,inherit);letter-spacing:.04em;color:#fff3d0;background:#0c1236e0;box-shadow:inset 0 0 0 1.2px #f3d58a,0 0 12px #ffd98a55}
+.dr-chip i{font-style:normal;font-size:.86em;padding:1px 6px;border-radius:99px;background:#b8233a;color:#fff;box-shadow:0 0 8px #ff4a6a88}
+.dr-chip.boss{box-shadow:inset 0 0 0 1.2px #ff8a9a,0 0 14px #ff4a6a66}
+.dr-chip.off{color:#cfd6ff;box-shadow:inset 0 0 0 1.2px #9aa3c8}
+.dr-top{position:absolute;z-index:2;left:var(--sx);width:var(--w);top:0;display:flex;align-items:center;gap:10px;padding:calc(env(safe-area-inset-top) + 12px) 14px 10px;background:linear-gradient(#060819d9,#06081900)}
+.dr-back{flex:none;width:44px;height:44px;padding:0 0 3px;border:0;border-radius:50%;display:grid;place-items:center;font:400 30px/1 var(--f-display);color:#fff3d0;background:#0c1236b3;box-shadow:inset 0 0 0 1.5px #f3d58a,0 0 14px #ffd98a44;cursor:pointer}
+.dr-h{display:flex;flex-direction:column;gap:2px;min-width:0}
+.dr-h b{font:700 clamp(17px,calc(var(--w) * .05),22px)/1.2 var(--f-display);letter-spacing:.08em;color:#ffe9ae;text-shadow:0 0 12px #ffd98a66}
+.dr-h small{font-size:12px;color:#c9d6ff;letter-spacing:.04em}
+.rv-cats{display:flex;gap:6px;overflow-x:auto;margin:0 0 10px;padding:2px 1px 4px;scrollbar-width:none}
+.rv-cats::-webkit-scrollbar{display:none}
+.rv-cats button{flex:none;display:flex;align-items:center;gap:5px;padding:6px 12px;border:0;border-radius:999px;background:#0c1236b3;box-shadow:inset 0 0 0 1px #f3d58a66;color:#cfd6ff;font:700 13px/1.2 inherit;letter-spacing:.04em;cursor:pointer}
+.rv-cats button.on{background:linear-gradient(#f6dc93,#c99a3d);color:#2a1a05;box-shadow:0 0 10px #ffd98a55}
+.rv-cats button i{font-style:normal;font-size:11px;min-width:16px;padding:0 4px;border-radius:99px;background:#b8233a;color:#fff;text-align:center}
+.rv-cats button i:empty{display:none}
 </style>
 </head>
 <body>
@@ -1007,8 +1029,12 @@ button{font:inherit;color:inherit;cursor:pointer}
     <button class="dock-btn" data-act="invite"><span class="ico"><span class="laurel" data-n="9" data-r="42"></span><svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c1-3.5 3.5-5.5 6.5-5.5s5.5 2 6.5 5.5M18 8v6M15 11h6"/></svg></span><em>邀請好友</em></button>
   </nav>
 
+  <section class="doors" id="doorsScr" hidden aria-label="選擇試煉之門">
+    <div class="dr-scene" id="drScene"></div>
+    <div class="dr-top"><button class="dr-back" id="drBack" aria-label="返回主畫面">‹</button><div class="dr-h"><b>選擇試煉之門</b><small>四道門各自闖關・每道門每 10 關一隻魔王</small></div></div>
+  </section>
   <section class="screen" id="battle" hidden aria-label="戰鬥">
-    <div class="b-top"><button class="ghost" id="bExit">← 地圖</button><div class="b-floor metal-text" id="bFloor">試煉 01</div><div class="b-bal"><span class="coin">U</span><span id="bBal">10,000</span></div></div>
+    <div class="b-top"><button class="ghost" id="bExit">← 返回</button><div class="b-floor metal-text" id="bFloor">試煉 01</div><div class="b-bal"><span class="coin">U</span><span id="bBal">10,000</span></div></div>
     <div class="stage" id="stage">
       <div class="m-info"><div class="m-name" id="mName"></div><div class="hp"><i id="mHp"></i></div></div>
       <div class="streak" id="streak" title="連續答對 3 次額外 +500 U"><span>連勝</span><b id="stN">0</b><div class="pips" id="stPips"><i></i><i></i><i></i></div></div>
@@ -1125,6 +1151,8 @@ const WALLET_SRC = 'data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAA
 const PLAQUE_SRC = 'data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==';
 const ME_SRC = 'data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==';
 const DOCK_SRC = {titles:'data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==',rank:'data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==',account:'data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==',invite:'data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=='};
+/* 進入試煉後的選門畫面（四道門） */
+const DOORS_SRC = 'img/doors.webp';
 const ENTER_SRC = { full: 'data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==', blank: 'data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==' };
 const GEM_SRC = 'data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==';
 const NIGHT_SRC = 'img/night.webp';
@@ -1154,12 +1182,12 @@ const CONFIG = {
     appId: "1:637732244476:web:fdee667878eac2c7794079"
   },
   // 題目、答案、總層數都由出題引擎（Apps Script）寫進這些集合
-  collections: { users: 'tq2_users', emails: 'tq2_emailIndex', floors: 'tq2_floors', answers: 'tq2_answers', meta: 'tq2_meta/tower', notices: 'tq2_notices', feed: 'tq2_feed', hist: 'tq2_hist' },
+  collections: { users: 'tq2_users', emails: 'tq2_emailIndex', floors: 'tq2_floors', answers: 'tq2_answers', meta: 'tq2_meta/tower', doors: 'tq2_meta/doors', notices: 'tq2_notices', feed: 'tq2_feed', hist: 'tq2_hist' },
   start: 10000, invite: 5000,
   checkin: 1000,   // 每日簽到獎勵，台北時間 00:00 換日（firestore.rules 裡也有同一個數字）
   adminEmail: 'chan37fx@gmail.com',   // 管理員：可跳關、重置自己的紀錄（firestore.rules 裡也有同一個信箱）
-  lotFrom: 51,
-  riskFrom: 101, riskMax: 5, riskMin: 30,   // 風控護盾：第幾道試煉起、幾次、幾分鐘回 1 次（firestore.rules 裡也有同樣的數字）   // 從第幾道試煉開始可以選 1-3 倍槓桿（firestore.rules 裡也有同一個數字）
+  lotFrom: 31,   // 每道門從第幾關開始可以選 1-3 倍槓桿（firestore.rules 裡也有同一個數字）
+  riskFrom: 51, riskMax: 5, riskMin: 30,   // 風控護盾：每道門從第幾關起、幾次、幾分鐘回 1 次（firestore.rules 裡也有同樣的數字）
   stake: 300, bossStake: 500, neutralLoss: 100, bossNeutralLoss: 200,   // 選「不進場」答錯只扣 100（魔王關 200），會乘上槓桿倍數；firestore.rules 用同一套算法      // 一般關 ±300、魔王關 ±500（正式模式以引擎寫入的金額為準）
   streakEvery: 3, streakBonus: 500, // 每連續答對 3 次額外 +500（要和 firestore.rules 一致）
   minRankGames: 20,
@@ -1244,6 +1272,43 @@ const reduceMotion = () => window.matchMedia && matchMedia('(prefers-reduced-mot
 /* 題目 q：{ floor, name, assetKey, vis:[[o,h,l,c]…40 根 15 分 K], h1:[1 小時 K], pts(判定點數), sourceHour, sessionLabel, boss, stake }
    答案 ans：{ answer, pts, finalMove, maxUp, maxDown, rev:[隱藏的 3 根], sourceTime, stake }——作答後才拿得到 */
 function totalFloors() { return S.live ? S.total : CONFIG.baseFloors + CONFIG.floorsPerDay * Math.max(0, daysBetween(CONFIG.launchDate, taipeiDate())); }
+/* ===== 四道試煉之門：每種商品一道門，各自從第 1 關往上打 =====
+   tq2_meta/doors 存 { gold:[題號…], btc:[…], nasdaq:[…], dow:[…] }：第 L 關＝清單裡第 L 個題號。
+   魔王關看「在門裡的位置」：每道門的第 10、20、30… 關。x/y/w/h 是門在插畫（941×1672）上的位置，cy 是進度標籤的位置 */
+const DOOR_KEYS = ['gold', 'btc', 'nasdaq', 'dow'];
+const DOORS = {
+  gold:   { tag: 'GOLD', name: '噬金魔窟', x: 270, y: 610, w: 300, h: 520, cy: 836 },
+  btc:    { tag: 'BTC',  name: '虛空深淵', x: 652, y: 465, w: 260, h: 420, cy: 664 },
+  nasdaq: { tag: 'NAS',  name: '造夢峽谷', x: 316, y: 1140, w: 360, h: 560, cy: 1424 },
+  dow:    { tag: 'DOW',  name: '鏽蝕要塞', x: 712, y: 880, w: 320, h: 470, cy: 1134 }
+};
+const baseOf = lv => lv % 10 === 0 ? CONFIG.bossStake : CONFIG.stake;
+const doorDone = (u, a) => (u && u.doors && u.doors[a]) || 0;          // 這道門已通過幾關
+const doorLabel = (a, lv) => `${DOORS[a] ? DOORS[a].name : ''} 第 ${lv} 關`;
+function setDoors(d) {
+  S.doors = d; S.doorPos = {};
+  if (d) DOOR_KEYS.forEach(a => (d[a] || []).forEach((n, i) => { S.doorPos[n] = { a, lv: i + 1 }; }));
+}
+/* 示範模式：每一題隨機分到一道門（黃金 2：其他各 1） */
+const demoAsset = n => ['gold', 'gold', 'btc', 'nasdaq', 'dow'][Math.floor(rng(hash('door' + n))() * 5)];
+function doorsList() {
+  if (!S.live) { const t = totalFloors(); if (S.doorsT !== t) { const d = { gold: [], btc: [], nasdaq: [], dow: [] }; for (let n = 1; n <= t; n++) d[demoAsset(n)].push(n); setDoors(d); S.doorsT = t; } }
+  return S.doors || null;
+}
+/* 舊紀錄（還沒有分門的帳號）：依總進度推回每道門通過幾關 */
+function doorsFromFloor(f) {
+  const d = doorsList(), o = {}; if (!d || !f) return o;
+  DOOR_KEYS.forEach(a => { const k = (d[a] || []).filter(n => n <= f).length; if (k) o[a] = k; });
+  return o;
+}
+/* 已經打過的題號（給戰績碑、回憶之廊用） */
+function doneFloors(u) { const d = doorsList(), out = []; if (!d || !u) return out; DOOR_KEYS.forEach(a => (d[a] || []).slice(0, doorDone(u, a)).forEach(n => out.push(n))); return out; }
+/* 依題目在門裡的位置決定魔王關與本金（每道門逢 10 關是魔王） */
+async function doorQ(n) {
+  const q = await getFloorQ(n), p = S.doorPos && S.doorPos[n];
+  if (p) { const boss = p.lv % 10 === 0; q.boss = boss ? (q.boss || { type: 'VOL' }) : null; q.stake = baseOf(p.lv); q.door = p.a; q.lv = p.lv; }
+  return q;
+}
 function dpOf(q) { const p = Math.abs(q.vis[q.vis.length - 1][3]); return p >= 10000 ? 1 : p >= 10 ? 2 : 4; }
 /* 判定（和出題引擎相同）。A＝題目最後一根 K 的收盤價，P＝該商品的判定點數，C3＝第 3 根的收盤價
    做多：3 根裡最高價碰到 A+P，且 C3 沒有低於 A
@@ -1269,8 +1334,8 @@ function ansFromDoc(a) { return { answer: a.answer, pts: +a.points, finalMove: +
 /* 示範模式用的模擬盤面（正式模式不會用到） */
 function demoFloor(n) {
   if (S.floors[n]) return S.floors[n];
-  const r = rng(hash('floor' + n)), boss = n % 10 === 0, keys = Object.keys(DEMO_ASSETS);
-  const key = boss ? keys[(n / 10) % 4] : ['gold', 'gold', 'btc', 'nasdaq', 'dow'][Math.floor(r() * 5)];
+  doorsList(); const p = S.doorPos && S.doorPos[n], lv = p ? p.lv : n;
+  const r = rng(hash('floor' + n)), boss = lv % 10 === 0, key = demoAsset(n);
   const A = DEMO_ASSETS[key], pts = CONFIG.points[key], x = r(), want = boss ? (x < .5 ? 'bull' : 'bear') : x < .2 ? 'neutral' : x < .6 ? 'bull' : 'bear';
   let all, j;
   for (let tries = 0; tries < 80; tries++) {
@@ -1286,7 +1351,7 @@ function demoFloor(n) {
   }
   const h1 = [];
   for (let i = 0; i < 160; i += 4) { const g = all.slice(i, i + 4); h1.push([g[0][0], Math.max(...g.map(c => c[1])), Math.min(...g.map(c => c[2])), g[3][3]]); }
-  const type = ['NFP', 'CPI', 'FOMC'][(n / 10) % 3], m = Math.floor(r() * 96) * 15, stake = boss ? CONFIG.bossStake : CONFIG.stake;
+  const type = ['NFP', 'CPI', 'FOMC', 'VOL'][Math.floor(lv / 10) % 4], m = Math.floor(r() * 96) * 15, stake = boss ? CONFIG.bossStake : CONFIG.stake;
   return (S.floors[n] = { floor: n, name: A.name, assetKey: key, vis: all.slice(120, 160), h1, pts, demo: true, stake,
     sourceHour: boss ? (type === 'FOMC' ? '02:00' : '20:30') : String(Math.floor(m / 60)).padStart(2, '0') + ':' + String(m % 60).padStart(2, '0'),
     sessionLabel: boss ? '美洲盤' : '', boss: boss ? { type } : null,
@@ -1322,7 +1387,7 @@ function applyAnswer(d, ok, stake, loss) {
 }
 function norm(uid, email, d) {
   return { uid, email, name: d.name || '交易員', balance: d.balance, peak: d.peak || d.balance, wins: d.wins || 0, losses: d.losses || 0,
-    total: d.total || 0, floor: d.floor || 0, streak: d.streak || 0, bestStreak: d.bestStreak || 0, invites: d.invites || 0,
+    total: d.total || 0, floor: d.floor || 0, doors: d.doors ? { ...d.doors } : doorsFromFloor(d.floor || 0), last: d.last || 0, streak: d.streak || 0, bestStreak: d.bestStreak || 0, invites: d.invites || 0,
     nameAt: d.nameAt ? (d.nameAt.toMillis ? d.nameAt.toMillis() : +d.nameAt) : 0,
     riskFull: riskFullOf(d), riskTest: !!d.riskTest, checkDay: +d.checkDay || 0, title: d.title || '', rankBp: d.rankBp ?? -1 };
 }
@@ -1333,22 +1398,24 @@ const canCheckin = u => !!u && (u.checkDay || 0) < taipeiDay();
 const RISK_MS = () => CONFIG.riskMin * 60000;
 function riskFullOf(d) { const b = d.riskBase; if (!b || !d.riskDebt) return 0; return (b.toMillis ? b.toMillis() : +b || Date.now()) + d.riskDebt * RISK_MS(); }
 const riskExempt = () => isAdmin() && !S.user.riskTest;   // 管理員預設不受限；在管理員工具打開「套用風控護盾」後就和一般玩家一樣
-function riskOn(u) { return !!u && !riskExempt() && (u.floor || 0) + 1 >= CONFIG.riskFrom; }
+const riskReach = u => !!u && DOOR_KEYS.some(a => doorDone(u, a) + 1 >= CONFIG.riskFrom);   // 有任何一道門到了第 51 關
+function riskOn(u) { return !riskExempt() && riskReach(u); }
 function riskLeft(u) { const rest = Math.max(0, (u.riskFull || 0) - Date.now()); return Math.max(0, CONFIG.riskMax - Math.ceil(rest / RISK_MS())); }
 function riskNextMs(u) { const rest = (u.riskFull || 0) - Date.now(); return rest > 0 ? (rest % RISK_MS() || RISK_MS()) : 0; }
 const mmss = ms => { const t = Math.ceil(ms / 1000); return String(Math.floor(t / 60)).padStart(2, '0') + ':' + String(t % 60).padStart(2, '0'); };
-const riskHit = (n, choice, ok, admin) => !ok && choice !== 'neutral' && n >= CONFIG.riskFrom && !admin;
+const riskHit = (lv, choice, ok, admin) => !ok && choice !== 'neutral' && lv >= CONFIG.riskFrom && !admin;   // lv：在門裡的第幾關
 const isAdmin = () => !!S.user && String(S.user.email || '').toLowerCase() === CONFIG.adminEmail;
 /* 各商品勝率：每層的（商品、對錯）存在這台裝置；缺的層在正式模式會從雲端補回來 */
 const HIST = {
   key() { return 'tq2h:' + (S.user ? S.user.uid : ''); },
   get() { try { return JSON.parse(localStorage.getItem(this.key()) || '{}'); } catch (e) { return this.mem || (this.mem = {}); } },
   put(h) { this.mem = h; try { localStorage.setItem(this.key(), JSON.stringify(h)); } catch (e) {} },
-  add(n, k, ok, c) { const h = this.get(); h[n] = [k, ok ? 1 : 0, c || '']; this.put(h); B.histSave && B.histSave({ [n]: h[n] }).catch(() => {}); },   // 同步存一份到雲端，換手機也不用重抓
+  add(n, k, ok, c, seq) { const h = this.get(); h[n] = [k, ok ? 1 : 0, c || '', seq || 0]; this.put(h); B.histSave && B.histSave({ [n]: h[n] }).catch(() => {}); },   // 同步存一份到雲端，換手機也不用重抓
   stats(h) { h = h || this.get();
     const o = { asset: { gold: 0, btc: 0, nasdaq: 0, dow: 0 }, dir: { bull: 0, bear: 0, neutral: 0 }, winRun: 0, loseRun: 0 }; let w = 0, l = 0, prev = 0;
-    Object.keys(h).map(Number).sort((a, b) => a - b).forEach(n => { if (!Array.isArray(h[n])) return; const [k, ok, c] = h[n], a = this.norm(k);
-      if (n !== prev + 1) w = l = 0; prev = n;
+    /* 依作答順序排（第 4 欄是「第幾次作答」；分門之前的舊紀錄就是題號本身） */
+    Object.keys(h).map(Number).filter(n => Array.isArray(h[n])).map(n => [h[n][3] || n, n]).sort((a, b) => a[0] - b[0]).forEach(([s, n]) => { const [k, ok, c] = h[n], a = this.norm(k);
+      if (s !== prev + 1) w = l = 0; prev = s;
       if (ok) { if (a) o.asset[a]++; if (c in o.dir) o.dir[c]++; w++; l = 0; } else { l++; w = 0; }
       o.winRun = Math.max(o.winRun, w); o.loseRun = Math.max(o.loseRun, l); });
     return o; },
@@ -1357,8 +1424,8 @@ const HIST = {
   async fill() {
     if (this.busy) return this.busy;
     return (this.busy = (async () => {
-      const h = this.get(), F = S.user.floor || 0, has = n => n in h && (h[n] === 0 || B === LOCAL || h[n].length >= 3);
-      let miss = []; for (let n = 1; n <= F; n++) if (!has(n)) miss.push(n);
+      const h = this.get(), has = n => n in h && (h[n] === 0 || B === LOCAL || h[n].length >= 3);
+      let miss = doneFloors(S.user).filter(n => !has(n));
       if (miss.length && B.histLoad) { try { const cloud = await B.histLoad(); for (const n of miss) if (cloud[n] !== undefined) h[n] = cloud[n]; } catch (e) {} miss = miss.filter(n => !has(n)); }
       const got = {};
       for (let i = 0; i < miss.length; i += 20) {
@@ -1389,7 +1456,7 @@ const LOCAL = {
   save() { store(this.key, this.mem); },
   view(em) { const u = this.db().users[em]; return norm(em, u.email, u); },
   async init(onUser) { this.onUser = onUser; const d = this.db(); onUser(d.session && d.users[d.session] ? this.view(d.session) : null); },
-  async loadTower() {},
+  async loadTower() { doorsList(); },
   async signUp({ email, pw, name, refEmail }) {
     const d = this.db(), em = email.toLowerCase();
     if (d.users[em]) throw new Error('EMAIL_USED');
@@ -1424,11 +1491,13 @@ const LOCAL = {
   async refresh() { const d = this.db(); return d.session ? this.view(d.session) : null; },
   async pendingVote() { return null; },
   async play(n, choice, mult = 1) {
-    const d = this.db(), u = d.users[d.session];
-    mult = n >= CONFIG.lotFrom && [2, 3].includes(mult) && u.balance >= demoFloor(n)._ans.stake * mult ? mult : 1;
-    if ((u.floor || 0) !== n - 1) throw new Error('ALREADY');
-    const ans = demoFloor(n)._ans;
-    const patch = applyAnswer(u, choice === ans.answer, ans.stake * mult, lossOf(ans.stake, mult, choice)), hit = riskHit(n, choice, choice === ans.answer, d.session === CONFIG.adminEmail && !u.riskTest);
+    const d = this.db(), u = d.users[d.session], p = (doorsList(), S.doorPos[n]); if (!p) throw new Error('MISSING');
+    const doors = this.view(d.session).doors, base = baseOf(p.lv);
+    mult = p.lv >= CONFIG.lotFrom && [2, 3].includes(mult) && u.balance >= base * mult ? mult : 1;
+    if (doorDone({ doors }, p.a) !== p.lv - 1) throw new Error('ALREADY');
+    const ans = { ...demoFloor(n)._ans, stake: base };
+    const patch = applyAnswer(u, choice === ans.answer, base * mult, lossOf(base, mult, choice)), hit = riskHit(p.lv, choice, choice === ans.answer, d.session === CONFIG.adminEmail && !u.riskTest);
+    patch.doors = { ...doors, [p.a]: p.lv }; patch.last = n;
     if (hit) { if (riskFullOf(u) > Date.now()) patch.riskDebt = u.riskDebt + 1; else { patch.riskBase = Date.now(); patch.riskDebt = 1; } }
     d.users[d.session] = { ...u, ...patch }; this.save();
     return { user: this.view(d.session), ans, choice, mult, hit };
@@ -1460,7 +1529,11 @@ const FB = {
       });
     });
   },
-  async loadTower() { const s = await this.db.doc(CONFIG.collections.meta).get(); S.total = s.exists ? (+s.data().total || 0) : 0; },
+  async loadTower() {
+    const [s, d] = await Promise.all([this.db.doc(CONFIG.collections.meta).get(), this.db.doc(CONFIG.collections.doors).get()]);
+    S.total = s.exists ? (+s.data().total || 0) : 0;
+    setDoors(d.exists ? Object.fromEntries(DOOR_KEYS.map(a => [a, (d.data()[a] || []).map(Number)])) : null);   // 還沒分門（出題引擎還沒跑 ADMIN_buildDoors）時是 null
+  },
   async getFloor(n) { const s = await this.F.doc(String(n)).get(); return s.exists ? s.data() : null; },
   async _load(u) {
     if (this._signup) await this._signup.catch(() => {});
@@ -1541,19 +1614,22 @@ const FB = {
   async pendingVote(n) { try { const v = await this._vote(n).get(); return v.exists ? v.data().choice : null; } catch (e) { return null; } },
   /* 1. 送出選擇（只能送一次，送出後不能改） 2. 這時才讀得到答案 3. 結算本金 */
   async play(n, choice, mult = 1) {
-    mult = n >= CONFIG.lotFrom && [2, 3].includes(mult) ? mult : 1;
+    const p = S.doorPos && S.doorPos[n]; if (!p) throw new Error('MISSING');
+    mult = p.lv >= CONFIG.lotFrom && [2, 3].includes(mult) ? mult : 1;
     const vref = this._vote(n);
     try { await vref.set(mult > 1 ? { choice, ts: Date.now(), mult } : { choice, ts: Date.now() }); }
     catch (e) { const v = await vref.get().catch(() => null); if (!v || !v.exists) throw e; choice = v.data().choice; mult = v.data().mult || 1; }
     const a = await this.A.doc(String(n)).get();
     if (!a.exists) throw new Error('MISSING');
     const ans = ansFromDoc(a.data()), ref = this.U.doc(this.uid); let out;
-    const ok = choice === ans.answer, hit = riskHit(n, choice, ok, String(this.email).toLowerCase() === CONFIG.adminEmail && !(S.user && S.user.riskTest));
+    const ok = choice === ans.answer, hit = riskHit(p.lv, choice, ok, String(this.email).toLowerCase() === CONFIG.adminEmail && !(S.user && S.user.riskTest));
     /* 額度是否還在恢復中由伺服器時間判定；手機時鐘不準時第一次可能猜錯，就換另一種再送一次 */
     const attempt = flip => this.db.runTransaction(async tx => {
       const d = (await tx.get(ref)).data();
-      if ((d.floor || 0) !== n - 1) throw new Error('ALREADY');
+      const dd = d.doors || (d.floor ? null : {}); if (!dd) throw new Error('NODOORS');   // 舊帳號還沒分門：等出題引擎跑完 ADMIN_buildDoors
+      if ((dd[p.a] || 0) !== p.lv - 1) throw new Error('ALREADY');
       const patch = applyAnswer(d, ok, ans.stake * mult, lossOf(ans.stake, mult, choice));
+      patch.doors = { ...dd, [p.a]: p.lv }; patch.last = n;
       if (hit) { const active = (riskFullOf(d) > Date.now()) !== flip;
         if (active && d.riskBase) patch.riskDebt = (d.riskDebt || 0) + 1; else { patch.riskBase = firebase.firestore.FieldValue.serverTimestamp(); patch.riskDebt = 1; } }
       tx.update(ref, patch); out = { ...d, ...patch };
@@ -1711,14 +1787,14 @@ function mapLoop(now) {
   if (!$('#mapCv').clientWidth) return;   // 畫布被 CSS 隱藏（現在主畫面用的是圖片）：直接停，不再空轉
   if (!S.entered || !$('#battle').hidden) return;
   /* 主畫面雲霧：一般手機每秒 30 格、低階機 12 格；開著面板、看故事或切到別的分頁時不重畫 */
-  const busy = document.hidden || !$('#sheet').hidden || !$('#story').hidden || !$('#heroPick').hidden;
+  const busy = document.hidden || !$('#doorsScr').hidden || !$('#sheet').hidden || !$('#story').hidden || !$('#heroPick').hidden;
   if (!busy && now - (MAP.drawn || 0) >= (LOW_END ? 80 : 32)) { MAP.drawn = now; mapFrame(now); }
   if (!reduceMotion()) MAP.raf = requestAnimationFrame(mapLoop);
 }
 function startMapLoop() { if (!MAP.raf) MAP.raf = requestAnimationFrame(mapLoop); }
 function refreshTower() {
   const total = totalFloors(), cleared = S.user ? Math.min(S.user.floor, total) : 0;
-  $('#towerRib').textContent = !total ? '塔正在建造中' : cleared >= total ? `已通過全部 ${total} 道試煉` : `${trial(cleared + 1)} ／ 共 ${total}`;
+  $('#towerRib').textContent = !doorsList() ? '試煉之門建造中' : `已通關 ${S.user ? S.user.floor || 0 : 0} 關`;
   feedStrip();
 }
 
@@ -1789,7 +1865,8 @@ const STORY = [
       ${rzCard('both', '雙向都碰到', '看第 3 根收在現價哪一邊（例：收在下方＝做空）', [[0, 1.2, -.1, .8], [.8, .9, -1.2, -.9], [-.9, -.2, -1, -.4]], [0, 1.2, 1, -1.2], true)}
     </div>` },
   { k: 'WARNING', h: `<h3>⚠️ 戰場異變警告</h3>
-    <p>試煉之門內部的空間極度不穩定，根據前線情報，當你深入至 <b>第 51 道</b> 與 <b>第 101 道</b> 試煉時，你將面臨機制更加嚴苛的極限考驗。</p>
+    <p>星海中矗立著四道試煉之門——<b>噬金魔窟</b>（黃金）、<b>虛空深淵</b>（比特幣）、<b>造夢峽谷</b>（納斯達克）、<b>鏽蝕要塞</b>（道瓊）。每道門各自闖關，每 10 關都有魔王鎮守。</p>
+    <p>根據前線情報，當你在任何一道門深入至 <b>第 31 關</b> 與 <b>第 51 關</b> 時，將面臨機制更加嚴苛的極限考驗。</p>
     <p>不僅如此，深淵的裂隙仍在持續蔓延——每日都將解鎖 <b>5 道</b>全新的未知關卡。</p>
     <p>戰鬥永無止境，請隨時保持你手中的利刃鋒利！</p><p class="fin">現在就開始進入試煉吧！</p>` }
 ];
@@ -1909,20 +1986,19 @@ function renderHome() {
   const u = S.user, total = totalFloors();
   paintAvatar(); if (u && !B.hero()) introStory().then(pickHero);
   $('#uName').textContent = u ? u.name : '訪客';
-  $('#uTitle').textContent = u ? myTitle() : '尚未登入'; if (u) { noticeDot(); const nf = (u.floor || 0) + 1; if (nf <= totalFloors() && !S.floors[nf]) setTimeout(() => getFloorQ(nf).catch(() => {}), 400); }   // 先把下一道試煉的盤面抓好，按進入時不用等
+  $('#uTitle').textContent = u ? myTitle() : '尚未登入'; if (u) noticeDot();
   const prev = $('#uBal').textContent, now = u ? fmt(u.balance) : fmt(CONFIG.start);
   $('#uBal').textContent = now;
   if (u && prev !== now) { const p = $('#purse'); p.classList.remove('pulse'); void p.offsetWidth; p.classList.add('pulse'); }
   const cleared = u ? Math.min(u.floor, total) : 0;
   refreshTower();
-  const bossNext = (cleared + 1) % 10 === 0 && cleared < total, eb = $('#btnBattle');
+  const eb = $('#btnBattle'), built = !!doorsList(), bossNext = false;
   $('#btnCheckin').hidden = true; $('#ckDot').hidden = !canCheckin(u);
-  const resting = !!u && cleared < total && riskOn(u) && riskLeft(u) === 0;
-  $('#btnBattle').classList.toggle('rest', resting);
-  $('#battleTxt').textContent = !total ? '建造中' : cleared >= total ? '明日再戰' : resting ? `休息中 ${mmss(riskNextMs(u))}` : bossNext ? '挑戰魔王' : '進入試煉';
+  $('#btnBattle').classList.remove('rest');
+  $('#battleTxt').textContent = built ? '進入試煉' : '建造中';
   { const eb = $('#btnBattle'), plain = $('#battleTxt').textContent === '進入試煉'; eb.classList.toggle('art-txt', plain); eb.style.backgroundImage = `url(${plain ? ENTER_SRC.full : ENTER_SRC.blank})`; }
-  eb.classList.toggle('boss', !!total && bossNext); eb.classList.toggle('off', !total || cleared >= total);
-  $('#uLv').textContent = u ? Math.min(cleared + 1, Math.max(total, 1)) : 1;
+  eb.classList.toggle('boss', bossNext); eb.classList.toggle('off', !built);
+  $('#uLv').textContent = u ? (u.floor || 0) + 1 : 1;
   $('#bBal').textContent = u ? fmt(u.balance) : '—';
   const notes = [];
   if (!S.live) notes.push(S.cloudFailed ? '連不到雲端，暫以示範模式執行：帳號與本金只存在這台裝置，盤面為模擬。' : '示範模式：帳號與本金只存在這台裝置，盤面為模擬。');
@@ -1960,14 +2036,18 @@ const BGM = {
    清單來自作答紀錄（只列「答過而且答錯」的關卡）；點進去時再向雲端確認：真的送出過選擇、而且選擇和答案不同，才會顯示答案 */
 const RV = { cache: {} };
 async function reviewSheet() {
-  const body = $('#sheetBody'); body.innerHTML = '<ul class="nt-list rv-list" id="rvList"><li class="nt-empty">讀取中…</li></ul>';
+  const body = $('#sheetBody'), tab = RV.tab || 'all';
+  body.innerHTML = `<div class="rv-cats" role="tablist" aria-label="依試煉之門分類">${['all', ...DOOR_KEYS].map(a => `<button role="tab" data-cat="${a}" class="${a === tab ? 'on' : ''}" aria-selected="${a === tab}">${a === 'all' ? '全部' : CONFIG.assetNames[a]}<i></i></button>`).join('')}</div><ul class="nt-list rv-list" id="rvList"><li class="nt-empty">讀取中…</li></ul>`;
+  body.querySelectorAll('[data-cat]').forEach(x => x.onclick = () => { RV.tab = x.dataset.cat; reviewSheet(); });
   try { await HIST.fill(); } catch (e) {}
   if (S.sheet !== 'review' || !$('#rvList')) return;
-  const h = HIST.get(), F = S.user.floor || 0, N = CONFIG.assetNames;
-  const wrong = Object.keys(h).map(Number).filter(n => n >= 1 && n <= F && Array.isArray(h[n]) && h[n][1] === 0).sort((a, b) => b - a);
-  $('#rvList').innerHTML = wrong.length ? wrong.map(n => { const [k, , c] = h[n], a = HIST.norm(k);
-    return `<li><button class="rv-item" data-n="${n}"><b>${trial(n)}</b><span>${a ? N[a] : '試煉'}${c ? ' · 你選了' + ({ bull: '做多', bear: '做空', neutral: '不進場' }[c] || '') : ''}</span><i aria-hidden="true">›</i></button></li>`; }).join('')
-    : '<li class="nt-empty">目前沒有答錯的試煉。答錯的關卡會收進這裡，方便你回來覆盤。</li>';
+  const h = HIST.get(), done = new Set(doneFloors(S.user)), pos = n => (S.doorPos || {})[n];
+  const all = [...done].filter(n => pos(n) && Array.isArray(h[n]) && h[n][1] === 0).sort((a, b) => (h[b][3] || b) - (h[a][3] || a));   // 最近答錯的在最上面
+  body.querySelectorAll('[data-cat]').forEach(x => { const c = x.dataset.cat === 'all' ? all.length : all.filter(n => pos(n).a === x.dataset.cat).length; x.querySelector('i').textContent = c ? c : ''; });
+  const wrong = tab === 'all' ? all : all.filter(n => pos(n).a === tab);
+  $('#rvList').innerHTML = wrong.length ? wrong.map(n => { const c = h[n][2], p = pos(n);
+    return `<li><button class="rv-item" data-n="${n}"><b>${doorLabel(p.a, p.lv)}</b><span>${p.lv % 10 === 0 ? '魔王關' : CONFIG.assetNames[p.a]}${c ? ' · 你選了' + ({ bull: '做多', bear: '做空', neutral: '不進場' }[c] || '') : ''}</span><i aria-hidden="true">›</i></button></li>`; }).join('')
+    : `<li class="nt-empty">${tab === 'all' ? '目前沒有答錯的試煉。' : `${DOORS[tab].name}目前沒有答錯的關卡。`}答錯的關卡會收進這裡，方便你回來覆盤。</li>`;
   body.querySelectorAll('.rv-item').forEach(x => x.onclick = () => reviewOne(+x.dataset.n));
 }
 async function reviewOne(n) {
@@ -1984,7 +2064,8 @@ async function reviewOne(n) {
   const dp = dpOf(q), now = q.vis[q.vis.length - 1][3], P = ans.pts, c3 = ans.rev[ans.rev.length - 1][3];
   const sg = v => (v > 0 ? '+' : v < 0 ? '−' : '') + Math.abs(v).toFixed(dp), L = { bull: '做多', bear: '做空', neutral: '盤整' };
   const cls = a => a === 'neutral' ? 'flat-t' : a === 'bull' ? 'good-t' : 'bad-t';
-  $('#rvBox').innerHTML = `<div class="rv-head"><h3 class="tg">${trial(n)}・${esc(q.name)}</h3>
+  const rp = (S.doorPos || {})[n];
+  $('#rvBox').innerHTML = `<div class="rv-head"><h3 class="tg">${rp ? doorLabel(rp.a, rp.lv) : trial(n)}・${esc(q.name)}</h3>
     ${q.h1.length ? '<div class="rv-tabs" role="tablist"><button data-tf="15m" class="on">15M</button><button data-tf="1h">1H</button></div>' : ''}</div>
     <div class="rv-chart"><canvas id="rvCv"></canvas></div>
     <dl class="facts rv-facts">
@@ -2045,14 +2126,41 @@ function mailTypo(email) {
   for (const k of MAIL_POP) if (editDist(dom, k) <= 2) return hit;
   return null;
 }
-function act(a) { if (a === 'battle') return startFloor(); openSheet(a); }
+function act(a) { if (a === 'battle') return openDoors(); openSheet(a); }
+/* ================= 四道試煉之門：選門畫面 ================= */
+async function openDoors() {
+  if (needLogin()) return;
+  if (!doorsList() && S.live) { try { await B.loadTower(); } catch (e) {} }
+  if (!doorsList()) { toast('試煉之門正在重新整理關卡，請稍後再來。'); return; }
+  const el = $('#drScene'), pct = (v, t) => (v / t * 100).toFixed(2) + '%';
+  el.style.backgroundImage = `url(${DOORS_SRC})`;
+  el.innerHTML = DOOR_KEYS.map(a => { const D = DOORS[a];
+    return `<button class="dr-door" data-door="${a}" style="left:${pct(D.x, 941)};top:${pct(D.y, 1672)};width:${pct(D.w, 941)};height:${pct(D.h, 1672)}"></button>
+      <span class="dr-chip" data-chip="${a}" style="left:${pct(D.x, 941)};top:${pct(D.cy, 1672)}"></span>`; }).join('');
+  el.querySelectorAll('.dr-door').forEach(b => b.onclick = () => startFloor(b.dataset.door));
+  $('#doorsScr').hidden = false; doorsPaint();
+}
+function closeDoors() { $('#doorsScr').hidden = true; renderHome(); }
+/* 每道門的進度標籤：第幾關／魔王關／休息中／已全破 */
+function doorsPaint() {
+  if ($('#doorsScr').hidden) return;
+  const d = doorsList() || {}, u = S.user, rest = !!u && riskOn(u) && riskLeft(u) === 0;
+  DOOR_KEYS.forEach(a => {
+    const c = document.querySelector(`[data-chip="${a}"]`), b = document.querySelector(`[data-door="${a}"]`); if (!c || !b) return;
+    const D = DOORS[a], tot = (d[a] || []).length, k = doorDone(u, a), lv = k + 1, done = k >= tot, boss = !done && lv % 10 === 0, lock = !done && rest && lv >= CONFIG.riskFrom;
+    const txt = !tot ? '建造中' : done ? `已全破 ${tot} 關` : lock ? `休息中 ${mmss(riskNextMs(u))}` : `第 ${lv} 關`;
+    c.className = 'dr-chip' + (boss && !lock ? ' boss' : '') + (done || lock ? ' off' : '');
+    c.innerHTML = (boss && !lock ? '<i>魔王</i>' : '') + txt;
+    b.setAttribute('aria-label', `${D.tag}・${D.name}：${boss && !lock ? '魔王關，' : ''}${txt}`);
+  });
+}
 
 /* ================= 戰鬥場景與怪物 ================= */
 function monsterFor(ctx) {
   const img = (k, tint) => `<img src="${MON_SRC[k]}" alt="" draggable="false"${tint ? ` style="filter:${tint}"` : ''}>`;
-  if (ctx.boss) { const ev = EVENT_INFO[ctx.boss.type] || EVENT_INFO.VOL; return { html: img(ev.mon), name: `${ev.boss} Lv.${ctx.floor}`, boss: true }; }
-  const fam = FAMILIES[Math.floor((ctx.floor - 1) / 10) % FAMILIES.length];
-  return { html: img(fam.k), name: `${fam.n} Lv.${ctx.floor}` };
+  if (ctx.boss) { const ev = EVENT_INFO[ctx.boss.type] || EVENT_INFO.VOL; return { html: img(ev.mon), name: `${ev.boss} Lv.${ctx.lv}`, boss: true }; }
+  const fam = FAMILIES[(Math.floor((ctx.lv - 1) / 10) + DOOR_KEYS.indexOf(ctx.door) * 3) % FAMILIES.length];   // 每道門的怪物順序錯開
+  return { html: img(fam.k), name: `${fam.n} Lv.${ctx.lv}` };
 }
 
 /* ================= K 線圖 ================= */
@@ -2200,8 +2308,8 @@ function hitFlash() { const m = $('#monster'); m.classList.remove('hit'); void m
 async function introBattle(ctx) {
   const mon = $('#monster'), w = $('#wave'), sm = $('#summon');
   if (!reduceMotion()) {
-    $('#waveMain').textContent = trial(ctx.floor);
-    $('#waveSub').textContent = ctx.boss ? 'BOSS BATTLE' : `TRIAL ${ctx.floor} / ${totalFloors()}`;
+    $('#waveMain').textContent = `第 ${ctx.lv} 關`;
+    $('#waveSub').textContent = ctx.boss ? `BOSS BATTLE · ${DOORS[ctx.door].tag}` : `${DOORS[ctx.door].tag} · ${DOORS[ctx.door].name}`;
     w.className = 'wave' + (ctx.boss ? ' boss' : ''); w.hidden = false; void w.offsetWidth;
     await sleep(1150);
     if (S.battle !== ctx) { w.hidden = true; return; }
@@ -2218,21 +2326,22 @@ async function introBattle(ctx) {
 /* ================= 戰鬥流程 ================= */
 function needLogin() { if (S.user) return false; showGate(); return true; }
 const SHIELD = on => `<svg viewBox="0 0 20 22" class="${on ? 'on' : ''}" aria-hidden="true"><path d="M10 1l8 3v6c0 5.2-3.4 9.3-8 11C5.400 19.3 2 15.2 2 10V4z"/></svg>`;
-function stageNotice(kind) {
+function stageNotice(kind, a) {
+  const dn = DOORS[a] ? `「${DOORS[a].name}」` : '';
   return new Promise(res => {
     const st = CONFIG.stake, bs = CONFIG.bossStake, el = $('#stageNote');
     $('#stageBody').innerHTML = kind === 'risk' ? `<p class="sn-k">STAGE II CLEAR</p><h2 id="stageT">第二階段試煉・通過</h2>
-      <p class="sn-p">恭喜你，冒險者！前 ${CONFIG.riskFrom - 1} 道試煉已全數通過。但在這深不可測的「多空深淵」裡，能活到最後的從來不是靠運氣，嚴密的風控與冷靜的心態，才是你走得長遠的唯一護甲。</p>
-      <p class="sn-p">從這一關起，正式啟用<b>「風控護盾」</b>：你擁有 ${CONFIG.riskMax} 次額度，<b>做多或做空判斷錯誤</b>將扣除 1 次。</p>
+      <p class="sn-p">恭喜你，冒險者！${dn}前 ${CONFIG.riskFrom - 1} 關已全數通過。但在這深不可測的「多空深淵」裡，能活到最後的從來不是靠運氣，嚴密的風控與冷靜的心態，才是你走得長遠的唯一護甲。</p>
+      <p class="sn-p">從這道門的這一關起，正式啟用<b>「風控護盾」</b>（四道門共用）：你擁有 ${CONFIG.riskMax} 次額度，<b>做多或做空判斷錯誤</b>將扣除 1 次。</p>
       <div class="sn-sh">${SHIELD(1).repeat(CONFIG.riskMax)}</div>
       <p class="sn-p">・護盾每 ${CONFIG.riskMin} 分鐘修復 1 次，未滿 ${CONFIG.riskMax} 次即啟動倒數。<br>・護盾耗盡將強制鎖定試煉，恢復前無法再次挑戰。<br>・選擇「不進場」若錯判僅扣本金，不扣除護盾。</p>
       <p class="sn-p sn-w">連續虧損最容易喚醒名為「衝動」的心魔。護盾碎裂時，請果斷離開盤面平復心態。</p>`
       : `<p class="sn-k">STAGE I CLEAR</p><h2 id="stageT">第一階段試煉・通過</h2>
-      <p class="sn-p">恭喜你，冒險者！前 ${CONFIG.lotFrom - 1} 道試煉已全數通過。</p>
+      <p class="sn-p">恭喜你，冒險者！${dn}前 ${CONFIG.lotFrom - 1} 關已全數通過。</p>
       <p class="sn-p">從這一關開始解鎖<b>「槓桿」</b>：每一題出手前，都可以自由選擇 1-3 倍，賺和賠會一起放大。</p>
       <table class="sn-t"><thead><tr><th>槓桿</th><th>一般關</th><th>魔王關</th></tr></thead><tbody>${[1, 2, 3].map(m => `<tr><th>${m} 倍</th><td>±${fmt(st * m)} U</td><td>±${fmt(bs * m)} U</td></tr>`).join('')}</tbody></table><p class="sn-p" style="font-size:13px">選「不進場」答錯只扣 ${CONFIG.neutralLoss} U（魔王關 ${CONFIG.bossNeutralLoss} U），一樣乘上倍數。</p>
       <p class="sn-p sn-w">倍數越高，贏得越快，輸得也越快。本金不夠賠的倍數無法選擇。請做好風控，量力而為。</p>`;
-    $('#stageNext').textContent = `前往${trial(kind === 'risk' ? CONFIG.riskFrom : CONFIG.lotFrom)}`;
+    $('#stageNext').textContent = `前往第 ${kind === 'risk' ? CONFIG.riskFrom : CONFIG.lotFrom} 關`;
     el.hidden = false; el.scrollTop = 0; $('#stageNext').focus();
     $('#stageNext').onclick = () => { el.hidden = true; res(); };
   });
@@ -2240,7 +2349,7 @@ function stageNotice(kind) {
 /* 主畫面右上角的盾牌、倒數，以及額度用完時鎖住「進入試煉」 */
 function riskPaint() {
   const u = S.user, pill = $('#riskPill'); if (!pill) return;
-  if (u && riskExempt() && (u.floor || 0) + 1 >= CONFIG.riskFrom) {   // 管理員不受限：盾牌全滿，標示「不受限」
+  if (u && riskExempt() && riskReach(u)) {   // 管理員不受限：盾牌全滿，標示「不受限」
     pill.hidden = false; $('#riskSh').innerHTML = SHIELD(1).repeat(CONFIG.riskMax); $('#riskT').textContent = '管理員不受限'; return;
   }
   const on = riskOn(u); pill.hidden = !on; if (!on) return;
@@ -2248,9 +2357,7 @@ function riskPaint() {
   $('#riskSh').innerHTML = Array.from({ length: CONFIG.riskMax }, (_, i) => SHIELD(i < left)).join('');
   $('#riskT').textContent = left >= CONFIG.riskMax ? '' : mmss(next);
   pill.setAttribute('aria-label', `風控護盾 ${left}／${CONFIG.riskMax}` + (next ? `，${mmss(next)} 後恢復 1 次` : ''));
-  const eb = $('#btnBattle'), locked = left === 0;
-  if (locked !== eb.classList.contains('rest')) renderHome();
-  else if (locked) $('#battleTxt').textContent = `休息中 ${mmss(next)}`;
+  doorsPaint();
 }
 setInterval(riskPaint, 1000);
 setInterval(() => { const cb = $('#ckDot'); if (cb && S.user && cb.hidden === canCheckin(S.user)) { renderHome(); if (S.sheet === 'checkin') openSheet('checkin'); } if (S.sheet === 'checkin' && $('#ckLeft')) $('#ckLeft').textContent = ckLeftTxt(); }, 1000);   // 跨過台北 00:00 時讓簽到鈕重新出現
@@ -2263,23 +2370,25 @@ async function doCheckin() {
     else { toast(e.code === 'permission-denied' ? '簽到失敗：請確認 Firestore 規則已更新（或手機時間不正確）。' : '簽到失敗，請檢查網路後再試一次。'); cb.disabled = false; cb.textContent = '簽到'; }
   }
 }
-async function startFloor() {
+async function startFloor(a) {
   if (needLogin() || S.starting) return;
+  a = a || (S.battle && S.battle.door); if (!DOORS[a]) return openDoors();
   S.starting = true;
   try {
-    const f = S.user.floor + 1;
-    if (f > totalFloors() && S.live) { try { await B.loadTower(); } catch (e) {} renderHome(); }
-    const total = totalFloors();
-    if (!total) { toast('塔還在建造中，題庫建立完成後就能開始挑戰。'); return; }
-    if (f > total) { toast(`目前 ${total} 道試煉都打完了！每天台北時間 00:00 過後會再新增 ${CONFIG.floorsPerDay} 道。`); return; }
+    let list = (doorsList() || {})[a] || [], k = doorDone(S.user, a);
+    if (k >= list.length && S.live) { try { await B.loadTower(); } catch (e) {} list = (doorsList() || {})[a] || []; doorsPaint(); }
+    const D = DOORS[a], lv = k + 1, n = list[k];
+    if (!list.length) { toast(`${D.name}還在建造中，題庫準備好後就能開始挑戰。`); return; }
+    if (n == null) { toast(`${D.name}目前 ${list.length} 關都打完了！每天台北時間 00:00 過後會再新增關卡，也可以先去其他門挑戰。`); return; }
     let q, pending;
-    try { [q, pending] = await Promise.all([getFloorQ(f), B.pendingVote(f)]); }
+    try { [q, pending] = await Promise.all([doorQ(n), B.pendingVote(n)]); }
     catch (e) { console.warn(e); toast(`試煉之門擁擠，請稍等（${String(e.code || e.message || '').replace(/^.*\//, '').slice(0, 24)}）`); return; }
-    const ctx = { q, floor: f, boss: q.boss, label: trial(f) };
-    if (pending && isAdmin()) { try { await B.clearVote(f); pending = null; } catch (e) { toast('管理員：清除舊紀錄失敗，請確認已更新 Firestore 規則。'); } }
-    if (!pending && f === CONFIG.lotFrom && !S.lotSeen) { S.lotSeen = true; await stageNotice('lot'); }
-    if (!pending && f === CONFIG.riskFrom && !S.riskSeen) { S.riskSeen = true; await stageNotice('risk'); }
-    if (!pending && riskOn(S.user) && riskLeft(S.user) === 0) { toast(`風控護盾已用完，先休息一下。${mmss(riskNextMs(S.user))} 後恢復 1 次。`); return; }
+    const ctx = { q, floor: n, door: a, lv, boss: q.boss, label: doorLabel(a, lv) };
+    if (pending && isAdmin()) { try { await B.clearVote(n); pending = null; } catch (e) { toast('管理員：清除舊紀錄失敗，請確認已更新 Firestore 規則。'); } }
+    S.seen = S.seen || {};
+    if (!pending && lv === CONFIG.lotFrom && !S.seen['lot' + a]) { S.seen['lot' + a] = 1; await stageNotice('lot', a); }
+    if (!pending && lv === CONFIG.riskFrom && !S.seen['risk' + a]) { S.seen['risk' + a] = 1; await stageNotice('risk', a); }
+    if (!pending && lv >= CONFIG.riskFrom && riskOn(S.user) && riskLeft(S.user) === 0) { toast(`風控護盾已用完，先休息一下。${mmss(riskNextMs(S.user))} 後恢復 1 次（第 ${CONFIG.riskFrom} 關以前的關卡不受影響）。`); return; }
     if (pending) { enterBattle(ctx, true); toast('上次在這道試煉已經出手，現在幫你結算。'); resolveBattle(pending); }
     else if (q.boss) showWarning(ctx);
     else enterBattle(ctx);
@@ -2287,7 +2396,7 @@ async function startFloor() {
 }
 function showWarning(ctx) {
   const ev = EVENT_INFO[ctx.boss.type] || EVENT_INFO.VOL;
-  $('#wSub').textContent = `${trial(ctx.floor)} · ${ev.boss}`;
+  $('#wSub').textContent = `${ctx.label} · ${ev.boss}`;
   $('#wEvent').textContent = ev.data ? `數據魔王：${ev.name}公布` : `魔王關：${ev.name}`;
   $('#wNote').textContent = (ev.data
     ? '盤面停在數據公布前的最後一根 K 棒，公布瞬間常出現大幅跳動與上下插針。'
@@ -2314,10 +2423,10 @@ function enterBattle(ctx, resume) {
   $('#battle').classList.toggle('boss', !!mon.boss);
   $('#battle').style.backgroundImage = (mon.boss ? 'linear-gradient(#5a0c1870,#3a081470 40%,#2a0612a6 70%,#1a040cc7)' : 'linear-gradient(#0a1c5024,#0a1c5033 40%,#0a174873 72%,#081238a6)') + `, url(${INSIDE_SRC})`;
   $('#mName').textContent = mon.name; $('#mHp').style.width = '100%';
-  $('#bFloor').textContent = ctx.boss ? `${ctx.label} · 魔王` : ctx.label;
+  $('#bFloor').textContent = ctx.boss && ctx.door ? `${DOORS[ctx.door].name}・魔王關` : ctx.label;
   $('#bFloor').className = 'b-floor' + (ctx.boss ? ' boss' : ' metal-text');
   { const L = $('#lots'), setM = m => { ctx.mult = m; L.querySelectorAll('button').forEach(x => { const on = +x.dataset.m === m; x.classList.toggle('on', on); x.setAttribute('aria-checked', on); }); $('#lotsV').textContent = `答對 +${fmt(ctx.q.stake * m)}／答錯 −${fmt(ctx.q.stake * m)}（不進場 −${fmt(lossOf(ctx.q.stake, m, 'neutral'))}）`; };
-    L.hidden = !(ctx.floor >= CONFIG.lotFrom) || !!resume; L.classList.remove('locked'); setM(1);
+    L.hidden = !(ctx.lv >= CONFIG.lotFrom) || !!resume; L.classList.remove('locked'); setM(1);
     L.querySelectorAll('button').forEach(x => { const m = +x.dataset.m; x.disabled = m > 1 && S.user.balance < ctx.q.stake * m; x.title = x.disabled ? '本金不足，無法選這個倍數' : ''; });
     L.querySelectorAll('button').forEach(x => x.onclick = () => { if (!L.classList.contains('locked')) setM(+x.dataset.m); }); }
   const q = ctx.q, ev = ctx.boss && (EVENT_INFO[ctx.boss.type] || EVENT_INFO.VOL), dp = dpOf(q), a = q.vis[q.vis.length - 1][3];
@@ -2335,12 +2444,12 @@ function enterBattle(ctx, resume) {
 /* ================= 試煉戰報（榮譽公佈欄）=================
    玩家達成里程碑時，自己寫一筆紀錄到 tq2_feed；大家打開戰報時讀最新的幾十筆。不再定時抓排行榜，讀取量小很多。 */
 const FEED_BOARD = { wealth: '財富榜', rate: '勝率榜' };
-const feedText = e => e.t === 'floor' ? `突破${trial(e.n)}` : e.t === 'streak' ? `達成 ${e.n} 連勝` : e.t === 'title' ? `獲得稱號「${e.s}」` : e.t === 'rank' ? `登上${FEED_BOARD[e.s] || '排行榜'}第 ${e.n} 名` : '';
+const feedText = e => e.t === 'floor' ? (DOORS[e.s] ? `突破${DOORS[e.s].name}第 ${e.n} 關` : `突破${trial(e.n)}`) : e.t === 'streak' ? `達成 ${e.n} 連勝` : e.t === 'title' ? `獲得稱號「${e.s}」` : e.t === 'rank' ? `登上${FEED_BOARD[e.s] || '排行榜'}第 ${e.n} 名` : '';
 const FEED = { top: null, at: 0, list: null, listAt: 0, rankAt: 0 };
 function feedPost(t, n, s) { if (!S.user) return; B.feedAdd({ t, n: n | 0, s: String(s || '').slice(0, 20), name: S.user.name }).then(() => { FEED.at = 0; FEED.listAt = 0; }).catch(e => console.warn('feed', e)); }
 /* 打完一題後檢查有沒有值得上戰報的事 */
-function feedAfter(before, u, newAch, ok) {
-  if (Math.floor(u.floor / 10) > Math.floor(before.floor / 10)) feedPost('floor', Math.floor(u.floor / 10) * 10);
+function feedAfter(before, u, newAch, ok, a) {
+  if (a && Math.floor(doorDone(u, a) / 10) > Math.floor(doorDone(before, a) / 10)) feedPost('floor', Math.floor(doorDone(u, a) / 10) * 10, a);   // 每道門每過 10 關上一次戰報
   if (ok && u.streak > 0 && u.streak % 5 === 0) feedPost('streak', u.streak);
   if (titleOf(u.peak) !== titleOf(before.peak)) feedPost('title', 0, titleOf(u.peak));
   newAch.forEach(id => feedPost('title', 0, ACH[id][1]));
@@ -2367,14 +2476,14 @@ async function feedStrip() {
   box.hidden = !e; feedPlace(); if (e) $('#tkTxt').textContent = `${e.name} ${feedText(e)}`;
 }
 async function feedSheet() {
-  const body = $('#sheetBody'); body.innerHTML = '<ul class="nt-list fd-list" id="fdList"><li class="nt-empty">讀取中…</li></ul><p class="hint">突破每 10 道試煉、每 5 連勝、獲得新稱號、登上財富榜或勝率榜前 10 名，都會記在這裡。</p>';
+  const body = $('#sheetBody'); body.innerHTML = '<ul class="nt-list fd-list" id="fdList"><li class="nt-empty">讀取中…</li></ul><p class="hint">每道門每突破 10 關、每 5 連勝、獲得新稱號、登上財富榜或勝率榜前 10 名，都會記在這裡。</p>';
   try { if (!FEED.list || Date.now() - FEED.listAt > 6e4) { FEED.list = await B.feed(40); FEED.listAt = Date.now(); } }
   catch (e) { console.warn(e); if ($('#fdList')) $('#fdList').innerHTML = '<li class="nt-empty">戰報讀取失敗，請稍後再試。</li>'; return; }
   if (S.sheet !== 'feed' || !$('#fdList')) return;
   const ago = ms => { const m = Math.max(0, Math.floor((Date.now() - ms) / 6e4)); return m < 1 ? '剛剛' : m < 60 ? `${m} 分鐘前` : m < 1440 ? `${Math.floor(m / 60)} 小時前` : noteTime(ms).slice(5, 10); };
   $('#fdList').innerHTML = FEED.list.length ? FEED.list.map(e => `<li class="fd-${e.t}"><span class="fd-ico" aria-hidden="true">${{ floor: '⚔', streak: '🔥', title: '✦', rank: '♛' }[e.t] || '✦'}</span><p><b>${esc(e.name)}</b> ${esc(feedText(e))}</p><time>${ago(e.ts)}</time></li>`).join('') : '<li class="nt-empty">還沒有戰報，成為第一個上榜的人吧。</li>';
 }
-function exitBattle() { $('#battle').hidden = true; $('#wave').hidden = true; FX.parts = []; S.battle = null; renderHome(); }
+function exitBattle() { $('#battle').hidden = true; $('#wave').hidden = true; FX.parts = []; S.battle = null; renderHome(); doorsPaint(); }
 function burst(stage, n) {
   for (let i = 0; i < n; i++) {
     const s = document.createElement('i'); s.className = 'spark';
@@ -2401,8 +2510,8 @@ async function resolveBattle(choice) {
     return;
   }
   const ans = res.ans, pick = res.choice, ok = pick === ans.answer, stake = ans.stake * (res.mult || 1), loss = lossOf(ans.stake, res.mult || 1, pick), st = settle(before, ok, stake, loss); b.loss = loss;
-  b.ans = ans; S.user = res.user; lockActs(true, pick); const achBefore = Object.keys(ACH).filter(id => achGot(id, before, HIST.stats())); HIST.add(b.floor, b.q.assetKey, ok, pick);
-  { const stN = HIST.stats(), nu = Object.keys(ACH).filter(id => achGot(id, S.user, stN) && !achBefore.includes(id)); try { feedAfter(before, S.user, nu, ok); } catch (e) { console.warn(e); } if (nu.length) setTimeout(() => toast(`解鎖稱號「${nu.map(id => ACH[id][1]).join('」「')}」！到稱號殿就能配戴。`), 5200); }
+  b.ans = ans; S.user = res.user; lockActs(true, pick); const achBefore = Object.keys(ACH).filter(id => achGot(id, before, HIST.stats())); HIST.add(b.floor, b.q.assetKey, ok, pick, S.user.floor);
+  { const stN = HIST.stats(), nu = Object.keys(ACH).filter(id => achGot(id, S.user, stN) && !achBefore.includes(id)); try { feedAfter(before, S.user, nu, ok, b.door); } catch (e) { console.warn(e); } if (nu.length) setTimeout(() => toast(`解鎖稱號「${nu.map(id => ACH[id][1]).join('」「')}」！到稱號殿就能配戴。`), 5200); }
   for (let r = 1; r <= 3; r++) { if (S.battle !== b) return; b.reveal = r; setTf('15m'); drawChart(r); await sleep(380); }
   if (S.battle !== b) return;
   const mon = $('#monster'), stage = $('#stage'), hp = $('#mHp');
@@ -2485,7 +2594,7 @@ function rzCard(kind, title, note, cs, hits, wide) {
   return `<div class="rz-card rz-${kind}${wide ? ' wide' : ''}"><b class="rz-tag">${title}</b><svg viewBox="0 0 ${W} ${H}" role="img" aria-label="${title}：${note}">${svg}</svg><p>${note}</p></div>`;
 }
 function showResult(b, pick, ok, stake, st) {
-  const q = b.q, ans = b.ans, dp = dpOf(q), total = totalFloors(), more = S.user.floor < total, rOn = riskOn(S.user), rLeft = rOn ? riskLeft(S.user) : CONFIG.riskMax, canNext = more && rLeft > 0, P = ans.pts;
+  const q = b.q, ans = b.ans, dp = dpOf(q), nk = doorDone(S.user, b.door), more = nk < ((doorsList() || {})[b.door] || []).length, rOn = riskOn(S.user), rLeft = rOn ? riskLeft(S.user) : CONFIG.riskMax, canNext = more && (rLeft > 0 || nk + 1 < CONFIG.riskFrom), P = ans.pts;
   const ev = b.boss && (EVENT_INFO[b.boss.type] || EVENT_INFO.VOL), who = b.monName;
   const now = q.vis[q.vis.length - 1][3], c3 = ans.rev[ans.rev.length - 1][3];
   const sg = v => (v > 0 ? '+' : v < 0 ? '−' : '') + Math.abs(v).toFixed(dp);
@@ -2511,11 +2620,11 @@ function showResult(b, pick, ok, stake, st) {
       ${rOn || b.hit ? `<dt>風控護盾</dt><dd>${b.hit ? '<b class="bad-t">−1</b>・' : ''}剩 ${rLeft}／${CONFIG.riskMax}${!b.hit && !ok && pick === 'neutral' ? '（不進場不扣額度）' : ''}</dd>` : ''}
       ${ans.sourceTime ? `<dt>盤面時間</dt><dd>${esc(ans.sourceTime)}${ev && ev.data ? '・' + esc(ev.name) : ''}</dd>` : ''}
     </dl>
-    <div class="row"><button class="btn dim" id="rMap">回地圖</button>${canNext ? `<button class="btn gold" id="rNext">前往${trial(S.user.floor + 1)}</button>` : ''}</div>
-    ${canNext ? '' : more ? `<p class="hint" style="margin:0;position:relative;color:#ffe9ae">風控護盾已用完，強制休息。先離開盤面平復心態，${mmss(riskNextMs(S.user))} 後恢復 1 次額度。</p>` : `<p class="hint" style="margin:0;position:relative">已打完目前所有試煉，每天台北時間 00:00 過後會再新增 ${CONFIG.floorsPerDay} 道。</p>`}`;
+    <div class="row"><button class="btn dim" id="rMap">回到門前</button>${canNext ? `<button class="btn gold" id="rNext">前往第 ${nk + 1} 關</button>` : ''}</div>
+    ${canNext ? '' : more ? `<p class="hint" style="margin:0;position:relative;color:#ffe9ae">風控護盾已用完，強制休息。先離開盤面平復心態，${mmss(riskNextMs(S.user))} 後恢復 1 次額度。</p>` : `<p class="hint" style="margin:0;position:relative">已打完${DOORS[b.door].name}目前所有關卡，每天台北時間 00:00 過後會再新增，也可以先去其他門挑戰。</p>`}`;
   $('#actions').hidden = true; $('#result').hidden = false;
   $('#rMap').onclick = exitBattle;
-  if (canNext) $('#rNext').onclick = startFloor;
+  if (canNext) $('#rNext').onclick = () => startFloor(b.door);
   $('#result').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
 }
 
@@ -2558,12 +2667,12 @@ function openSheet(kind) {
       <h3>本金怎麼算</h3>
       <ul>
         <li>一般關：答對 +${CONFIG.stake} U；做多、做空答錯 −${CONFIG.stake} U，選不進場答錯只扣 −${CONFIG.neutralLoss} U。</li>
-        <li>從${trial(CONFIG.lotFrom)}開始，每一題出手前可以選 1-3 倍槓桿，賺賠都乘上倍數（包含不進場答錯的扣款；連勝獎勵不加倍）。本金不夠賠的倍數不能選。</li>
-        <li>魔王關（每 10 道試煉，數據公布前一刻的盤面）：答對 +${CONFIG.bossStake} U；做多、做空答錯 −${CONFIG.bossStake} U，選不進場答錯只扣 −${CONFIG.bossNeutralLoss} U。</li>
-        <li>風控護盾：從${trial(CONFIG.riskFrom)}開始，做多或做空答錯一次扣 1 次額度（共 ${CONFIG.riskMax} 次，每 ${CONFIG.riskMin} 分鐘恢復 1 次）。用完會強制休息，恢復前不能進入試煉。不進場答錯只扣本金，不扣額度。</li>
+        <li>四道試煉之門（黃金、比特幣、納斯達克、道瓊）各自計算關卡。每道門從第 ${CONFIG.lotFrom} 關開始，每一題出手前可以選 1-3 倍槓桿，賺賠都乘上倍數（包含不進場答錯的扣款；連勝獎勵不加倍）。本金不夠賠的倍數不能選。</li>
+        <li>魔王關（每道門的第 10、20、30… 關，常是數據公布前一刻的盤面）：答對 +${CONFIG.bossStake} U；做多、做空答錯 −${CONFIG.bossStake} U，選不進場答錯只扣 −${CONFIG.bossNeutralLoss} U。</li>
+        <li>風控護盾：每道門從第 ${CONFIG.riskFrom} 關開始，做多或做空答錯一次扣 1 次額度（四道門共用 ${CONFIG.riskMax} 次，每 ${CONFIG.riskMin} 分鐘恢復 1 次）。用完會強制休息，恢復前不能挑戰第 ${CONFIG.riskFrom} 關以後的關卡。不進場答錯只扣本金，不扣額度。</li>
         <li>每日簽到：每天可以在主畫面簽到一次，+${fmt(CONFIG.checkin)} U，台北時間 00:00 換日。</li>
         <li>連勝：每連續答對 ${CONFIG.streakEvery} 次額外 +${CONFIG.streakBonus} U，答錯歸零。</li>
-        <li>每道試煉只能出手一次，送出後不能改。答對答錯都會前進到下一道。</li>
+        <li>每一關只能出手一次，送出後不能改。答對答錯都會前進到這道門的下一關。</li>
         <li>邀請好友註冊並填你的信箱：+${fmt(CONFIG.invite)} U。</li>
       </ul>
       <h3>音樂出處</h3>
@@ -2606,25 +2715,27 @@ function openSheet(kind) {
     body.innerHTML = `<div class="acct" style="background-image:url(${ACCT_SRC})">
       <h2 class="ac-title">戰績碑</h2><button class="ac-x" id="acX" aria-label="關閉"></button>
       <div class="ac-name"><b>${esc(u.name)}</b><span>${esc(u.email || '')} ・ 稱號「${esc(myTitle())}」</span><div class="rename" id="renameBox"></div></div>
-      ${cell(1, '本金', fmt(u.balance) + ' U')}${cell(2, '勝率', rate)}${cell(3, '戰績', `${u.wins} 勝 ${u.losses} 敗`)}${cell(4, '試煉', `${u.floor} / ${totalFloors()}`)}${cell(5, '目前連勝', u.streak + ' 次')}${cell(6, '最高連勝', u.bestStreak + ' 次')}
+      ${cell(1, '本金', fmt(u.balance) + ' U')}${cell(2, '勝率', rate)}${cell(3, '戰績', `${u.wins} 勝 ${u.losses} 敗`)}${cell(4, '通關', `${u.floor} 關`)}${cell(5, '目前連勝', u.streak + ' 次')}${cell(6, '最高連勝', u.bestStreak + ' 次')}
       <button class="ac-out" id="logout">登出</button></div>
       <div class="ac-assets"><h3>各商品勝率</h3><div class="aa-grid" id="aaGrid">${['gold', 'btc', 'nasdaq', 'dow'].map(k => `<div class="aa-c"><span>${CONFIG.assetNames[k]}</span><b>…</b><small>&nbsp;</small></div>`).join('')}</div></div>`;
     if (isAdmin()) {
       body.insertAdjacentHTML('beforeend', `<div class="ac-assets adm"><h3>管理員工具</h3>
-        <div class="adm-row"><label for="admN">跳到試煉</label><input id="admN" type="number" inputmode="numeric" min="1" max="${totalFloors()}" value="${Math.min(u.floor + 1, totalFloors())}"><button id="admGo">前往</button></div>
+        <div class="adm-row"><label for="admD">跳關</label><select id="admD" class="adm-sel">${DOOR_KEYS.map(a => `<option value="${a}">${DOORS[a].name}</option>`).join('')}</select><input id="admN" type="number" inputmode="numeric" min="1" value="${doorDone(u, 'gold') + 1}" aria-label="第幾關"><button id="admGo">前往</button></div>
         <div class="adm-row adm-r2"><button id="admRisk" class="adm-alt" aria-pressed="${u.riskTest}">套用風控護盾：${u.riskTest ? '開' : '關'}</button><button id="admFill" class="adm-alt">補滿額度</button></div>
         <div class="adm-row adm-r2"><button id="admStory" class="adm-alt">重看開頭故事</button><button id="admTour" class="adm-alt">重看新手教學</button></div>
-        <button id="admReset" class="adm-reset">重置我的關卡紀錄</button><p class="adm-msg" id="admMsg">共 ${totalFloors()} 道試煉。跳關只改進度，本金和戰績不變。</p></div>`);
+        <button id="admReset" class="adm-reset">重置我的關卡紀錄</button><p class="adm-msg" id="admMsg">${DOOR_KEYS.map(a => `${DOORS[a].name} ${((doorsList() || {})[a] || []).length} 關`).join('・')}。跳關只改進度，本金和戰績不變。</p></div>`);
       const msg = t => { const m = $('#admMsg'); if (m) m.textContent = t; };
-      const run = async (patch, done) => { try { const nu = await B.adminSet(patch); if (nu) S.user = nu; S.lotSeen = S.riskSeen = false; renderHome(); done(); } catch (e) { msg('失敗：' + (e.code === 'permission-denied' ? '請先更新 Firestore 規則' : e.message)); } };
-      $('#admGo').onclick = () => { const n = Math.floor(+$('#admN').value), t = totalFloors(); if (!(n >= 1 && n <= t)) return msg(`請輸入 1～${t}`); run({ floor: n - 1 }, () => { closeSheet(); toast(`已跳到${trial(n)}，按「進入試煉」開始。`); }); };
+      const run = async (patch, done) => { try { const nu = await B.adminSet(patch); if (nu) S.user = nu; S.seen = {}; renderHome(); done(); } catch (e) { msg('失敗：' + (e.code === 'permission-denied' ? '請先更新 Firestore 規則' : e.message)); } };
+      $('#admD').onchange = () => { $('#admN').value = doorDone(S.user, $('#admD').value) + 1; };
+      $('#admGo').onclick = () => { const a = $('#admD').value, n = Math.floor(+$('#admN').value), t = ((doorsList() || {})[a] || []).length; if (!(n >= 1 && n <= t)) return msg(`${DOORS[a].name}請輸入 1～${t}`);
+        const doors = { ...(S.user.doors || {}), [a]: n - 1 }; run({ doors, floor: DOOR_KEYS.reduce((x, k) => x + (doors[k] || 0), 0) }, () => { closeSheet(); toast(`已跳到${doorLabel(a, n)}，按「進入試煉」選門開始。`); }); };
       $('#admRisk').onclick = () => run({ riskTest: !u.riskTest }, () => { openSheet('account'); toast(u.riskTest ? '風控護盾：管理員不受限。' : '風控護盾：已套用，和一般玩家一樣會扣額度、會被鎖。'); });
       $('#admStory').onclick = () => { closeSheet(); STORY_P = null; introStory(true); };
       $('#admTour').onclick = () => { closeSheet(); setTimeout(() => startTour(true), 300); };
       $('#admFill').onclick = () => run({ riskDebt: 0 }, () => { closeSheet(); toast('風控護盾已補滿。'); });
       let armed = false;
       $('#admReset').onclick = () => { if (!armed) { armed = true; $('#admReset').textContent = '再按一次確認重置'; return; }
-        run({ floor: 0, balance: CONFIG.start + (u.invites || 0) * CONFIG.invite, peak: CONFIG.start, wins: 0, losses: 0, total: 0, streak: 0, bestStreak: 0, rankBp: -1, riskDebt: 0, checkDay: 0, title: '' }, () => { HIST.put({}); openSheet('account'); toast(`已重置：回到試煉 01、本金 ${fmt(CONFIG.start + (u.invites || 0) * CONFIG.invite)} U${u.invites ? '（含邀請獎勵）' : ''}。`); }); };
+        run({ floor: 0, doors: {}, last: 0, balance: CONFIG.start + (u.invites || 0) * CONFIG.invite, peak: CONFIG.start, wins: 0, losses: 0, total: 0, streak: 0, bestStreak: 0, rankBp: -1, riskDebt: 0, checkDay: 0, title: '' }, () => { HIST.put({}); openSheet('account'); toast(`已重置：四道門都回到第 1 關、本金 ${fmt(CONFIG.start + (u.invites || 0) * CONFIG.invite)} U${u.invites ? '（含邀請獎勵）' : ''}。`); }); };
     }
     HIST.fill().then(o => { const g = $('#aaGrid'); if (!g || S.sheet !== 'account') return;
       g.innerHTML = ['gold', 'btc', 'nasdaq', 'dow'].map(k => { const [w, t] = o[k]; return `<div class="aa-c"><span>${CONFIG.assetNames[k]}</span><b>${t ? (w / t * 100).toFixed(1) + '%' : '—'}</b><small>${t ? `${w} 勝 ${t - w} 敗` : '尚無紀錄'}</small></div>`; }).join(''); }).catch(() => {});
@@ -2722,6 +2833,7 @@ function bindUI() {
   $('#bExit').onclick = exitBattle;
   $('#bRules').onclick = () => openSheet('rules');
   $('#wBack').onclick = () => { $('#warning').hidden = true; S.pending = null; };
+  $('#drBack').onclick = closeDoors;
   $('#wGo').onclick = () => { $('#warning').hidden = true; const c = S.pending; S.pending = null; if (c) enterBattle(c); };
   document.querySelectorAll('.act').forEach(x => x.onclick = () => resolveBattle(DIRS[x.dataset.dir]));
   document.querySelectorAll('.tabs button').forEach(t => t.onclick = () => { setTf(t.dataset.tf); drawChart(S.battle ? S.battle.reveal : 0); });
@@ -2768,6 +2880,6 @@ function boot() {
 }
 boot();
 </script>
-<script>addEventListener("load",()=>setTimeout(()=>{const q=["heroes.webp", "heroes2.webp", "night.webp", "acct.webp", "head.webp", "inside.webp", "mon.webp", "mon10.webp", "mon11.webp", "mon12.webp", "mon13.webp", "mon14.webp", "mon2.webp", "mon3.webp", "mon4.webp", "mon5.webp", "mon6.webp", "mon7.webp", "mon8.webp", "mon9.webp", "rvi.webp", "sp.webp", "sp10.webp", "sp2.webp", "sp3.webp", "sp4.webp", "sp5.webp", "sp6.webp", "sp7.webp", "sp8.webp", "sp9.webp"];(function n(){const f=q.shift();if(!f)return;const i=new Image();i.onload=i.onerror=n;i.src="img/"+f})()},1200));</script>
+<script>addEventListener("load",()=>setTimeout(()=>{const q=["heroes.webp", "heroes2.webp", "night.webp", "acct.webp", "doors.webp", "head.webp", "inside.webp", "mon.webp", "mon10.webp", "mon11.webp", "mon12.webp", "mon13.webp", "mon14.webp", "mon2.webp", "mon3.webp", "mon4.webp", "mon5.webp", "mon6.webp", "mon7.webp", "mon8.webp", "mon9.webp", "rvi.webp", "sp.webp", "sp10.webp", "sp2.webp", "sp3.webp", "sp4.webp", "sp5.webp", "sp6.webp", "sp7.webp", "sp8.webp", "sp9.webp"];(function n(){const f=q.shift();if(!f)return;const i=new Image();i.onload=i.onerror=n;i.src="img/"+f})()},1200));</script>
 </body>
 </html>
