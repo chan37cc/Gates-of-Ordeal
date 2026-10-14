@@ -905,11 +905,15 @@ button{font:inherit;color:inherit;cursor:pointer}
 .rv-chart canvas{width:100%;height:100%;display:block}
 .rv-facts{color:#fff}
 /* 回憶之廊入口：放在主畫面右側雲海上（位置照設計稿）；星環圖示＋文字牌 */
-#btnReview.rv-art{position:absolute;z-index:3;left:calc(var(--sx) + var(--w) * 0.8905);bottom:calc(var(--ih) * 0.3947);transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:0;margin:0;padding:0;border:0;background:none;cursor:pointer;-webkit-tap-highlight-color:transparent}
-#btnReview .rv-emb{display:block;width:calc(var(--w) * 0.1275);height:calc(var(--ih) * 0.0754);background:center/100% 100% no-repeat}
-#btnReview .rv-lab{display:flex;align-items:center;gap:4px;margin-top:-8%;padding:1px 7px;border-radius:5px;white-space:nowrap;font:700 clamp(9px,2.4vw,11.5px) var(--f-title);letter-spacing:.1em;color:#ffe9ae;background:linear-gradient(#141a3fe6,#0b1030e6);box-shadow:inset 0 0 0 1px #c99a4a,0 2px 6px #0008;text-shadow:0 1px 2px #000}
-#btnReview .rv-lab em{font-style:normal;font-size:.75em;color:#f3d58a}
-#btnReview:active .rv-emb{filter:brightness(1.25)}
+#btnNotice.rv-art,#btnReview.rv-art{position:absolute;z-index:3;left:calc(var(--sx) + var(--w) * 0.8905);bottom:calc(var(--ih) * 0.3947);transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:0;margin:0;padding:0;border:0;background:none;cursor:pointer;-webkit-tap-highlight-color:transparent}
+#btnNotice .rv-emb,#btnReview .rv-emb{display:block;width:calc(var(--w) * 0.1275);height:calc(var(--ih) * 0.0754);background:center/100% 100% no-repeat}
+#btnNotice .rv-lab,#btnReview .rv-lab{display:flex;align-items:center;gap:4px;margin-top:-8%;padding:1px 7px;border-radius:5px;white-space:nowrap;font:700 clamp(9px,2.4vw,11.5px) var(--f-title);letter-spacing:.1em;color:#ffe9ae;background:linear-gradient(#141a3fe6,#0b1030e6);box-shadow:inset 0 0 0 1px #c99a4a,0 2px 6px #0008;text-shadow:0 1px 2px #000}
+#btnNotice .rv-lab em,#btnReview .rv-lab em{font-style:normal;font-size:.75em;color:#f3d58a}
+#btnNotice:active .rv-emb,#btnReview:active .rv-emb{filter:brightness(1.25)}
+/* 雲訊之亭（公告）入口：左下雲海，和回憶之廊左右對稱 */
+#btnNotice.rv-art{left:calc(var(--sx) + var(--w) * 0.118);bottom:calc(var(--ih) * 0.332)}
+#btnNotice .rv-lab{margin-top:calc(var(--ih) * 0.006)}
+#btnNotice .note-dot{top:8%;right:24%}
 .rv-head{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:4px 0 2px}.rv-head h3.tg{margin:0;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .rv-tabs{flex:none;display:inline-flex;gap:4px;padding:3px;margin:0;border-radius:999px;background:#0b123acc;box-shadow:inset 0 0 0 1px #f3d58a88}
 .rv-tabs button{border:0;border-radius:999px;padding:5px 13px;letter-spacing:.04em;background:none;color:#e6e9ff;font:700 13px var(--f-title);cursor:pointer}
@@ -1008,7 +1012,7 @@ button{font:inherit;color:inherit;cursor:pointer}
 
   <main class="map" id="map"><canvas id="mapCv"></canvas><div class="scene" id="scene"><i class="scene-glow"></i></div><div class="scene-stars" aria-hidden="true"></div></main>
   <button class="help-btn" id="btnAccount" aria-label="規則說明"><span>?</span></button>
-  <button class="help-btn note-btn" id="btnNotice" aria-label="公告"><span><svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 10v4h3l6 4V6L7 10H4z"/><path d="M16.5 9a4 4 0 0 1 0 6M19 6.5a7.5 7.5 0 0 1 0 11"/></svg></span><i class="note-dot" id="noteDot" hidden></i></button>
+  <button class="rv-art" id="btnNotice" aria-label="雲訊之亭（公告）"><i class="rv-emb" aria-hidden="true"></i><b class="rv-lab"><em aria-hidden="true">✦</em>雲訊之亭<em aria-hidden="true">✦</em></b><i class="note-dot" id="noteDot" hidden></i></button>
   <button class="rv-art" id="btnReview" aria-label="回憶之廊"><i class="rv-emb" aria-hidden="true"></i><b class="rv-lab"><em aria-hidden="true">✦</em>回憶之廊<em aria-hidden="true">✦</em></b></button>
   <button class="help-btn note-btn bgm-btn" id="btnBgm" aria-label="音樂開關" aria-pressed="true"><span>♪</span></button>
   <button class="ticker" id="ticker" hidden aria-label="試煉戰報"><span class="tk-ico" aria-hidden="true">✦</span><div class="tk-win"><span id="tkTxt"></span></div><span class="tk-go" aria-hidden="true">戰報 ›</span></button>
@@ -1153,6 +1157,8 @@ const ME_SRC = 'data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAA
 const DOCK_SRC = {titles:'data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==',rank:'data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==',account:'data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==',invite:'data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=='};
 /* 進入試煉後的選門畫面（四道門） */
 const DOORS_SRC = 'img/doors.webp';
+/* 雲訊之亭（公告）入口圖示 */
+const NTI_SRC = 'img/nti.webp';
 const ENTER_SRC = { full: 'data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==', blank: 'data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==' };
 const GEM_SRC = 'data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==';
 const NIGHT_SRC = 'img/night.webp';
@@ -1908,6 +1914,7 @@ const TOUR = [
   { el: ['.dock-btn[data-act="titles"]', '.dock-btn[data-act="rank"]'], t: '稱號與排行榜', d: '達成目標就能解鎖稱號、配戴在名字上；排行榜可以和其他破局者比勝率、財富和人脈。' },
   { el: ['#btnBattle'], t: '試煉之門', d: '點這裡踏入 K 線交織的迷宮：看穿多空走向、抓準時機精準出手，一舉擊退心魔怪獸。' },
   { el: ['#btnReview'], t: '回憶之廊', d: '沒有成功擊敗的關卡會收進這裡。隨時回來覆盤、變得更強大。' },
+  { el: ['#btnNotice'], t: '雲訊之亭', d: '最新公告和活動消息都在這裡。亮起紅點就代表有新消息，記得進來看看。' },
   { t: '準備好了！', d: '有問題隨時點右上角的「？」看規則說明。現在就踏進第一道試煉吧！' }
 ];
 function startTour(force) {
@@ -2637,7 +2644,7 @@ function openSheet(kind) {
   const u = S.user; if (!u) return showGate();
   S.sheet = kind; const body = $('#sheetBody');
   $('#sheet').classList.toggle('art', ['account'].includes(kind)); $('#sheet').hidden = false;
-  $('#sheetTitle').textContent = { rank: '排行榜', titles: '稱號殿', invite: '邀請好友', account: '戰績碑', rules: '規則說明', checkin: '每日簽到', notice: '公告', feed: '試煉戰報', review: '回憶之廊' }[kind];
+  $('#sheetTitle').textContent = { rank: '排行榜', titles: '稱號殿', invite: '邀請好友', account: '戰績碑', rules: '規則說明', checkin: '每日簽到', notice: '雲訊之亭', feed: '試煉戰報', review: '回憶之廊' }[kind];
   if (kind === 'notice') { noticeSheet(); return; }
   if (kind === 'feed') { feedSheet(); return; }
   if (kind === 'review') { reviewSheet(); return; }
@@ -2828,7 +2835,7 @@ function bindUI() {
   $('#avatar').onclick = () => openSheet('account');
   $('#walletPlus').onclick = () => openSheet('invite');
   $('#btnAccount').onclick = () => openSheet('rules');
-  $('#btnNotice').onclick = () => openSheet('notice');
+  $('#btnNotice').onclick = () => openSheet('notice'); $('#btnNotice .rv-emb').style.backgroundImage = `url(${NTI_SRC})`;
   $('#ticker').onclick = () => openSheet('feed');
   $('#btnReview').onclick = () => openSheet('review'); $('#btnReview .rv-emb').style.backgroundImage = `url(${RVI_SRC})`;
   BGM.init();
@@ -2884,6 +2891,6 @@ function boot() {
 }
 boot();
 </script>
-<script>addEventListener("load",()=>setTimeout(()=>{const q=["heroes.webp", "heroes2.webp", "night.webp", "acct.webp", "doors.webp", "head.webp", "inside.webp", "mon.webp", "mon10.webp", "mon11.webp", "mon12.webp", "mon13.webp", "mon14.webp", "mon2.webp", "mon3.webp", "mon4.webp", "mon5.webp", "mon6.webp", "mon7.webp", "mon8.webp", "mon9.webp", "rvi.webp", "sp.webp", "sp10.webp", "sp2.webp", "sp3.webp", "sp4.webp", "sp5.webp", "sp6.webp", "sp7.webp", "sp8.webp", "sp9.webp"];(function n(){const f=q.shift();if(!f)return;const i=new Image();i.onload=i.onerror=n;i.src="img/"+f})()},1200));</script>
+<script>addEventListener("load",()=>setTimeout(()=>{const q=["heroes.webp", "heroes2.webp", "night.webp", "acct.webp", "doors.webp", "head.webp", "inside.webp", "mon.webp", "mon10.webp", "mon11.webp", "mon12.webp", "mon13.webp", "mon14.webp", "mon2.webp", "mon3.webp", "mon4.webp", "mon5.webp", "mon6.webp", "mon7.webp", "mon8.webp", "mon9.webp", "nti.webp", "rvi.webp", "sp.webp", "sp10.webp", "sp2.webp", "sp3.webp", "sp4.webp", "sp5.webp", "sp6.webp", "sp7.webp", "sp8.webp", "sp9.webp"];(function n(){const f=q.shift();if(!f)return;const i=new Image();i.onload=i.onerror=n;i.src="img/"+f})()},1200));</script>
 </body>
 </html>
