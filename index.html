@@ -978,6 +978,13 @@ button{font:inherit;color:inherit;cursor:pointer}
 .rv-cats button.on{background:linear-gradient(#f6dc93,#c99a3d);color:#2a1a05;box-shadow:0 0 10px #ffd98a55}
 .rv-cats button i{font-style:normal;font-size:11px;min-width:16px;padding:0 4px;border-radius:99px;background:#b8233a;color:#fff;text-align:center}
 .rv-cats button i:empty{display:none}
+.nt-tabs button{flex:1 1 0;font-size:14px;padding:8px 10px}
+.gd-intro{margin:0 0 10px;color:#dfe6ff;font:500 14px/1.7 var(--f-body)}
+.gd-card{display:grid;gap:8px}
+.gd-head{display:flex;align-items:baseline;justify-content:space-between;gap:8px}
+.gd-head b{font:900 17px var(--f-title);letter-spacing:.06em;color:#ffe9ae}
+.gd-head span{font:700 12px var(--f-body);color:#9fd0ff}
+.gd-go{display:block;text-align:center;text-decoration:none;margin-top:2px}
 </style>
 </head>
 <body>
@@ -2093,9 +2100,21 @@ const NOTE = { key: 'tq2n:seen', seen() { try { return +localStorage.getItem(thi
 const sortNotes = l => l.sort((a, b) => (b.pinned - a.pinned) || (b.ts - a.ts));   // 置頂在最上面，其餘越新越上面
 const noteTime = ms => { const t = new Date(ms + 8 * 36e5), p = n => String(n).padStart(2, '0'); return `${t.getUTCFullYear()}/${p(t.getUTCMonth() + 1)}/${p(t.getUTCDate())} ${p(t.getUTCHours())}:${p(t.getUTCMinutes())}`; };
 async function noticeDot() { if (Date.now() - (NOTE.at || 0) < 3e5) return; NOTE.at = Date.now(); try { const l = await B.notices(), top = Math.max(0, ...l.map(x => x.ts)); const d = $('#noteDot'); if (d) d.hidden = !(top > NOTE.seen()); } catch (e) {} }
-async function noticeSheet() {
+/* 破局者同盟：學習社群。要加新的社群就在這裡加一筆 */
+const GUILDS = [
+  { name: '黃金拼刀樂', app: 'Telegram 社群', text: '對交易黃金有興趣的朋朋，一起來討論行情～', url: 'https://t.me/+C9iQpzuMiXY4NTk1' }
+];
+function guildPane() {
+  return `<p class="gd-intro">獨自闖關很孤單！加入破局者同盟，和其他冒險者一起覆盤、交流盤勢吧～～</p>
+    <ul class="nt-list gd-list">${GUILDS.map(g => `<li class="gd-card"><div class="gd-head"><b>${esc(g.name)}</b><span>${esc(g.app)}</span></div><p>${esc(g.text)}</p>
+      <a class="btn gold gd-go" href="${esc(g.url)}" target="_blank" rel="noopener">加入同盟</a></li>`).join('')}</ul>`;
+}
+async function noticeSheet(tab) {
+  NOTE.tab = tab || NOTE.tab || 'news';
   const body = $('#sheetBody'), adm = isAdmin();
-  body.innerHTML = `${adm ? `<div class="nt-form"><textarea id="ntText" rows="4" maxlength="1000" placeholder="輸入公告內容（最多 1000 字）" aria-label="公告內容"></textarea>
+  const tabs = `<div class="rv-cats nt-tabs" role="tablist">${[['news', '星諭'], ['guild', '破局者同盟']].map(([k, n]) => `<button role="tab" data-ntab="${k}" class="${NOTE.tab === k ? 'on' : ''}" aria-selected="${NOTE.tab === k}">${n}</button>`).join('')}</div>`;
+  if (NOTE.tab === 'guild') { body.innerHTML = tabs + guildPane(); body.querySelectorAll('[data-ntab]').forEach(x => x.onclick = () => noticeSheet(x.dataset.ntab)); return; }
+  body.innerHTML = tabs + `${adm ? `<div class="nt-form"><textarea id="ntText" rows="4" maxlength="1000" placeholder="輸入公告內容（最多 1000 字）" aria-label="公告內容"></textarea>
     <div class="nt-row"><label class="nt-pin"><input type="checkbox" id="ntPin"> 置頂</label><button class="btn gold" id="ntGo">發佈公告</button></div></div>` : ''}<ul class="nt-list" id="ntList"><li class="nt-empty">讀取中…</li></ul>`;
   const load = async () => {
     let l; try { l = sortNotes(await B.notices()); } catch (e) { console.warn(e); if ($('#ntList')) $('#ntList').innerHTML = '<li class="nt-empty">公告讀取失敗，請稍後再試。</li>'; return; }
@@ -2108,6 +2127,7 @@ async function noticeSheet() {
     body.querySelectorAll('[data-pin]').forEach(x => x.onclick = () => run(() => B.noticePin(x.dataset.pin, x.dataset.v === '1'), x.dataset.v === '1' ? '已置頂。' : '已取消置頂。'));
     body.querySelectorAll('[data-del]').forEach(x => x.onclick = () => { if (x.dataset.sure) run(() => B.noticeDel(x.dataset.del), '已刪除公告。'); else { x.dataset.sure = 1; x.textContent = '再按一次確認刪除'; } });
   };
+  body.querySelectorAll('[data-ntab]').forEach(x => x.onclick = () => noticeSheet(x.dataset.ntab));
   if (adm) $('#ntGo').onclick = async () => { const t = $('#ntText').value.trim(); if (!t) return toast('請先輸入公告內容。'); $('#ntGo').disabled = true;
     try { await B.noticeAdd(t, $('#ntPin').checked); $('#ntText').value = ''; $('#ntPin').checked = false; toast('公告已發佈。'); await load(); } catch (e) { console.warn(e); toast('發佈失敗，請稍後再試。'); }
     $('#ntGo').disabled = false; };
@@ -2645,7 +2665,7 @@ function openSheet(kind) {
   S.sheet = kind; const body = $('#sheetBody');
   $('#sheet').classList.toggle('art', ['account'].includes(kind)); $('#sheet').hidden = false;
   $('#sheetTitle').textContent = { rank: '排行榜', titles: '稱號殿', invite: '邀請好友', account: '戰績碑', rules: '規則說明', checkin: '每日簽到', notice: '雲訊之亭', feed: '試煉戰報', review: '回憶之廊' }[kind];
-  if (kind === 'notice') { noticeSheet(); return; }
+  if (kind === 'notice') { noticeSheet('news'); return; }
   if (kind === 'feed') { feedSheet(); return; }
   if (kind === 'review') { reviewSheet(); return; }
   if (kind === 'checkin') {
