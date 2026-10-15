@@ -991,6 +991,9 @@ button{font:inherit;color:inherit;cursor:pointer}
 #battle .chart-head{gap:5px}#battle .chart-head > div:last-child{gap:4px!important}
 #battle .tabs button{padding:4px 8px}#battle .chart-head .ghost{padding:4px 7px!important}
 #battle .sym{font-size:clamp(11.5px,3.3vw,14px)}
+/* 有分頁的面板（回憶之廊、雲訊之亭）固定高度、內容從上往下排：切換分頁時標題不會跳上跳下 */
+.sheet.tall .sheet-card{height:68%;display:flex;flex-direction:column}
+.sheet.tall #sheetBody{flex:1 1 auto;overflow-y:auto;min-height:0}
 </style>
 </head>
 <body>
@@ -2740,7 +2743,7 @@ function showResult(b, pick, ok, stake, st) {
 function openSheet(kind) {
   const u = S.user; if (!u) return showGate();
   S.sheet = kind; const body = $('#sheetBody');
-  $('#sheet').classList.toggle('art', ['account'].includes(kind)); $('#sheet').hidden = false;
+  $('#sheet').classList.toggle('art', ['account'].includes(kind)); $('#sheet').classList.toggle('tall', ['review', 'notice'].includes(kind)); $('#sheet').hidden = false;
   $('#sheetTitle').textContent = { rank: '排行榜', titles: '稱號殿', invite: '邀請好友', account: '戰績碑', rules: '規則說明', checkin: '每日簽到', notice: '雲訊之亭', feed: '試煉戰報', review: '回憶之廊' }[kind];
   if (kind === 'notice') { noticeSheet('news'); return; }
   if (kind === 'feed') { feedSheet(); return; }
