@@ -985,6 +985,12 @@ button{font:inherit;color:inherit;cursor:pointer}
 .gd-head b{font:900 17px var(--f-title);letter-spacing:.06em;color:#ffe9ae}
 .gd-head span{font:700 12px var(--f-body);color:#9fd0ff}
 .gd-go{display:block;text-align:center;text-decoration:none;margin-top:2px}
+.sr-btn{padding:4px 8px!important;font-size:12px!important;white-space:nowrap}
+.sr-btn.on{color:#2a1806!important;background:linear-gradient(#fff0bf,#e0b04f)!important}
+.sr-btn.ask{color:#fff!important;background:#b8233a!important}
+#battle .chart-head{gap:5px}#battle .chart-head > div:last-child{gap:4px!important}
+#battle .tabs button{padding:4px 8px}#battle .chart-head .ghost{padding:4px 7px!important}
+#battle .sym{font-size:clamp(11.5px,3.3vw,14px)}
 </style>
 </head>
 <body>
@@ -1056,7 +1062,7 @@ button{font:inherit;color:inherit;cursor:pointer}
     <div class="chart-card gild">
       <div class="chart-head">
         <div class="sym" id="cSym"></div>
-        <div style="display:flex;gap:6px;align-items:center;flex:none"><button class="ghost" id="bRules" style="padding:4px 9px;font-size:12px">規則</button><div class="tabs" role="tablist"><button data-tf="15m" class="on">15m</button><button data-tf="1h">1H</button></div></div>
+        <div style="display:flex;gap:6px;align-items:center;flex:none"><button class="ghost sr-btn" id="bSR" title="自動標出支撐與壓力（每關 50 U）">支撐壓力</button><button class="ghost" id="bRules" style="padding:4px 9px;font-size:12px">規則</button><div class="tabs" role="tablist"><button data-tf="15m" class="on">15m</button><button data-tf="1h">1H</button></div></div>
       </div>
       <canvas id="chart"></canvas>
     </div>
@@ -1341,8 +1347,10 @@ function judgeQ(vis, rev, pts) {
   return { answer, finalMove: c3 - a, maxUp: hi - a, maxDown: a - lo };
 }
 const cvCandles = a => (a || []).map(x => [+x.open, +x.high, +x.low, +x.close]);
+/* 盤面上顯示的商品名稱（不管題目來源是現貨、指數還是期貨，一律用這個短名稱） */
+const ASSET_LABEL = { gold: '黃金現貨(XAUUSD)', btc: '比特幣(BTCUSDT)', nasdaq: '納斯達克(NAS100)', dow: '道瓊(US30)' };
 function floorFromDoc(d) {
-  return { floor: +d.floor, name: d.name || '', assetKey: d.assetKey || '', vis: cvCandles(d.candles15m), h1: cvCandles(d.candles1h), t15: (d.t15 || []).map(Number), t1h: (d.t1h || []).map(Number), pts: +d.points,
+  return { floor: +d.floor, name: ASSET_LABEL[d.assetKey] || d.name || '', assetKey: d.assetKey || '', vis: cvCandles(d.candles15m), h1: cvCandles(d.candles1h), t15: (d.t15 || []).map(Number), t1h: (d.t1h || []).map(Number), pts: +d.points,
     sourceHour: d.sourceHour || '', sessionLabel: d.sessionLabel || '', boss: d.boss ? { type: EVENT_INFO[d.boss] ? d.boss : 'VOL' } : null, stake: +d.stake || CONFIG.stake };
 }
 function ansFromDoc(a) { return { answer: a.answer, pts: +a.points, finalMove: +a.finalMove, maxUp: +a.maxUp, maxDown: +a.maxDown, rev: cvCandles(a.reveal15m), sourceTime: a.sourceTime || '', stake: Math.trunc(+a.stake) || CONFIG.stake }; }
@@ -1367,7 +1375,7 @@ function demoFloor(n) {
   const h1 = [];
   for (let i = 0; i < 160; i += 4) { const g = all.slice(i, i + 4); h1.push([g[0][0], Math.max(...g.map(c => c[1])), Math.min(...g.map(c => c[2])), g[3][3]]); }
   const type = ['NFP', 'CPI', 'FOMC'][Math.floor(lv / 10) % 3], m = Math.floor(r() * 96) * 15, stake = boss ? CONFIG.bossStake : CONFIG.stake;
-  return (S.floors[n] = { floor: n, name: A.name, assetKey: key, vis: all.slice(120, 160), h1, pts, demo: true, stake,
+  return (S.floors[n] = { floor: n, name: ASSET_LABEL[key] || A.name, assetKey: key, vis: all.slice(120, 160), h1, pts, demo: true, stake,
     sourceHour: boss ? (type === 'FOMC' ? '02:00' : '20:30') : String(Math.floor(m / 60)).padStart(2, '0') + ':' + String(m % 60).padStart(2, '0'),
     sessionLabel: boss ? '美洲盤' : '', boss: boss ? { type } : null,
     _ans: { ...j, pts, rev: all.slice(160), sourceTime: '示範用模擬盤面', stake } });
@@ -1499,6 +1507,7 @@ const LOCAL = {
   async noticeDel(id) { const d = this.db(); d.notices = (d.notices || []).filter(x => x.id !== id); this.save(); },
   async setTitle(id) { const d = this.db(); d.users[d.session].title = id; this.save(); return this.view(d.session); },
   async checkin() { const d = this.db(), u = d.users[d.session], day = taipeiDay(); if ((u.checkDay || 0) >= day) throw new Error('CHECKED'); u.balance += CONFIG.checkin; u.peak = Math.max(u.peak || 0, netOf(u)); u.checkDay = day; this.save(); return this.view(d.session); },
+  async buyTool(cost) { const d = this.db(), u = d.users[d.session]; if (u.balance < cost) throw new Error('POOR'); u.balance -= cost; this.save(); return this.view(d.session); },
   async adminSet(patch) { const d = this.db(); Object.assign(d.users[d.session], patch); this.save(); return this.view(d.session); },
   async clearVote() {},
   async signOut() { this.db().session = null; this.save(); this.onUser(null); },
@@ -1599,6 +1608,11 @@ const FB = {
   async refresh() { if (!this.uid) return null; const s = await this.U.doc(this.uid).get(); return s.exists ? norm(this.uid, this.email, s.data()) : null; },
   _vote(n) { return this.F.doc(String(n)).collection('votes').doc(this.uid); },
   async adminSet(patch) { await this.U.doc(this.uid).update(patch); return this.refresh(); },
+  async buyTool(cost) {   // 道具：只能扣自己的本金（firestore.rules 的 tq2ValidTool 會驗證）
+    const ref = this.U.doc(this.uid);
+    await this.db.runTransaction(async tx => { const d = (await tx.get(ref)).data(); if (d.balance < cost) throw new Error('POOR'); tx.update(ref, { balance: d.balance - cost }); });
+    return this.refresh();
+  },
   async clearVote(n) { await this._vote(n).delete(); },
   async checkin() {
     const ref = this.U.doc(this.uid), day = taipeiDay();
@@ -1924,8 +1938,18 @@ const TOUR = [
   { el: ['#btnNotice'], t: '雲訊之亭', d: '最新公告和活動消息都在這裡。亮起紅點就代表有新消息，記得進來看看。' },
   { t: '準備好了！', d: '有問題隨時點右上角的「？」看規則說明。現在就踏進第一道試煉吧！' }
 ];
-function startTour(force) {
-  const key = 'tq2tour:' + (S.user ? S.user.uid : '');
+/* 試煉教學：第一次點「進入試煉」時出現（選門畫面＋示範戰鬥畫面） */
+const TRIAL_TOUR = [
+  { el: ['.dr-door'], box: 'bottom', t: '四道試煉之門', d: '每道門對應一種商品：噬金魔窟＝黃金、虛空深淵＝比特幣、造夢峽谷＝納斯達克、鏽蝕要塞＝道瓊。四道門各自闖關，門下的標籤是「目前關卡／總關數」。' },
+  { el: ['#chart'], box: 'bottom', battle: true, t: '看盤判斷多空', d: '這是真實的歷史行情。右邊藏著接下來的 3 根 K 棒，上下兩條金色虛線是做多線和做空線。猜猜價格會碰到哪一條？' },
+  { el: ['#actions'], box: 'top', battle: true, t: '選擇出手', d: '覺得會往上碰到做多線就按「做多」，往下碰到做空線就按「做空」；看不出方向、覺得上下都碰不到，就選「不進場」。' },
+  { el: ['#bBal'], box: 'bottom', battle: true, t: '獲得或減少本金', d: '答對 +300 U（數據魔王關 +500 U）。做多、做空答錯 −300 U（魔王關 −500 U）；選不進場答錯只扣 −100 U（魔王關 −200 U）。' },
+  { el: ['#bSR', '#chart'], box: 'bottom', battle: true, srDemo: true, t: '道具：支撐壓力', d: '看不出方向時，可以按「支撐壓力」，支付 50 U 自動畫出壓力線（紅）和支撐線（綠），看看價格可能在哪裡被擋住。同一關付一次就能隨時開關。' },
+  { el: ['#streak'], box: 'bottom', battle: true, t: '連勝獎勵', d: '每連續答對 3 次，額外再 +500 U！答錯會歸零，穩穩地判斷比亂猜更划算。' },
+  { t: '出發吧！', d: '選一道門，開始你的第一道試煉。有問題隨時點「規則」或右上角的「？」查看說明。' }
+];
+function startTour(force, steps, kp) {
+  const TOUR_ = steps || TOUR, key = (kp || 'tq2tour:') + (S.user ? S.user.uid : '');
   if (!force) { try { if (localStorage.getItem(key)) return; } catch (e) {} }
   closeSheet && $('#sheet') && !$('#sheet').hidden && closeSheet();
   let ov = $('#tour'); if (!ov) { ov = document.createElement('div'); ov.id = 'tour'; ov.setAttribute('role', 'dialog'); ov.setAttribute('aria-label', '新手教學');
@@ -1934,23 +1958,35 @@ function startTour(force) {
   let i = 0;
   const box = $('#trBox'), hole = $('#trHole');
   const rectOf = sels => { const a = $('#app').getBoundingClientRect(); let r = null;
-    sels.forEach(q => { const e = document.querySelector(q); if (!e || !e.offsetParent) return; const b = e.getBoundingClientRect(); if (!b.width) return;
-      r = r ? { l: Math.min(r.l, b.left), t: Math.min(r.t, b.top), r: Math.max(r.r, b.right), b: Math.max(r.b, b.bottom) } : { l: b.left, t: b.top, r: b.right, b: b.bottom }; });
+    sels.forEach(q => document.querySelectorAll(q).forEach(e => { if (!e.offsetParent) return; const b = e.getBoundingClientRect(); if (!b.width) return;
+      r = r ? { l: Math.min(r.l, b.left), t: Math.min(r.t, b.top), r: Math.max(r.r, b.right), b: Math.max(r.b, b.bottom) } : { l: b.left, t: b.top, r: b.right, b: b.bottom }; }));
     return r && { x: r.l - a.left, y: r.t - a.top, w: r.r - r.l, h: r.b - r.t, H: a.height, W: a.width }; };
+  /* 介紹戰鬥畫面的步驟：開一個示範用的戰鬥畫面（不能作答、不會扣錢），離開這一步就關掉 */
+  let demo = false;
+  const battleDemo = on => {
+    if (on && !demo) { demo = true; const n = 999999, q = demoFloor(n);
+      const a = DOORS[q.assetKey] ? q.assetKey : 'gold';
+      enterBattle({ q, floor: n, door: a, lv: 1, boss: null, label: doorLabel(a, 1), preview: true, srOwned: true, srOn: false }, true);
+      lockActs(true); $('#lots').hidden = true; srPaint(); $('#bSR').textContent = '支撐壓力'; $('#bBal').textContent = fmt(S.user.balance); requestAnimationFrame(() => drawChart(0)); }
+    else if (!on && demo) { demo = false; exitBattle(); }
+  };
   const show = () => {
-    const st = TOUR[i], last = i === TOUR.length - 1;
-    $('#trN').textContent = `${i + 1} / ${TOUR.length}`; $('#trT').textContent = st.t; $('#trD').textContent = st.d;
+    const st = TOUR_[i], last = i === TOUR_.length - 1;
+    battleDemo(!!st.battle);
+    if (demo && S.battle) { S.battle.srOn = !!st.srDemo; srPaint(); $('#bSR').textContent = '支撐壓力'; drawChart(0); }
+    $('#trN').textContent = `${i + 1} / ${TOUR_.length}`; $('#trT').textContent = st.t; $('#trD').textContent = st.d;
     $('#trPrev').disabled = i === 0; $('#trNext').classList.toggle('last', last); $('#trNext').setAttribute('aria-label', last ? '開始試煉' : '下一步');
     const r = st.el && rectOf(st.el), pad = 8;
     if (r) {
       Object.assign(hole.style, { left: r.x - pad + 'px', top: r.y - pad + 'px', width: r.w + pad * 2 + 'px', height: r.h + pad * 2 + 'px', borderRadius: Math.min(r.w, r.h) > 80 ? '18px' : '999px', opacity: 1 });
-      const below = r.y + r.h / 2 < r.H / 2;   // 亮處在上半部就把說明放下面，反之放上面
-      box.style.top = below ? (r.y + r.h + pad + 14) + 'px' : ''; box.style.bottom = below ? '' : (r.H - r.y + pad + 14) + 'px';
+      const below = st.box === 'bottom' ? false : st.box === 'top' ? true : r.y + r.h / 2 < r.H / 2;   // 亮處在上半部就把說明放下面，反之放上面
+      box.style.top = below ? (r.y + r.h + pad + 14) + 'px' : ''; box.style.bottom = st.box === 'bottom' ? '16px' : below ? '' : (r.H - r.y + pad + 14) + 'px';
+      if (st.box === 'top') { box.style.top = '16px'; box.style.bottom = ''; }
       box.classList.remove('mid');
     } else { Object.assign(hole.style, { left: '50%', top: '50%', width: '0px', height: '0px', opacity: 1 }); box.style.top = ''; box.style.bottom = ''; box.classList.add('mid'); }
   };
-  const end = () => { ov.hidden = true; try { localStorage.setItem(key, '1'); } catch (e) {} };
-  $('#trNext').onclick = () => { if (i < TOUR.length - 1) { i++; show(); } else end(); };
+  const end = () => { battleDemo(false); ov.hidden = true; try { localStorage.setItem(key, '1'); } catch (e) {} };
+  $('#trNext').onclick = () => { if (i < TOUR_.length - 1) { i++; show(); } else end(); };
   $('#trPrev').onclick = () => { if (i > 0) { i--; show(); } };
   ov.hidden = false; requestAnimationFrame(show);
   window.addEventListener('resize', () => { if (!ov.hidden) show(); });
@@ -2169,6 +2205,7 @@ async function openDoors() {
       <span class="dr-chip" data-chip="${a}" style="left:${pct(D.x, 941)};top:${pct(D.cy, 1672)}"></span>`; }).join('');
   el.querySelectorAll('.dr-door').forEach(b => b.onclick = () => startFloor(b.dataset.door));
   $('#doorsScr').hidden = false; doorsPaint();
+  setTimeout(() => startTour(false, TRIAL_TOUR, 'tq2tour2:'), 350);   // 第一次進來：試煉教學
 }
 const DOORS_PF = {};
 function closeDoors() { $('#doorsScr').hidden = true; renderHome(); }
@@ -2208,6 +2245,19 @@ function candleMins(q, is15, n) {
   const first = is15 ? a - 15 : Math.floor((a - 1) / 60) * 60;   // 最後一根的開盤時間
   return Array.from({ length: n }, (_, i) => (((first - (n - 1 - i) * step) % 1440) + 1440) % 1440);
 }
+/* 支撐壓力（道具）：只用看得到的 K 棒找轉折高低點，價位接近的合併成一條線；上方、下方各取最近的 2 條 */
+function srLevels(cs, now) {
+  const n = cs.length, piv = [], K = 2; if (n < 6) return { res: [], sup: [] };
+  for (let i = K; i < n - K; i++) { let isH = true, isL = true;
+    for (let j = i - K; j <= i + K; j++) { if (j === i) continue; if (cs[j][1] > cs[i][1]) isH = false; if (cs[j][2] < cs[i][2]) isL = false; }
+    if (isH) piv.push(cs[i][1]); if (isL) piv.push(cs[i][2]); }
+  piv.push(Math.max(...cs.map(c => c[1])), Math.min(...cs.map(c => c[2])));   // 整段的最高、最低也算
+  const rng = cs.reduce((s, c) => s + c[1] - c[2], 0) / n, tol = rng * .6, cl = [];
+  piv.sort((a, b) => a - b).forEach(p => { const c = cl[cl.length - 1]; if (c && p - c.max <= tol) { c.sum += p; c.n++; c.max = p; } else cl.push({ sum: p, n: 1, max: p }); });
+  const lv = cl.map(c => ({ p: c.sum / c.n, n: c.n }));
+  return { res: lv.filter(x => x.p > now + rng * .15).sort((a, b) => a.p - b.p).slice(0, 2),
+           sup: lv.filter(x => x.p < now - rng * .15).sort((a, b) => b.p - a.p).slice(0, 2) };
+}
 function drawChart(reveal, o) {   // o：回憶之廊用 { cv, q, ans }，沒給就是畫戰鬥中的盤面
   const b = o || S.battle; if (!b) return;
   const q = b.q, cv = (o && o.cv) || $('#chart'), V = cssv(), dpr = window.devicePixelRatio || 1;
@@ -2238,6 +2288,16 @@ function drawChart(reveal, o) {   // o：回憶之廊用 { cv, q, ans }，沒給
     g.fillStyle = '#d4a44618'; g.fillRect(xb, yu, plotW - xb, yd - yu);
     g.strokeStyle = '#d4a44688'; g.setLineDash([3, 3]); g.beginPath(); g.moveTo(xb, yu); g.lineTo(plotW, yu); g.moveTo(xb, yd); g.lineTo(plotW, yd); g.stroke(); g.setLineDash([]);
   }
+  if (!o && b.srOn) {   // 支撐壓力線（畫在 K 棒後面）
+    const L = srLevels(is15 ? q.vis : q.h1, last);
+    [['res', '#ff8a7a', '壓力'], ['sup', '#5be3a0', '支撐']].forEach(([k, col, nm]) => L[k].forEach(x => {
+      const y = Y(x.p); if (y < top || y > bot) return;
+      g.save(); g.strokeStyle = col; g.globalAlpha = .85; g.lineWidth = Math.min(3, .8 + x.n * .5); g.setLineDash([6, 4]);
+      g.beginPath(); g.moveTo(0, y); g.lineTo(plotW, y); g.stroke(); g.setLineDash([]); g.globalAlpha = 1;
+      const t = `${nm} ${x.p.toFixed(dp)}`, tw = g.measureText(t).width + 8;
+      g.fillStyle = '#0b1236d9'; g.fillRect(2, y - 15, tw, 13); g.fillStyle = col; g.textAlign = 'left'; g.fillText(t, 6, y - 8.5); g.restore();
+    }));
+  }
   shown.forEach(([o, h, l, c], i) => {
     const x = step * (i + 0.5), up = c >= o, isF = i >= vis.length, col = up ? V('--long') : V('--short');
     g.strokeStyle = col; g.fillStyle = col; g.lineWidth = 1;
@@ -2250,11 +2310,6 @@ function drawChart(reveal, o) {   // o：回憶之廊用 { cv, q, ans }，沒給
     const xb = step * vis.length;
     g.setLineDash([4, 4]); g.strokeStyle = V('--gold'); g.beginPath(); g.moveTo(xb, top); g.lineTo(xb, bot); g.stroke(); g.setLineDash([]);
     g.fillStyle = V('--gold-hi'); g.textAlign = 'center'; { const lb = q.sourceHour ? `現在 ${q.sourceHour}` : '現在', hw = g.measureText(lb).width / 2 + 2; g.fillText(lb, Math.min(Math.max(xb, hw), plotW - hw), bot + 9); }   // 「現在」旁邊標上這根 K 棒的時間（台北）
-    for (let k = fut.length; k < 3; k++) {
-      const x = step * (vis.length + k + 0.5), yh = (top + bot) / 2, hw = Math.max(bw + 2, 10);
-      g.strokeStyle = V('--gold'); g.setLineDash([3, 3]); g.strokeRect(x - hw / 2, yh - 26, hw, 52); g.setLineDash([]);
-      g.fillStyle = V('--gold-hi'); g.fillText('?', x, yh);
-    }
   } else { g.fillStyle = V('--muted'); g.textAlign = 'right'; g.fillText('1H 輔助視角（只到現在這一刻）', plotW, candleMins(q, false, 1) ? top + 8 : bot + 9); }
   /* 時間刻度：15 分圖每到整點標一次（每 4 根），1 小時圖每 4 小時標一次 */
   { const mins = candleMins(q, is15, vis.length), xNow = step * vis.length;
@@ -2445,6 +2500,25 @@ function renderStreak(n, flash) {
   if (flash) { const el = $('#streak'); el.classList.remove('shake'); void el.offsetWidth; el.classList.add('shake'); }
 }
 function setTf(tf) { S.tf = tf; document.querySelectorAll('.tabs button').forEach(t => t.classList.toggle('on', t.dataset.tf === tf)); }
+/* 支撐壓力道具：每關第一次打開扣 50 U（同一關之後再開關都免費）；要按兩下確認，避免誤觸 */
+const SR_COST = 50, srKey = n => `tq2sr:${S.user ? S.user.uid : ''}:${n}`;
+function srPaint() {
+  const b = S.battle, x = $('#bSR'); if (!b || !x) return;
+  b.srOwned = b.srOwned || store(srKey(b.floor)) === 1;
+  x.classList.toggle('on', !!b.srOn); x.classList.remove('ask');
+  x.textContent = b.srOwned ? (b.srOn ? '隱藏線' : '支撐壓力') : '支撐壓力';
+  x.title = b.srOwned ? '這一關已經解鎖，可以隨時開關' : `自動標出支撐與壓力（這一關 ${SR_COST} U）`;
+}
+async function srClick() {
+  const b = S.battle, x = $('#bSR'); if (!b || !S.user || b.preview) return;
+  if (b.srOwned) { b.srOn = !b.srOn; srPaint(); drawChart(b.reveal || 0); return; }
+  if (S.user.balance < SR_COST) return toast(`本金不足 ${SR_COST} U，無法使用支撐壓力。`);
+  if (!x.classList.contains('ask')) { x.classList.add('ask'); x.textContent = `確定 −${SR_COST} U？`; clearTimeout(srClick.t); srClick.t = setTimeout(() => { if (x.classList.contains('ask')) srPaint(); }, 3000); return; }
+  x.disabled = true;
+  try { const nu = await B.buyTool(SR_COST); if (nu) S.user = nu; b.srOwned = b.srOn = true; store(srKey(b.floor), 1); renderHome(); $('#bBal').textContent = fmt(S.user.balance); toast(`已使用支撐壓力 −${SR_COST} U（這一關可以隨時開關）`); }
+  catch (e) { console.warn(e); toast(e.code === 'permission-denied' ? '使用失敗：請確認 Firestore 規則已更新。' : '使用失敗，請稍後再試。'); }
+  x.disabled = false; srPaint(); drawChart(b.reveal || 0);
+}
 function lockActs(on, pick) { document.querySelectorAll('.act').forEach(x => { x.disabled = on; x.classList.toggle('picked', !!pick && DIRS[x.dataset.dir] === pick); }); }
 function enterBattle(ctx, resume) {
   S.battle = ctx; ctx.reveal = 0; ctx.locked = !resume; ctx.ans = null; setTf('15m');
@@ -2463,8 +2537,10 @@ function enterBattle(ctx, resume) {
     L.querySelectorAll('button').forEach(x => x.onclick = () => { if (!L.classList.contains('locked')) setM(+x.dataset.m); }); }
   const q = ctx.q, ev = ctx.boss && (EVENT_INFO[ctx.boss.type] || EVENT_INFO.VOL), dp = dpOf(q), a = q.vis[q.vis.length - 1][3];
   const when = q.sessionLabel ? `${q.sessionLabel} · ` : '';   // 時間改標在圖上「現在」那根 K 棒旁邊
-  $('#cSym').innerHTML = `${esc(q.name)}<small>${ev ? '⚠ ' + esc(ev.data ? ev.name + '公布前一刻' : ev.name) + ' · ' : ''}${esc(when)}${q.demo ? '模擬盤面' : '真實歷史行情'}</small>`;
+  const nm = /^(.*?)\s*\((.*)\)$/.exec(q.name) || [0, q.name, ''];   // 「黃金現貨(XAUUSD)」→ 大字「黃金現貨」，代號放到下一行
+  $('#cSym').innerHTML = `${esc(nm[1])}<small>${nm[2] ? esc(nm[2]) + ' · ' : ''}${ev ? '⚠ ' + esc(ev.data ? ev.name + '公布前一刻' : ev.name) + ' · ' : ''}${esc(when)}${q.demo ? '模擬盤面' : '真實歷史行情'}</small>`;
   $('#cFoot').textContent = `現價 ${a.toFixed(dp)}，判定點數 ${q.pts} 點。之後 3 根裡碰到 ${(a + q.pts).toFixed(dp)} 且第 3 根收盤不低於現價＝做多；碰到 ${(a - q.pts).toFixed(dp)} 且第 3 根收盤不高於現價＝做空；其餘＝盤整，不進場勝。答對 +${q.stake} U、答錯 −${q.stake} U。`;
+  srPaint();
   renderStreak(S.user.streak);
   lockActs(!resume);
   $('#actions').hidden = false; $('#result').hidden = true;
@@ -2707,6 +2783,13 @@ function openSheet(kind) {
         <li>每一關只能出手一次，送出後不能改。答對答錯都會前進到這道門的下一關。</li>
         <li>邀請好友註冊並填你的信箱：+${fmt(CONFIG.invite)} U。</li>
       </ul>
+      <h3>道具：支撐壓力</h3>
+      <ul>
+        <li>戰鬥時按圖表上方的「支撐壓力」，再按一次確認，扣 ${SR_COST} U。</li>
+        <li>圖上會自動畫出離現價最近的壓力線（紅色，最多 2 條）和支撐線（綠色，最多 2 條），線越粗代表價格越常在那裡轉折。</li>
+        <li>15m 和 1H 各自計算；同一關付過一次就能隨時開關，不會重複扣款。</li>
+        <li>線只用看得到的 K 棒算出來，不會透露答案，僅供參考。看到做多線上方就有壓力擋著時，要特別小心。</li>
+      </ul>
       <h3>音樂出處</h3>
       <p class="credits">主畫面音樂：“The Epic Hero” by Keys of Moon（CC BY 4.0）<br>戰鬥音樂：“Legionnaire” by Scott Buckley（CC BY 4.0）· www.scottbuckley.com.au</p></div>`;
     $('#sheet').hidden = false; return;
@@ -2755,6 +2838,7 @@ function openSheet(kind) {
         <div class="adm-row"><label for="admD">跳關</label><select id="admD" class="adm-sel">${DOOR_KEYS.map(a => `<option value="${a}">${DOORS[a].name}</option>`).join('')}</select><input id="admN" type="number" inputmode="numeric" min="1" value="${doorDone(u, 'gold') + 1}" aria-label="第幾關"><button id="admGo">前往</button></div>
         <div class="adm-row adm-r2"><button id="admRisk" class="adm-alt" aria-pressed="${u.riskTest}">套用風控護盾：${u.riskTest ? '開' : '關'}</button><button id="admFill" class="adm-alt">補滿額度</button></div>
         <div class="adm-row adm-r2"><button id="admStory" class="adm-alt">重看開頭故事</button><button id="admTour" class="adm-alt">重看新手教學</button></div>
+        <div class="adm-row adm-r2"><button id="admTour2" class="adm-alt">重看試煉教學</button></div>
         <button id="admReset" class="adm-reset">重置我的關卡紀錄</button><p class="adm-msg" id="admMsg">${DOOR_KEYS.map(a => `${DOORS[a].name} ${((doorsList() || {})[a] || []).length} 關`).join('・')}。跳關只改進度，本金和戰績不變。</p></div>`);
       const msg = t => { const m = $('#admMsg'); if (m) m.textContent = t; };
       const run = async (patch, done) => { try { const nu = await B.adminSet(patch); if (nu) S.user = nu; S.seen = {}; renderHome(); done(); } catch (e) { msg('失敗：' + (e.code === 'permission-denied' ? '請先更新 Firestore 規則' : e.message)); } };
@@ -2764,6 +2848,7 @@ function openSheet(kind) {
       $('#admRisk').onclick = () => run({ riskTest: !u.riskTest }, () => { openSheet('account'); toast(u.riskTest ? '風控護盾：管理員不受限。' : '風控護盾：已套用，和一般玩家一樣會扣額度、會被鎖。'); });
       $('#admStory').onclick = () => { closeSheet(); STORY_P = null; introStory(true); };
       $('#admTour').onclick = () => { closeSheet(); setTimeout(() => startTour(true), 300); };
+      $('#admTour2').onclick = () => { closeSheet(); openDoors().then(() => setTimeout(() => startTour(true, TRIAL_TOUR, 'tq2tour2:'), 400)); };
       $('#admFill').onclick = () => run({ riskDebt: 0 }, () => { closeSheet(); toast('風控護盾已補滿。'); });
       let armed = false;
       $('#admReset').onclick = () => { if (!armed) { armed = true; $('#admReset').textContent = '再按一次確認重置'; return; }
@@ -2864,6 +2949,7 @@ function bindUI() {
   $('#sheet').onclick = e => { if (e.target.id === 'sheet') closeSheet(); };
   $('#bExit').onclick = exitBattle;
   $('#bRules').onclick = () => openSheet('rules');
+  $('#bSR').onclick = srClick;
   $('#wBack').onclick = () => { $('#warning').hidden = true; S.pending = null; };
   $('#drBack').onclick = closeDoors;
   $('#wGo').onclick = () => { $('#warning').hidden = true; const c = S.pending; S.pending = null; if (c) enterBattle(c); };
