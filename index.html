@@ -2102,12 +2102,13 @@ const noteTime = ms => { const t = new Date(ms + 8 * 36e5), p = n => String(n).p
 async function noticeDot() { if (Date.now() - (NOTE.at || 0) < 3e5) return; NOTE.at = Date.now(); try { const l = await B.notices(), top = Math.max(0, ...l.map(x => x.ts)); const d = $('#noteDot'); if (d) d.hidden = !(top > NOTE.seen()); } catch (e) {} }
 /* 破局者同盟：學習社群。要加新的社群就在這裡加一筆 */
 const GUILDS = [
-  { name: '黃金拼刀樂', app: 'Telegram 社群', text: '對交易黃金有興趣的朋朋，一起來討論行情～', url: 'https://t.me/+C9iQpzuMiXY4NTk1' }
+  { name: '黃金拼刀樂', app: 'Telegram 社群', text: '對交易黃金有興趣的朋朋，一起來討論行情～', url: 'https://t.me/+C9iQpzuMiXY4NTk1' },
+  { name: '私訊遊戲作者', app: 'Threads', text: '想討論其他商品或是給予遊戲建議，可以私訊我的 Threads！', url: 'https://www.threads.com/@chartwith.cc', btn: '前往 Threads 私訊' }
 ];
 function guildPane() {
   return `<p class="gd-intro">獨自闖關很孤單！加入破局者同盟，和其他冒險者一起覆盤、交流盤勢吧～～</p>
     <ul class="nt-list gd-list">${GUILDS.map(g => `<li class="gd-card"><div class="gd-head"><b>${esc(g.name)}</b><span>${esc(g.app)}</span></div><p>${esc(g.text)}</p>
-      <a class="btn gold gd-go" href="${esc(g.url)}" target="_blank" rel="noopener">加入同盟</a></li>`).join('')}</ul>`;
+      <a class="btn gold gd-go" href="${esc(g.url)}" target="_blank" rel="noopener">${esc(g.btn || '加入同盟')}</a></li>`).join('')}</ul>`;
 }
 async function noticeSheet(tab) {
   NOTE.tab = tab || NOTE.tab || 'news';
